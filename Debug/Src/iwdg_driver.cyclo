@@ -1,0 +1,2 @@
+../Src/iwdg_driver.c:3:6:IWDG_Init	1
+../Src/iwdg_driver.c:11:6:IWDG_Refresh	1

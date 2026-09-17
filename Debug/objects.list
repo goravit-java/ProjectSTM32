@@ -1,0 +1,8 @@
+"./Src/adc_driver.o"
+"./Src/gpio_driver.o"
+"./Src/iwdg_driver.o"
+"./Src/main.o"
+"./Src/syscalls.o"
+"./Src/sysmem.o"
+"./Src/uart_driver.o"
+"./Startup/startup_stm32f401retx.o"
