@@ -6,29 +6,44 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Src/adc_driver.c \
+../Src/dht11_driver.c \
+../Src/fsm.c \
 ../Src/gpio_driver.c \
 ../Src/iwdg_driver.c \
 ../Src/main.c \
+../Src/menu.c \
+../Src/safety.c \
 ../Src/syscalls.c \
 ../Src/sysmem.c \
+../Src/tim2_driver.c \
 ../Src/uart_driver.c 
 
 OBJS += \
 ./Src/adc_driver.o \
+./Src/dht11_driver.o \
+./Src/fsm.o \
 ./Src/gpio_driver.o \
 ./Src/iwdg_driver.o \
 ./Src/main.o \
+./Src/menu.o \
+./Src/safety.o \
 ./Src/syscalls.o \
 ./Src/sysmem.o \
+./Src/tim2_driver.o \
 ./Src/uart_driver.o 
 
 C_DEPS += \
 ./Src/adc_driver.d \
+./Src/dht11_driver.d \
+./Src/fsm.d \
 ./Src/gpio_driver.d \
 ./Src/iwdg_driver.d \
 ./Src/main.d \
+./Src/menu.d \
+./Src/safety.d \
 ./Src/syscalls.d \
 ./Src/sysmem.d \
+./Src/tim2_driver.d \
 ./Src/uart_driver.d 
 
 
@@ -39,7 +54,7 @@ Src/%.o Src/%.su Src/%.cyclo: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/adc_driver.cyclo ./Src/adc_driver.d ./Src/adc_driver.o ./Src/adc_driver.su ./Src/gpio_driver.cyclo ./Src/gpio_driver.d ./Src/gpio_driver.o ./Src/gpio_driver.su ./Src/iwdg_driver.cyclo ./Src/iwdg_driver.d ./Src/iwdg_driver.o ./Src/iwdg_driver.su ./Src/main.cyclo ./Src/main.d ./Src/main.o ./Src/main.su ./Src/syscalls.cyclo ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.cyclo ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/uart_driver.cyclo ./Src/uart_driver.d ./Src/uart_driver.o ./Src/uart_driver.su
+	-$(RM) ./Src/adc_driver.cyclo ./Src/adc_driver.d ./Src/adc_driver.o ./Src/adc_driver.su ./Src/dht11_driver.cyclo ./Src/dht11_driver.d ./Src/dht11_driver.o ./Src/dht11_driver.su ./Src/fsm.cyclo ./Src/fsm.d ./Src/fsm.o ./Src/fsm.su ./Src/gpio_driver.cyclo ./Src/gpio_driver.d ./Src/gpio_driver.o ./Src/gpio_driver.su ./Src/iwdg_driver.cyclo ./Src/iwdg_driver.d ./Src/iwdg_driver.o ./Src/iwdg_driver.su ./Src/main.cyclo ./Src/main.d ./Src/main.o ./Src/main.su ./Src/menu.cyclo ./Src/menu.d ./Src/menu.o ./Src/menu.su ./Src/safety.cyclo ./Src/safety.d ./Src/safety.o ./Src/safety.su ./Src/syscalls.cyclo ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.cyclo ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/tim2_driver.cyclo ./Src/tim2_driver.d ./Src/tim2_driver.o ./Src/tim2_driver.su ./Src/uart_driver.cyclo ./Src/uart_driver.d ./Src/uart_driver.o ./Src/uart_driver.su
 
 .PHONY: clean-Src
 

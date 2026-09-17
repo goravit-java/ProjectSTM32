@@ -40,5 +40,33 @@ void LED_Toggle(GPIO_TypeDef *GPIOx, uint8_t pin) {
 }
 
 uint8_t BTN_IsPressed(GPIO_TypeDef *GPIOx, uint8_t pin) {
-    return ((GPIOx->IDR & (1U << pin)) == 0) ? 1 : 0;
+    return ((GPIOx->IDR & (1U << pin)) == 0U) ? 1U : 0U;
+}
+
+/* ตั้งค่า Mode ของขา (Input/Output/AF/Analog) ทีละขา ใช้เวลาต้องสลับ Direction แบบ Dynamic
+ * เช่น DHT11 ที่ต้องเป็น Output ตอนส่ง Start Signal แล้วสลับเป็น Input ตอนอ่านข้อมูลกลับ
+ */
+void GPIO_SetPinMode(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t mode) {
+    GPIOx->MODER &= ~(3U << ((uint32_t)pin * 2U));
+    GPIOx->MODER |= ((uint32_t)mode << ((uint32_t)pin * 2U));
+}
+
+/* ตั้งค่า Pull-up/Pull-down ของขา (0=ไม่ต่อ, 1=Pull-up, 2=Pull-down) */
+void GPIO_SetPinPull(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t pull) {
+    GPIOx->PUPDR &= ~(3U << ((uint32_t)pin * 2U));
+    GPIOx->PUPDR |= ((uint32_t)pull << ((uint32_t)pin * 2U));
+}
+
+/* เขียนค่า Digital Output ของขา (state: 0=Low, 1=High) ผ่าน BSRR (Atomic, ปลอดภัยกว่าการแก้ ODR ตรง ๆ) */
+void GPIO_WritePin(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t state) {
+    if (state != 0U) {
+        GPIOx->BSRR = (1U << pin);
+    } else {
+        GPIOx->BSRR = (1U << (pin + 16U));
+    }
+}
+
+/* อ่านค่า Digital Input ของขา คืนค่า 0 หรือ 1 */
+uint8_t GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint8_t pin) {
+    return ((GPIOx->IDR & (1U << pin)) != 0U) ? 1U : 0U;
 }

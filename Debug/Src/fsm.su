@@ -1,0 +1,6 @@
+../Src/fsm.c:31:6:FSM_Init	4	static
+../Src/fsm.c:41:15:FSM_GetState	4	static
+../Src/fsm.c:45:6:FSM_Run	24	static
+../Src/fsm.c:183:16:EdgePressed	32	static
+../Src/fsm.c:191:13:FSM_UpdateOutputs	8	static
+../Src/fsm.c:223:13:FSM_EnterState	16	static

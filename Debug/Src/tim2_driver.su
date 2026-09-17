@@ -1,0 +1,3 @@
+../Src/tim2_driver.c:8:6:TIM2_Init	4	static
+../Src/tim2_driver.c:17:10:TIM2_GetMicros	4	static
+../Src/tim2_driver.c:24:6:TIM2_DelayUs	24	static

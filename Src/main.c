@@ -1,88 +1,81 @@
 #include "stm32f411xx_custom.h"
 #include "gpio_driver.h"
 #include "uart_driver.h"
+#include "adc_driver.h"
+#include "iwdg_driver.h"
+#include "safety.h"
+#include "menu.h"
+#include "fsm.h"
+#include "dht11_driver.h"
+
+/* DHT11 อ่านค่าได้ไม่เร็วกว่า 1 ครั้ง/วินาที จึงอ่านทุก ๆ ~2 วินาทีแทนที่จะอ่านทุกรอบ Loop
+ * (Loop หลักวิ่งทุก ~20ms ดังนั้น 100 รอบ Loop โดยประมาณ = 2 วินาที)
+ */
+#define DHT11_READ_INTERVAL_TICKS   100U
 
 static void delay_ms(volatile uint32_t ms) {
     for (volatile uint32_t i = 0; i < ms * 3000; i++) {
         __asm("NOP");
     }
 }
-/* ฟังก์ชันสำหรับส่งค่าอุณหภูมิ float (ทศนิยม 2 ตำแหน่ง) ออกทาง UART */
-void UART2_PrintTemperature(float temp) {
-    if (temp < 0.0f) {
-        UART2_SendString("TIMEOUT ERROR!\r\n");
-        return;
-    }
 
-    int integer_part = (int)temp;
-    int decimal_part = (int)((temp - (float)integer_part) * 100.0f);
-
-    UART2_SendString("Current Temp: ");
-
-    /* แปลงและส่งเลขส่วนจำนวนเต็ม */
-    char buf[10];
-    int i = 0;
-    if (integer_part == 0) UART2_SendChar('0');
-    while (integer_part > 0) {
-        buf[i++] = (integer_part % 10) + '0';
-        integer_part /= 10;
-    }
-    while (i > 0) UART2_SendChar(buf[--i]);
-
-    UART2_SendString(".");
-
-    /* เติม 0 นำหน้ากรณีทศนิยมหลักเดียว เช่น .05 */
-    if (decimal_part < 10) UART2_SendString("0");
-
-    /* แปลงและส่งเลขส่วนทศนิยม */
-    i = 0;
-    if (decimal_part == 0) UART2_SendChar('0');
-    while (decimal_part > 0) {
-        buf[i++] = (decimal_part % 10) + '0';
-        decimal_part /= 10;
-    }
-    while (i > 0) UART2_SendChar(buf[--i]);
-
-    UART2_SendString(" C\r\n");
+/* เปิดใช้งาน Hardware FPU ของ Cortex-M4 (ต้องเรียกก่อนมีการใช้ float/double ใด ๆ ทั้งหมด)
+ * ให้สิทธิ์ Full Access กับ Coprocessor 10 และ 11 (บิต 20-23 ของ CPACR)
+ * ตามด้วย DSB/ISB เพื่อให้แน่ใจว่าการตั้งค่ามีผลก่อนคำสั่งถัดไปจะถูกดึงมา Execute
+ */
+static void FPU_Enable(void) {
+    SCB_CPACR |= (0xFU << 20);
+    __asm volatile ("dsb");
+    __asm volatile ("isb");
 }
+
 int main(void) {
+    uint32_t dht11_tick = 0U;
+
+    FPU_Enable();  /* ต้องเป็นบรรทัดแรกสุดของ main() เสมอ ก่อนโค้ดส่วนอื่นที่อาจมี float แฝงอยู่ */
+
     GPIO_Init();
     UART2_Init();
+    ADC1_Init();
+    DHT11_Init();
+    Menu_Init();
+    FSM_Init();
+    IWDG_Init();   /* ทำเป็นลำดับสุดท้ายของการ Init เสมอ เผื่อ Init ตัวอื่นค้างจะได้โดน Reset */
 
     UART2_SendString("\r\n========================================\r\n");
     UART2_SendString("   Smart Vending Machine Controller     \r\n");
-    UART2_SendString("   Day 1: Hardware & Comms Initialized  \r\n");
+    UART2_SendString("   Day 4: Simulation, Refactor & Test    \r\n");
     UART2_SendString("========================================\r\n");
 
+    Menu_PrintAll();
+
     while (1) {
-        /* ใช้ else if เพื่อให้ประมวลผลได้ทีละ 1 ปุ่มเท่านั้น ป้องกันการกดพร้อมกัน */
-        if (BTN_IsPressed(BTN_UP_PORT, BTN_UP_PIN)) {
-            LED_On(LED1_PORT, LED1_PIN);
-            UART2_SendString("[INPUT] Button UP Pressed\r\n");
-            delay_ms(250); // กันกดซ้ำ/กดค้าง
+        IWDG_Refresh(); /* เลี้ยง Watchdog ทุกรอบ Loop ป้องกันโปรแกรมค้างแล้วไม่มีใครรู้ */
+
+        FSM_Run();       /* อ่านปุ่ม + ประมวลผล 1 Tick ของ State ปัจจุบัน (ไม่ Block) */
+
+        dht11_tick++;
+        if (dht11_tick >= DHT11_READ_INTERVAL_TICKS) {
+            DHT11_Data_t dht_data;
+
+            dht11_tick = 0U;
+
+            if (DHT11_Read(&dht_data) != 0U) {
+                UART2_SendString("[DHT11] Humidity: ");
+                UART2_SendUint(dht_data.humidity);
+                UART2_SendString(" %RH | Temp: ");
+                if (dht_data.temperature < 0) {
+                    UART2_SendString("-");
+                    UART2_SendUint((uint32_t)(-(int32_t)dht_data.temperature));
+                } else {
+                    UART2_SendUint((uint32_t)dht_data.temperature);
+                }
+                UART2_SendString(" C\r\n");
+            } else {
+                UART2_SendString("[DHT11] Read failed (timeout/checksum) - check wiring\r\n");
+            }
         }
-        else if (BTN_IsPressed(BTN_DOWN_PORT, BTN_DOWN_PIN)) {
-            LED_On(LED2_PORT, LED2_PIN);
-            UART2_SendString("[INPUT] Button DOWN Pressed\r\n");
-            delay_ms(250);
-        }
-        else if (BTN_IsPressed(BTN_OK_PORT, BTN_OK_PIN)) {
-            LED_On(LED3_PORT, LED3_PIN);
-            UART2_SendString("[INPUT] Button OK Pressed\r\n");
-            delay_ms(250);
-        }
-        else if (BTN_IsPressed(BTN_BACK_PORT, BTN_BACK_PIN)) {
-            LED_On(LED4_PORT, LED4_PIN);
-            UART2_SendString("[INPUT] Button BACK Pressed\r\n");
-            delay_ms(250);
-            UART2_PrintTemperature(10);
-        }
-        else {
-            /* เมื่อไม่มีการกดปุ่มใดๆ ให้ปิด LED ทั้งหมด */
-            LED_Off(LED1_PORT, LED1_PIN);
-            LED_Off(LED2_PORT, LED2_PIN);
-            LED_Off(LED3_PORT, LED3_PIN);
-            LED_Off(LED4_PORT, LED4_PIN);
-        }
+
+        delay_ms(20);    /* คาบเวลาสุ่มตรวจปุ่ม ~20ms ช่วย Debounce เบื้องต้น และเป็นฐานเวลาให้ FSM/DHT11 นับ Tick */
     }
 }

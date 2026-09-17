@@ -5,47 +5,47 @@ Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
   0 .isr_vector   00000194  08000000  08000000  00001000  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  1 .text         000005ac  08000194  08000194  00001194  2**2
+  1 .text         000010ac  08000194  08000194  00001194  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000160  08000740  08000740  00001740  2**2
+  2 .rodata       00000410  08001240  08001240  00002240  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  080008a0  080008a0  000018a8  2**0
+  3 .ARM.extab    00000000  08001650  08001650  00002658  2**0
                   CONTENTS, READONLY
-  4 .ARM          00000000  080008a0  080008a0  000018a8  2**0
+  4 .ARM          00000000  08001650  08001650  00002658  2**0
                   CONTENTS, READONLY
-  5 .preinit_array 00000000  080008a0  080008a8  000018a8  2**0
+  5 .preinit_array 00000000  08001650  08001658  00002658  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  080008a0  080008a0  000018a0  2**2
+  6 .init_array   00000004  08001650  08001650  00002650  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  080008a4  080008a4  000018a4  2**2
+  7 .fini_array   00000004  08001654  08001654  00002654  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         00000000  20000000  20000000  000018a8  2**0
+  8 .data         00000000  20000000  20000000  00002658  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          0000001c  20000000  080008a8  00002000  2**2
+  9 .bss          00000078  20000000  08001658  00003000  2**2
                   ALLOC
- 10 ._user_heap_stack 00000604  2000001c  080008a8  0000201c  2**0
+ 10 ._user_heap_stack 00000600  20000078  08001658  00003078  2**0
                   ALLOC
- 11 .ARM.attributes 00000030  00000000  00000000  000018a8  2**0
+ 11 .ARM.attributes 00000030  00000000  00000000  00002658  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00000845  00000000  00000000  000018d8  2**0
+ 12 .debug_info   00001be7  00000000  00000000  00002688  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00000398  00000000  00000000  0000211d  2**0
+ 13 .debug_abbrev 00000b66  00000000  00000000  0000426f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000000c8  00000000  00000000  000024b8  2**3
+ 14 .debug_aranges 00000248  00000000  00000000  00004dd8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00000085  00000000  00000000  00002580  2**0
+ 15 .debug_rnglists 00000189  00000000  00000000  00005020  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000001f0  00000000  00000000  00002605  2**0
+ 16 .debug_macro  00002174  00000000  00000000  000051a9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00000f8b  00000000  00000000  000027f5  2**0
+ 17 .debug_line   000035f9  00000000  00000000  0000731d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000040bf  00000000  00000000  00003780  2**0
+ 18 .debug_str    00007ed4  00000000  00000000  0000a916  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0000783f  2**0
+ 19 .comment      00000043  00000000  00000000  000127ea  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000001ec  00000000  00000000  00007884  2**2
+ 20 .debug_frame  00000638  00000000  00000000  00012830  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000065  00000000  00000000  00007a70  2**0
+ 21 .debug_line_str 00000065  00000000  00000000  00012e68  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -64,7 +64,7 @@ Disassembly of section .text:
  80001aa:	bd10      	pop	{r4, pc}
  80001ac:	20000000 	.word	0x20000000
  80001b0:	00000000 	.word	0x00000000
- 80001b4:	08000728 	.word	0x08000728
+ 80001b4:	08001228 	.word	0x08001228
 
 080001b8 <frame_dummy>:
  80001b8:	b508      	push	{r3, lr}
@@ -76,831 +76,2546 @@ Disassembly of section .text:
  80001c6:	bd08      	pop	{r3, pc}
  80001c8:	00000000 	.word	0x00000000
  80001cc:	20000004 	.word	0x20000004
- 80001d0:	08000728 	.word	0x08000728
+ 80001d0:	08001228 	.word	0x08001228
 
-080001d4 <GPIO_Init>:
+080001d4 <ADC1_Init>:
+#define TS_CAL1        (*((volatile uint16_t *) 0x1FFF7A2CUL))
+#define TS_CAL2        (*((volatile uint16_t *) 0x1FFF7A2EUL))
+#define TS_CAL1_TEMP   (30.0f)
+#define TS_CAL2_TEMP   (110.0f)
+
+void ADC1_Init(void) {
+ 80001d4:	b480      	push	{r7}
+ 80001d6:	b083      	sub	sp, #12
+ 80001d8:	af00      	add	r7, sp, #0
+    /* 1. เปิด Clock ให้ ADC1 (อยู่บน APB2 Bus) */
+    RCC->APB2ENR |= (1U << 8); // ADC1EN
+ 80001da:	4b24      	ldr	r3, [pc, #144]	@ (800026c <ADC1_Init+0x98>)
+ 80001dc:	6c5b      	ldr	r3, [r3, #68]	@ 0x44
+ 80001de:	4a23      	ldr	r2, [pc, #140]	@ (800026c <ADC1_Init+0x98>)
+ 80001e0:	f443 7380 	orr.w	r3, r3, #256	@ 0x100
+ 80001e4:	6453      	str	r3, [r2, #68]	@ 0x44
+
+    /* 2. ตั้งค่า Resolution เป็น 12-bit (RES = 00, เป็นค่า default อยู่แล้ว แต่เคลียร์ไว้ให้ชัดเจน) */
+    ADC1->CR1 &= ~(3U << 24);
+ 80001e6:	4b22      	ldr	r3, [pc, #136]	@ (8000270 <ADC1_Init+0x9c>)
+ 80001e8:	685b      	ldr	r3, [r3, #4]
+ 80001ea:	4a21      	ldr	r2, [pc, #132]	@ (8000270 <ADC1_Init+0x9c>)
+ 80001ec:	f023 7340 	bic.w	r3, r3, #50331648	@ 0x3000000
+ 80001f0:	6053      	str	r3, [r2, #4]
+
+    /* 3. เปิดใช้งาน Internal Temperature Sensor + VREFINT ผ่านบิต TSVREFE ใน Common Register */
+    ADC123_COMMON->CCR |= (1U << 23); // TSVREFE = 1
+ 80001f2:	4b20      	ldr	r3, [pc, #128]	@ (8000274 <ADC1_Init+0xa0>)
+ 80001f4:	685b      	ldr	r3, [r3, #4]
+ 80001f6:	4a1f      	ldr	r2, [pc, #124]	@ (8000274 <ADC1_Init+0xa0>)
+ 80001f8:	f443 0300 	orr.w	r3, r3, #8388608	@ 0x800000
+ 80001fc:	6053      	str	r3, [r2, #4]
+
+    /* 4. ตั้งค่า Sequence ให้แปลงแค่ 1 Channel คือ Channel 18 (Internal Temp Sensor) */
+    ADC1->SQR1 &= ~(0xFU << 20);      // L[3:0] = 0000 -> 1 conversion ใน Regular sequence
+ 80001fe:	4b1c      	ldr	r3, [pc, #112]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000200:	6adb      	ldr	r3, [r3, #44]	@ 0x2c
+ 8000202:	4a1b      	ldr	r2, [pc, #108]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000204:	f423 0370 	bic.w	r3, r3, #15728640	@ 0xf00000
+ 8000208:	62d3      	str	r3, [r2, #44]	@ 0x2c
+    ADC1->SQR3 &= ~(0x1FU << 0);
+ 800020a:	4b19      	ldr	r3, [pc, #100]	@ (8000270 <ADC1_Init+0x9c>)
+ 800020c:	6b5b      	ldr	r3, [r3, #52]	@ 0x34
+ 800020e:	4a18      	ldr	r2, [pc, #96]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000210:	f023 031f 	bic.w	r3, r3, #31
+ 8000214:	6353      	str	r3, [r2, #52]	@ 0x34
+    ADC1->SQR3 |=  (18U << 0);        // SQ1 = Channel 18
+ 8000216:	4b16      	ldr	r3, [pc, #88]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000218:	6b5b      	ldr	r3, [r3, #52]	@ 0x34
+ 800021a:	4a15      	ldr	r2, [pc, #84]	@ (8000270 <ADC1_Init+0x9c>)
+ 800021c:	f043 0312 	orr.w	r3, r3, #18
+ 8000220:	6353      	str	r3, [r2, #52]	@ 0x34
+
+    /* 5. ตั้งค่า Sample Time ของ Channel 18 ให้นานที่สุด (480 cycles)
+     *    เนื่องจาก Datasheet กำหนดว่า Sampling time ของ Temp Sensor ต้อง > 17.1 us
+     *    Channel 18 อยู่ใน SMPR1 บิตตำแหน่ง [26:24]
+     */
+    ADC1->SMPR1 &= ~(7U << 24);
+ 8000222:	4b13      	ldr	r3, [pc, #76]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000224:	68db      	ldr	r3, [r3, #12]
+ 8000226:	4a12      	ldr	r2, [pc, #72]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000228:	f023 63e0 	bic.w	r3, r3, #117440512	@ 0x7000000
+ 800022c:	60d3      	str	r3, [r2, #12]
+    ADC1->SMPR1 |=  (7U << 24);       // 111 = 480 cycles
+ 800022e:	4b10      	ldr	r3, [pc, #64]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000230:	68db      	ldr	r3, [r3, #12]
+ 8000232:	4a0f      	ldr	r2, [pc, #60]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000234:	f043 63e0 	orr.w	r3, r3, #117440512	@ 0x7000000
+ 8000238:	60d3      	str	r3, [r2, #12]
+
+    /* 6. เปิดใช้งาน ADC1 (ADON) */
+    ADC1->CR2 |= (1U << 0);
+ 800023a:	4b0d      	ldr	r3, [pc, #52]	@ (8000270 <ADC1_Init+0x9c>)
+ 800023c:	689b      	ldr	r3, [r3, #8]
+ 800023e:	4a0c      	ldr	r2, [pc, #48]	@ (8000270 <ADC1_Init+0x9c>)
+ 8000240:	f043 0301 	orr.w	r3, r3, #1
+ 8000244:	6093      	str	r3, [r2, #8]
+
+    /* หน่วงเวลาสั้น ๆ รอ Temperature Sensor Stable ก่อนอ่านค่าจริงครั้งแรก (t_START ตาม Datasheet) */
+    for (volatile uint32_t i = 0; i < 10000U; i++) {
+ 8000246:	2300      	movs	r3, #0
+ 8000248:	607b      	str	r3, [r7, #4]
+ 800024a:	e003      	b.n	8000254 <ADC1_Init+0x80>
+        __asm("NOP");
+ 800024c:	bf00      	nop
+    for (volatile uint32_t i = 0; i < 10000U; i++) {
+ 800024e:	687b      	ldr	r3, [r7, #4]
+ 8000250:	3301      	adds	r3, #1
+ 8000252:	607b      	str	r3, [r7, #4]
+ 8000254:	687b      	ldr	r3, [r7, #4]
+ 8000256:	f242 720f 	movw	r2, #9999	@ 0x270f
+ 800025a:	4293      	cmp	r3, r2
+ 800025c:	d9f6      	bls.n	800024c <ADC1_Init+0x78>
+    }
+}
+ 800025e:	bf00      	nop
+ 8000260:	bf00      	nop
+ 8000262:	370c      	adds	r7, #12
+ 8000264:	46bd      	mov	sp, r7
+ 8000266:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 800026a:	4770      	bx	lr
+ 800026c:	40023800 	.word	0x40023800
+ 8000270:	40012000 	.word	0x40012000
+ 8000274:	40012300 	.word	0x40012300
+
+08000278 <ADC1_ReadRaw>:
+
+uint16_t ADC1_ReadRaw(void) {
+ 8000278:	b480      	push	{r7}
+ 800027a:	af00      	add	r7, sp, #0
+    ADC1->CR2 |= (1U << 30);              // SWSTART: สั่งเริ่มแปลงค่า
+ 800027c:	4b0a      	ldr	r3, [pc, #40]	@ (80002a8 <ADC1_ReadRaw+0x30>)
+ 800027e:	689b      	ldr	r3, [r3, #8]
+ 8000280:	4a09      	ldr	r2, [pc, #36]	@ (80002a8 <ADC1_ReadRaw+0x30>)
+ 8000282:	f043 4380 	orr.w	r3, r3, #1073741824	@ 0x40000000
+ 8000286:	6093      	str	r3, [r2, #8]
+    while (!(ADC1->SR & (1U << 1))) { }   /* รอจน EOC = 1 (End Of Conversion) */
+ 8000288:	bf00      	nop
+ 800028a:	4b07      	ldr	r3, [pc, #28]	@ (80002a8 <ADC1_ReadRaw+0x30>)
+ 800028c:	681b      	ldr	r3, [r3, #0]
+ 800028e:	f003 0302 	and.w	r3, r3, #2
+ 8000292:	2b00      	cmp	r3, #0
+ 8000294:	d0f9      	beq.n	800028a <ADC1_ReadRaw+0x12>
+    return (uint16_t)(ADC1->DR & 0xFFFFU);
+ 8000296:	4b04      	ldr	r3, [pc, #16]	@ (80002a8 <ADC1_ReadRaw+0x30>)
+ 8000298:	6cdb      	ldr	r3, [r3, #76]	@ 0x4c
+ 800029a:	b29b      	uxth	r3, r3
+}
+ 800029c:	4618      	mov	r0, r3
+ 800029e:	46bd      	mov	sp, r7
+ 80002a0:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 80002a4:	4770      	bx	lr
+ 80002a6:	bf00      	nop
+ 80002a8:	40012000 	.word	0x40012000
+
+080002ac <ADC1_ReadTemperature>:
+
+float ADC1_ReadTemperature(void) {
+ 80002ac:	b580      	push	{r7, lr}
+ 80002ae:	b082      	sub	sp, #8
+ 80002b0:	af00      	add	r7, sp, #0
+    uint16_t raw = ADC1_ReadRaw();
+ 80002b2:	f7ff ffe1 	bl	8000278 <ADC1_ReadRaw>
+ 80002b6:	4603      	mov	r3, r0
+ 80002b8:	80fb      	strh	r3, [r7, #6]
+
+    /* สูตรตาม Reference Manual:
+     * Temp = ((TS_CAL2_TEMP - TS_CAL1_TEMP) / (TS_CAL2 - TS_CAL1)) * (raw - TS_CAL1) + TS_CAL1_TEMP
+     */
+    float temp = ((TS_CAL2_TEMP - TS_CAL1_TEMP) / (float)(TS_CAL2 - TS_CAL1))
+ 80002ba:	4b17      	ldr	r3, [pc, #92]	@ (8000318 <ADC1_ReadTemperature+0x6c>)
+ 80002bc:	881b      	ldrh	r3, [r3, #0]
+ 80002be:	b29b      	uxth	r3, r3
+ 80002c0:	461a      	mov	r2, r3
+ 80002c2:	4b16      	ldr	r3, [pc, #88]	@ (800031c <ADC1_ReadTemperature+0x70>)
+ 80002c4:	881b      	ldrh	r3, [r3, #0]
+ 80002c6:	b29b      	uxth	r3, r3
+ 80002c8:	1ad3      	subs	r3, r2, r3
+ 80002ca:	ee07 3a90 	vmov	s15, r3
+ 80002ce:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+ 80002d2:	eddf 6a13 	vldr	s13, [pc, #76]	@ 8000320 <ADC1_ReadTemperature+0x74>
+ 80002d6:	ee86 7aa7 	vdiv.f32	s14, s13, s15
+                 * ((float)raw - (float)TS_CAL1)
+ 80002da:	88fb      	ldrh	r3, [r7, #6]
+ 80002dc:	ee07 3a90 	vmov	s15, r3
+ 80002e0:	eef8 6a67 	vcvt.f32.u32	s13, s15
+ 80002e4:	4b0d      	ldr	r3, [pc, #52]	@ (800031c <ADC1_ReadTemperature+0x70>)
+ 80002e6:	881b      	ldrh	r3, [r3, #0]
+ 80002e8:	b29b      	uxth	r3, r3
+ 80002ea:	ee07 3a90 	vmov	s15, r3
+ 80002ee:	eef8 7a67 	vcvt.f32.u32	s15, s15
+ 80002f2:	ee76 7ae7 	vsub.f32	s15, s13, s15
+ 80002f6:	ee67 7a27 	vmul.f32	s15, s14, s15
+    float temp = ((TS_CAL2_TEMP - TS_CAL1_TEMP) / (float)(TS_CAL2 - TS_CAL1))
+ 80002fa:	eeb3 7a0e 	vmov.f32	s14, #62	@ 0x41f00000  30.0
+ 80002fe:	ee77 7a87 	vadd.f32	s15, s15, s14
+ 8000302:	edc7 7a00 	vstr	s15, [r7]
+                 + TS_CAL1_TEMP;
+
+    return temp;
+ 8000306:	683b      	ldr	r3, [r7, #0]
+ 8000308:	ee07 3a90 	vmov	s15, r3
+}
+ 800030c:	eeb0 0a67 	vmov.f32	s0, s15
+ 8000310:	3708      	adds	r7, #8
+ 8000312:	46bd      	mov	sp, r7
+ 8000314:	bd80      	pop	{r7, pc}
+ 8000316:	bf00      	nop
+ 8000318:	1fff7a2e 	.word	0x1fff7a2e
+ 800031c:	1fff7a2c 	.word	0x1fff7a2c
+ 8000320:	42a00000 	.word	0x42a00000
+
+08000324 <DHT11_Init>:
+#define DHT11_BIT_THRESHOLD_US   40U
+
+static uint8_t DHT11_WaitForLevel(uint8_t level, uint32_t timeout_us);
+static uint8_t DHT11_ReadByte(void);
+
+void DHT11_Init(void) {
+ 8000324:	b580      	push	{r7, lr}
+ 8000326:	af00      	add	r7, sp, #0
+    RCC->AHB1ENR |= (1U << 2); /* เปิด Clock ให้ GPIOC (PC3) */
+ 8000328:	4b09      	ldr	r3, [pc, #36]	@ (8000350 <DHT11_Init+0x2c>)
+ 800032a:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
+ 800032c:	4a08      	ldr	r2, [pc, #32]	@ (8000350 <DHT11_Init+0x2c>)
+ 800032e:	f043 0304 	orr.w	r3, r3, #4
+ 8000332:	6313      	str	r3, [r2, #48]	@ 0x30
+    TIM2_Init();
+ 8000334:	f000 fdd6 	bl	8000ee4 <TIM2_Init>
+
+    /* สถานะปกติเมื่อไม่ได้สื่อสาร: Input + Pull-up (บัสถูกดึงขึ้น HIGH ค้างไว้) */
+    GPIO_SetPinMode(DHT11_PORT, DHT11_PIN, GPIO_MODE_INPUT);
+ 8000338:	2200      	movs	r2, #0
+ 800033a:	2103      	movs	r1, #3
+ 800033c:	4805      	ldr	r0, [pc, #20]	@ (8000354 <DHT11_Init+0x30>)
+ 800033e:	f000 fbd4 	bl	8000aea <GPIO_SetPinMode>
+    GPIO_SetPinPull(DHT11_PORT, DHT11_PIN, GPIO_PULL_UP);
+ 8000342:	2201      	movs	r2, #1
+ 8000344:	2103      	movs	r1, #3
+ 8000346:	4803      	ldr	r0, [pc, #12]	@ (8000354 <DHT11_Init+0x30>)
+ 8000348:	f000 fbf2 	bl	8000b30 <GPIO_SetPinPull>
+}
+ 800034c:	bf00      	nop
+ 800034e:	bd80      	pop	{r7, pc}
+ 8000350:	40023800 	.word	0x40023800
+ 8000354:	40020800 	.word	0x40020800
+
+08000358 <DHT11_WaitForLevel>:
+
+/* รอจนกว่าขาจะขึ้น/ลงตามที่ต้องการ ภายในเวลา timeout_us ไม่เช่นนั้นคืนค่า 0 (ล้มเหลว) */
+static uint8_t DHT11_WaitForLevel(uint8_t level, uint32_t timeout_us) {
+ 8000358:	b580      	push	{r7, lr}
+ 800035a:	b084      	sub	sp, #16
+ 800035c:	af00      	add	r7, sp, #0
+ 800035e:	4603      	mov	r3, r0
+ 8000360:	6039      	str	r1, [r7, #0]
+ 8000362:	71fb      	strb	r3, [r7, #7]
+    uint32_t start = TIM2_GetMicros();
+ 8000364:	f000 fde6 	bl	8000f34 <TIM2_GetMicros>
+ 8000368:	60f8      	str	r0, [r7, #12]
+
+    while (GPIO_ReadPin(DHT11_PORT, DHT11_PIN) != level) {
+ 800036a:	e009      	b.n	8000380 <DHT11_WaitForLevel+0x28>
+        if ((TIM2_GetMicros() - start) > timeout_us) {
+ 800036c:	f000 fde2 	bl	8000f34 <TIM2_GetMicros>
+ 8000370:	4602      	mov	r2, r0
+ 8000372:	68fb      	ldr	r3, [r7, #12]
+ 8000374:	1ad3      	subs	r3, r2, r3
+ 8000376:	683a      	ldr	r2, [r7, #0]
+ 8000378:	429a      	cmp	r2, r3
+ 800037a:	d201      	bcs.n	8000380 <DHT11_WaitForLevel+0x28>
+            return 0U;
+ 800037c:	2300      	movs	r3, #0
+ 800037e:	e009      	b.n	8000394 <DHT11_WaitForLevel+0x3c>
+    while (GPIO_ReadPin(DHT11_PORT, DHT11_PIN) != level) {
+ 8000380:	2103      	movs	r1, #3
+ 8000382:	4806      	ldr	r0, [pc, #24]	@ (800039c <DHT11_WaitForLevel+0x44>)
+ 8000384:	f000 fc14 	bl	8000bb0 <GPIO_ReadPin>
+ 8000388:	4603      	mov	r3, r0
+ 800038a:	461a      	mov	r2, r3
+ 800038c:	79fb      	ldrb	r3, [r7, #7]
+ 800038e:	4293      	cmp	r3, r2
+ 8000390:	d1ec      	bne.n	800036c <DHT11_WaitForLevel+0x14>
+        }
+    }
+    return 1U;
+ 8000392:	2301      	movs	r3, #1
+}
+ 8000394:	4618      	mov	r0, r3
+ 8000396:	3710      	adds	r7, #16
+ 8000398:	46bd      	mov	sp, r7
+ 800039a:	bd80      	pop	{r7, pc}
+ 800039c:	40020800 	.word	0x40020800
+
+080003a0 <DHT11_ReadByte>:
+
+/* อ่านทีละ Byte (8 บิต, MSB ก่อน) ตาม Protocol ของ DHT11
+ * ทุกบิตเริ่มด้วย LOW ~50us เสมอ แล้ววัดความยาวช่วง HIGH ที่ตามมาเพื่อแยกว่าเป็นบิต 0 หรือ 1
+ */
+static uint8_t DHT11_ReadByte(void) {
+ 80003a0:	b580      	push	{r7, lr}
+ 80003a2:	b084      	sub	sp, #16
+ 80003a4:	af00      	add	r7, sp, #0
+    uint8_t value = 0U;
+ 80003a6:	2300      	movs	r3, #0
+ 80003a8:	73fb      	strb	r3, [r7, #15]
+    uint8_t i;
+
+    for (i = 0U; i < 8U; i++) {
+ 80003aa:	2300      	movs	r3, #0
+ 80003ac:	73bb      	strb	r3, [r7, #14]
+ 80003ae:	e021      	b.n	80003f4 <DHT11_ReadByte+0x54>
+        uint32_t high_start;
+        uint32_t high_duration;
+
+        (void)DHT11_WaitForLevel(0U, DHT11_TIMEOUT_US); /* ช่วง LOW เริ่มต้นบิต (~50us) */
+ 80003b0:	2196      	movs	r1, #150	@ 0x96
+ 80003b2:	2000      	movs	r0, #0
+ 80003b4:	f7ff ffd0 	bl	8000358 <DHT11_WaitForLevel>
+        (void)DHT11_WaitForLevel(1U, DHT11_TIMEOUT_US); /* เข้าสู่ช่วง HIGH ที่บอกค่าบิต */
+ 80003b8:	2196      	movs	r1, #150	@ 0x96
+ 80003ba:	2001      	movs	r0, #1
+ 80003bc:	f7ff ffcc 	bl	8000358 <DHT11_WaitForLevel>
+
+        high_start = TIM2_GetMicros();
+ 80003c0:	f000 fdb8 	bl	8000f34 <TIM2_GetMicros>
+ 80003c4:	60b8      	str	r0, [r7, #8]
+        (void)DHT11_WaitForLevel(0U, DHT11_TIMEOUT_US); /* รอจน HIGH จบ (กลับไป LOW ของบิตถัดไป) */
+ 80003c6:	2196      	movs	r1, #150	@ 0x96
+ 80003c8:	2000      	movs	r0, #0
+ 80003ca:	f7ff ffc5 	bl	8000358 <DHT11_WaitForLevel>
+        high_duration = TIM2_GetMicros() - high_start;
+ 80003ce:	f000 fdb1 	bl	8000f34 <TIM2_GetMicros>
+ 80003d2:	4602      	mov	r2, r0
+ 80003d4:	68bb      	ldr	r3, [r7, #8]
+ 80003d6:	1ad3      	subs	r3, r2, r3
+ 80003d8:	607b      	str	r3, [r7, #4]
+
+        value = (uint8_t)(value << 1);
+ 80003da:	7bfb      	ldrb	r3, [r7, #15]
+ 80003dc:	005b      	lsls	r3, r3, #1
+ 80003de:	73fb      	strb	r3, [r7, #15]
+        if (high_duration > DHT11_BIT_THRESHOLD_US) {
+ 80003e0:	687b      	ldr	r3, [r7, #4]
+ 80003e2:	2b28      	cmp	r3, #40	@ 0x28
+ 80003e4:	d903      	bls.n	80003ee <DHT11_ReadByte+0x4e>
+            value |= 1U;
+ 80003e6:	7bfb      	ldrb	r3, [r7, #15]
+ 80003e8:	f043 0301 	orr.w	r3, r3, #1
+ 80003ec:	73fb      	strb	r3, [r7, #15]
+    for (i = 0U; i < 8U; i++) {
+ 80003ee:	7bbb      	ldrb	r3, [r7, #14]
+ 80003f0:	3301      	adds	r3, #1
+ 80003f2:	73bb      	strb	r3, [r7, #14]
+ 80003f4:	7bbb      	ldrb	r3, [r7, #14]
+ 80003f6:	2b07      	cmp	r3, #7
+ 80003f8:	d9da      	bls.n	80003b0 <DHT11_ReadByte+0x10>
+        }
+    }
+    return value;
+ 80003fa:	7bfb      	ldrb	r3, [r7, #15]
+}
+ 80003fc:	4618      	mov	r0, r3
+ 80003fe:	3710      	adds	r7, #16
+ 8000400:	46bd      	mov	sp, r7
+ 8000402:	bd80      	pop	{r7, pc}
+
+08000404 <DHT11_Read>:
+
+uint8_t DHT11_Read(DHT11_Data_t *out) {
+ 8000404:	b590      	push	{r4, r7, lr}
+ 8000406:	b085      	sub	sp, #20
+ 8000408:	af00      	add	r7, sp, #0
+ 800040a:	6078      	str	r0, [r7, #4]
+    uint8_t raw[5] = { 0U, 0U, 0U, 0U, 0U };
+ 800040c:	f107 0308 	add.w	r3, r7, #8
+ 8000410:	2200      	movs	r2, #0
+ 8000412:	601a      	str	r2, [r3, #0]
+ 8000414:	711a      	strb	r2, [r3, #4]
+    uint8_t checksum;
+    uint8_t i;
+
+    /* 1. ส่งสัญญาณ Start: MCU ดึงขาลง LOW อย่างน้อย 18ms */
+    GPIO_SetPinMode(DHT11_PORT, DHT11_PIN, GPIO_MODE_OUTPUT);
+ 8000416:	2201      	movs	r2, #1
+ 8000418:	2103      	movs	r1, #3
+ 800041a:	482d      	ldr	r0, [pc, #180]	@ (80004d0 <DHT11_Read+0xcc>)
+ 800041c:	f000 fb65 	bl	8000aea <GPIO_SetPinMode>
+    GPIO_WritePin(DHT11_PORT, DHT11_PIN, 0U);
+ 8000420:	2200      	movs	r2, #0
+ 8000422:	2103      	movs	r1, #3
+ 8000424:	482a      	ldr	r0, [pc, #168]	@ (80004d0 <DHT11_Read+0xcc>)
+ 8000426:	f000 fba6 	bl	8000b76 <GPIO_WritePin>
+    TIM2_DelayUs(18000U);
+ 800042a:	f244 6050 	movw	r0, #18000	@ 0x4650
+ 800042e:	f000 fd8b 	bl	8000f48 <TIM2_DelayUs>
+
+    /* 2. ปล่อยขาขึ้น HIGH สั้น ๆ (20-40us) แล้วสลับเป็น Input รอฟัง Sensor ตอบกลับ */
+    GPIO_WritePin(DHT11_PORT, DHT11_PIN, 1U);
+ 8000432:	2201      	movs	r2, #1
+ 8000434:	2103      	movs	r1, #3
+ 8000436:	4826      	ldr	r0, [pc, #152]	@ (80004d0 <DHT11_Read+0xcc>)
+ 8000438:	f000 fb9d 	bl	8000b76 <GPIO_WritePin>
+    TIM2_DelayUs(30U);
+ 800043c:	201e      	movs	r0, #30
+ 800043e:	f000 fd83 	bl	8000f48 <TIM2_DelayUs>
+    GPIO_SetPinMode(DHT11_PORT, DHT11_PIN, GPIO_MODE_INPUT);
+ 8000442:	2200      	movs	r2, #0
+ 8000444:	2103      	movs	r1, #3
+ 8000446:	4822      	ldr	r0, [pc, #136]	@ (80004d0 <DHT11_Read+0xcc>)
+ 8000448:	f000 fb4f 	bl	8000aea <GPIO_SetPinMode>
+
+    /* 3. รอ Response จาก Sensor: LOW ~80us แล้วตามด้วย HIGH ~80us
+     *    จบสองช่วงนี้แล้วจะเข้าสู่บิตข้อมูลตัวแรกทันที (ห้ามรอ LOW เพิ่มอีกช่วง มิเช่นนั้นบิตจะเลื่อน)
+     */
+    if (DHT11_WaitForLevel(0U, DHT11_TIMEOUT_US) == 0U) {
+ 800044c:	2196      	movs	r1, #150	@ 0x96
+ 800044e:	2000      	movs	r0, #0
+ 8000450:	f7ff ff82 	bl	8000358 <DHT11_WaitForLevel>
+ 8000454:	4603      	mov	r3, r0
+ 8000456:	2b00      	cmp	r3, #0
+ 8000458:	d101      	bne.n	800045e <DHT11_Read+0x5a>
+        return 0U; /* Sensor ไม่ตอบสนอง: ตรวจสายไฟ/Pull-up Resistor */
+ 800045a:	2300      	movs	r3, #0
+ 800045c:	e033      	b.n	80004c6 <DHT11_Read+0xc2>
+    }
+    if (DHT11_WaitForLevel(1U, DHT11_TIMEOUT_US) == 0U) {
+ 800045e:	2196      	movs	r1, #150	@ 0x96
+ 8000460:	2001      	movs	r0, #1
+ 8000462:	f7ff ff79 	bl	8000358 <DHT11_WaitForLevel>
+ 8000466:	4603      	mov	r3, r0
+ 8000468:	2b00      	cmp	r3, #0
+ 800046a:	d101      	bne.n	8000470 <DHT11_Read+0x6c>
+        return 0U;
+ 800046c:	2300      	movs	r3, #0
+ 800046e:	e02a      	b.n	80004c6 <DHT11_Read+0xc2>
+    }
+
+    /* 4. อ่านข้อมูล 5 Byte: Humidity Int, Humidity Dec, Temp Int, Temp Dec, Checksum */
+    for (i = 0U; i < 5U; i++) {
+ 8000470:	2300      	movs	r3, #0
+ 8000472:	73fb      	strb	r3, [r7, #15]
+ 8000474:	e00c      	b.n	8000490 <DHT11_Read+0x8c>
+        raw[i] = DHT11_ReadByte();
+ 8000476:	7bfc      	ldrb	r4, [r7, #15]
+ 8000478:	f7ff ff92 	bl	80003a0 <DHT11_ReadByte>
+ 800047c:	4603      	mov	r3, r0
+ 800047e:	461a      	mov	r2, r3
+ 8000480:	f104 0310 	add.w	r3, r4, #16
+ 8000484:	443b      	add	r3, r7
+ 8000486:	f803 2c08 	strb.w	r2, [r3, #-8]
+    for (i = 0U; i < 5U; i++) {
+ 800048a:	7bfb      	ldrb	r3, [r7, #15]
+ 800048c:	3301      	adds	r3, #1
+ 800048e:	73fb      	strb	r3, [r7, #15]
+ 8000490:	7bfb      	ldrb	r3, [r7, #15]
+ 8000492:	2b04      	cmp	r3, #4
+ 8000494:	d9ef      	bls.n	8000476 <DHT11_Read+0x72>
+    }
+
+    /* 5. ตรวจ Checksum: ผลรวม 4 Byte แรก (8 บิตล่าง) ต้องตรงกับ Byte ที่ 5 */
+    checksum = (uint8_t)(raw[0] + raw[1] + raw[2] + raw[3]);
+ 8000496:	7a3a      	ldrb	r2, [r7, #8]
+ 8000498:	7a7b      	ldrb	r3, [r7, #9]
+ 800049a:	4413      	add	r3, r2
+ 800049c:	b2da      	uxtb	r2, r3
+ 800049e:	7abb      	ldrb	r3, [r7, #10]
+ 80004a0:	4413      	add	r3, r2
+ 80004a2:	b2da      	uxtb	r2, r3
+ 80004a4:	7afb      	ldrb	r3, [r7, #11]
+ 80004a6:	4413      	add	r3, r2
+ 80004a8:	73bb      	strb	r3, [r7, #14]
+    if (checksum != raw[4]) {
+ 80004aa:	7b3b      	ldrb	r3, [r7, #12]
+ 80004ac:	7bba      	ldrb	r2, [r7, #14]
+ 80004ae:	429a      	cmp	r2, r3
+ 80004b0:	d001      	beq.n	80004b6 <DHT11_Read+0xb2>
+        return 0U; /* ข้อมูลผิดพลาด (สัญญาณรบกวน/Timing คลาดเคลื่อน) ลองอ่านใหม่ */
+ 80004b2:	2300      	movs	r3, #0
+ 80004b4:	e007      	b.n	80004c6 <DHT11_Read+0xc2>
+    }
+
+    out->humidity = raw[0];
+ 80004b6:	7a3a      	ldrb	r2, [r7, #8]
+ 80004b8:	687b      	ldr	r3, [r7, #4]
+ 80004ba:	701a      	strb	r2, [r3, #0]
+    out->temperature = (int8_t)raw[2];
+ 80004bc:	7abb      	ldrb	r3, [r7, #10]
+ 80004be:	b25a      	sxtb	r2, r3
+ 80004c0:	687b      	ldr	r3, [r7, #4]
+ 80004c2:	705a      	strb	r2, [r3, #1]
+
+    return 1U;
+ 80004c4:	2301      	movs	r3, #1
+}
+ 80004c6:	4618      	mov	r0, r3
+ 80004c8:	3714      	adds	r7, #20
+ 80004ca:	46bd      	mov	sp, r7
+ 80004cc:	bd90      	pop	{r4, r7, pc}
+ 80004ce:	bf00      	nop
+ 80004d0:	40020800 	.word	0x40020800
+
+080004d4 <FSM_Init>:
+
+static uint8_t EdgePressed(GPIO_TypeDef *port, uint8_t pin, uint8_t *prev_state);
+static void FSM_UpdateOutputs(void);
+static void FSM_EnterState(SystemState_t new_state);
+
+void FSM_Init(void) {
+ 80004d4:	b480      	push	{r7}
+ 80004d6:	af00      	add	r7, sp, #0
+    current_state = STATE_INIT;
+ 80004d8:	4b0c      	ldr	r3, [pc, #48]	@ (800050c <FSM_Init+0x38>)
+ 80004da:	2200      	movs	r2, #0
+ 80004dc:	701a      	strb	r2, [r3, #0]
+    selected_index = 0U;
+ 80004de:	4b0c      	ldr	r3, [pc, #48]	@ (8000510 <FSM_Init+0x3c>)
+ 80004e0:	2200      	movs	r2, #0
+ 80004e2:	701a      	strb	r2, [r3, #0]
+    state_tick = 0U;
+ 80004e4:	4b0b      	ldr	r3, [pc, #44]	@ (8000514 <FSM_Init+0x40>)
+ 80004e6:	2200      	movs	r2, #0
+ 80004e8:	601a      	str	r2, [r3, #0]
+    prev_up = 0U;
+ 80004ea:	4b0b      	ldr	r3, [pc, #44]	@ (8000518 <FSM_Init+0x44>)
+ 80004ec:	2200      	movs	r2, #0
+ 80004ee:	701a      	strb	r2, [r3, #0]
+    prev_down = 0U;
+ 80004f0:	4b0a      	ldr	r3, [pc, #40]	@ (800051c <FSM_Init+0x48>)
+ 80004f2:	2200      	movs	r2, #0
+ 80004f4:	701a      	strb	r2, [r3, #0]
+    prev_ok = 0U;
+ 80004f6:	4b0a      	ldr	r3, [pc, #40]	@ (8000520 <FSM_Init+0x4c>)
+ 80004f8:	2200      	movs	r2, #0
+ 80004fa:	701a      	strb	r2, [r3, #0]
+    prev_back = 0U;
+ 80004fc:	4b09      	ldr	r3, [pc, #36]	@ (8000524 <FSM_Init+0x50>)
+ 80004fe:	2200      	movs	r2, #0
+ 8000500:	701a      	strb	r2, [r3, #0]
+}
+ 8000502:	bf00      	nop
+ 8000504:	46bd      	mov	sp, r7
+ 8000506:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 800050a:	4770      	bx	lr
+ 800050c:	2000001c 	.word	0x2000001c
+ 8000510:	2000001d 	.word	0x2000001d
+ 8000514:	20000020 	.word	0x20000020
+ 8000518:	20000024 	.word	0x20000024
+ 800051c:	20000025 	.word	0x20000025
+ 8000520:	20000026 	.word	0x20000026
+ 8000524:	20000027 	.word	0x20000027
+
+08000528 <FSM_Run>:
+
+SystemState_t FSM_GetState(void) {
+    return current_state;
+}
+
+void FSM_Run(void) {
+ 8000528:	b580      	push	{r7, lr}
+ 800052a:	b084      	sub	sp, #16
+ 800052c:	af00      	add	r7, sp, #0
+    uint8_t up_edge   = EdgePressed(BTN_UP_PORT,   BTN_UP_PIN,   &prev_up);
+ 800052e:	4ab3      	ldr	r2, [pc, #716]	@ (80007fc <FSM_Run+0x2d4>)
+ 8000530:	210a      	movs	r1, #10
+ 8000532:	48b3      	ldr	r0, [pc, #716]	@ (8000800 <FSM_Run+0x2d8>)
+ 8000534:	f000 f9c2 	bl	80008bc <EdgePressed>
+ 8000538:	4603      	mov	r3, r0
+ 800053a:	73fb      	strb	r3, [r7, #15]
+    uint8_t down_edge = EdgePressed(BTN_DOWN_PORT, BTN_DOWN_PIN, &prev_down);
+ 800053c:	4ab1      	ldr	r2, [pc, #708]	@ (8000804 <FSM_Run+0x2dc>)
+ 800053e:	2103      	movs	r1, #3
+ 8000540:	48b1      	ldr	r0, [pc, #708]	@ (8000808 <FSM_Run+0x2e0>)
+ 8000542:	f000 f9bb 	bl	80008bc <EdgePressed>
+ 8000546:	4603      	mov	r3, r0
+ 8000548:	73bb      	strb	r3, [r7, #14]
+    uint8_t ok_edge   = EdgePressed(BTN_OK_PORT,   BTN_OK_PIN,   &prev_ok);
+ 800054a:	4ab0      	ldr	r2, [pc, #704]	@ (800080c <FSM_Run+0x2e4>)
+ 800054c:	2105      	movs	r1, #5
+ 800054e:	48ae      	ldr	r0, [pc, #696]	@ (8000808 <FSM_Run+0x2e0>)
+ 8000550:	f000 f9b4 	bl	80008bc <EdgePressed>
+ 8000554:	4603      	mov	r3, r0
+ 8000556:	737b      	strb	r3, [r7, #13]
+    uint8_t back_edge = EdgePressed(BTN_BACK_PORT, BTN_BACK_PIN, &prev_back);
+ 8000558:	4aad      	ldr	r2, [pc, #692]	@ (8000810 <FSM_Run+0x2e8>)
+ 800055a:	2104      	movs	r1, #4
+ 800055c:	48aa      	ldr	r0, [pc, #680]	@ (8000808 <FSM_Run+0x2e0>)
+ 800055e:	f000 f9ad 	bl	80008bc <EdgePressed>
+ 8000562:	4603      	mov	r3, r0
+ 8000564:	733b      	strb	r3, [r7, #12]
+
+    state_tick++;
+ 8000566:	4bab      	ldr	r3, [pc, #684]	@ (8000814 <FSM_Run+0x2ec>)
+ 8000568:	681b      	ldr	r3, [r3, #0]
+ 800056a:	3301      	adds	r3, #1
+ 800056c:	4aa9      	ldr	r2, [pc, #676]	@ (8000814 <FSM_Run+0x2ec>)
+ 800056e:	6013      	str	r3, [r2, #0]
+
+    switch (current_state) {
+ 8000570:	4ba9      	ldr	r3, [pc, #676]	@ (8000818 <FSM_Run+0x2f0>)
+ 8000572:	781b      	ldrb	r3, [r3, #0]
+ 8000574:	2b08      	cmp	r3, #8
+ 8000576:	f200 8188 	bhi.w	800088a <FSM_Run+0x362>
+ 800057a:	a201      	add	r2, pc, #4	@ (adr r2, 8000580 <FSM_Run+0x58>)
+ 800057c:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
+ 8000580:	080005a5 	.word	0x080005a5
+ 8000584:	080005b3 	.word	0x080005b3
+ 8000588:	080005f3 	.word	0x080005f3
+ 800058c:	080006bd 	.word	0x080006bd
+ 8000590:	080006e1 	.word	0x080006e1
+ 8000594:	08000717 	.word	0x08000717
+ 8000598:	08000757 	.word	0x08000757
+ 800059c:	08000861 	.word	0x08000861
+ 80005a0:	08000877 	.word	0x08000877
+
+    case STATE_INIT:
+        UART2_SendString("[FSM] INIT -> IDLE\r\n");
+ 80005a4:	489d      	ldr	r0, [pc, #628]	@ (800081c <FSM_Run+0x2f4>)
+ 80005a6:	f000 fd39 	bl	800101c <UART2_SendString>
+        FSM_EnterState(STATE_IDLE);
+ 80005aa:	2001      	movs	r0, #1
+ 80005ac:	f000 f9f0 	bl	8000990 <FSM_EnterState>
+        break;
+ 80005b0:	e17a      	b.n	80008a8 <FSM_Run+0x380>
+
+    case STATE_IDLE:
+        if (ok_edge != 0U) {
+ 80005b2:	7b7b      	ldrb	r3, [r7, #13]
+ 80005b4:	2b00      	cmp	r3, #0
+ 80005b6:	f000 816c 	beq.w	8000892 <FSM_Run+0x36a>
+            selected_index = 0U;
+ 80005ba:	4b99      	ldr	r3, [pc, #612]	@ (8000820 <FSM_Run+0x2f8>)
+ 80005bc:	2200      	movs	r2, #0
+ 80005be:	701a      	strb	r2, [r3, #0]
+            UART2_SendString("[FSM] Welcome! Select a drink (UP/DOWN = scroll, OK = confirm)\r\n");
+ 80005c0:	4898      	ldr	r0, [pc, #608]	@ (8000824 <FSM_Run+0x2fc>)
+ 80005c2:	f000 fd2b 	bl	800101c <UART2_SendString>
+            UART2_SendString("> ");
+ 80005c6:	4898      	ldr	r0, [pc, #608]	@ (8000828 <FSM_Run+0x300>)
+ 80005c8:	f000 fd28 	bl	800101c <UART2_SendString>
+            UART2_SendString(menu[selected_index].name);
+ 80005cc:	4b94      	ldr	r3, [pc, #592]	@ (8000820 <FSM_Run+0x2f8>)
+ 80005ce:	781b      	ldrb	r3, [r3, #0]
+ 80005d0:	461a      	mov	r2, r3
+ 80005d2:	4613      	mov	r3, r2
+ 80005d4:	009b      	lsls	r3, r3, #2
+ 80005d6:	4413      	add	r3, r2
+ 80005d8:	009b      	lsls	r3, r3, #2
+ 80005da:	4a94      	ldr	r2, [pc, #592]	@ (800082c <FSM_Run+0x304>)
+ 80005dc:	4413      	add	r3, r2
+ 80005de:	4618      	mov	r0, r3
+ 80005e0:	f000 fd1c 	bl	800101c <UART2_SendString>
+            UART2_SendString("\r\n");
+ 80005e4:	4892      	ldr	r0, [pc, #584]	@ (8000830 <FSM_Run+0x308>)
+ 80005e6:	f000 fd19 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_SELECT_DRINK);
+ 80005ea:	2002      	movs	r0, #2
+ 80005ec:	f000 f9d0 	bl	8000990 <FSM_EnterState>
+        }
+        break;
+ 80005f0:	e14f      	b.n	8000892 <FSM_Run+0x36a>
+
+    case STATE_SELECT_DRINK:
+        if (up_edge != 0U) {
+ 80005f2:	7bfb      	ldrb	r3, [r7, #15]
+ 80005f4:	2b00      	cmp	r3, #0
+ 80005f6:	d01e      	beq.n	8000636 <FSM_Run+0x10e>
+            selected_index = (selected_index == 0U) ? (uint8_t)(MENU_ITEM_COUNT - 1U) : (uint8_t)(selected_index - 1U);
+ 80005f8:	4b89      	ldr	r3, [pc, #548]	@ (8000820 <FSM_Run+0x2f8>)
+ 80005fa:	781b      	ldrb	r3, [r3, #0]
+ 80005fc:	2b00      	cmp	r3, #0
+ 80005fe:	d004      	beq.n	800060a <FSM_Run+0xe2>
+ 8000600:	4b87      	ldr	r3, [pc, #540]	@ (8000820 <FSM_Run+0x2f8>)
+ 8000602:	781b      	ldrb	r3, [r3, #0]
+ 8000604:	3b01      	subs	r3, #1
+ 8000606:	b2db      	uxtb	r3, r3
+ 8000608:	e000      	b.n	800060c <FSM_Run+0xe4>
+ 800060a:	2303      	movs	r3, #3
+ 800060c:	4a84      	ldr	r2, [pc, #528]	@ (8000820 <FSM_Run+0x2f8>)
+ 800060e:	7013      	strb	r3, [r2, #0]
+            UART2_SendString("> ");
+ 8000610:	4885      	ldr	r0, [pc, #532]	@ (8000828 <FSM_Run+0x300>)
+ 8000612:	f000 fd03 	bl	800101c <UART2_SendString>
+            UART2_SendString(menu[selected_index].name);
+ 8000616:	4b82      	ldr	r3, [pc, #520]	@ (8000820 <FSM_Run+0x2f8>)
+ 8000618:	781b      	ldrb	r3, [r3, #0]
+ 800061a:	461a      	mov	r2, r3
+ 800061c:	4613      	mov	r3, r2
+ 800061e:	009b      	lsls	r3, r3, #2
+ 8000620:	4413      	add	r3, r2
+ 8000622:	009b      	lsls	r3, r3, #2
+ 8000624:	4a81      	ldr	r2, [pc, #516]	@ (800082c <FSM_Run+0x304>)
+ 8000626:	4413      	add	r3, r2
+ 8000628:	4618      	mov	r0, r3
+ 800062a:	f000 fcf7 	bl	800101c <UART2_SendString>
+            UART2_SendString("\r\n");
+ 800062e:	4880      	ldr	r0, [pc, #512]	@ (8000830 <FSM_Run+0x308>)
+ 8000630:	f000 fcf4 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_IDLE);
+        }
+        else {
+            /* ไม่มี Event ใหม่ -> ไม่ต้องทำอะไร */
+        }
+        break;
+ 8000634:	e12f      	b.n	8000896 <FSM_Run+0x36e>
+        else if (down_edge != 0U) {
+ 8000636:	7bbb      	ldrb	r3, [r7, #14]
+ 8000638:	2b00      	cmp	r3, #0
+ 800063a:	d01b      	beq.n	8000674 <FSM_Run+0x14c>
+            selected_index = (uint8_t)((selected_index + 1U) % MENU_ITEM_COUNT);
+ 800063c:	4b78      	ldr	r3, [pc, #480]	@ (8000820 <FSM_Run+0x2f8>)
+ 800063e:	781b      	ldrb	r3, [r3, #0]
+ 8000640:	3301      	adds	r3, #1
+ 8000642:	b2db      	uxtb	r3, r3
+ 8000644:	f003 0303 	and.w	r3, r3, #3
+ 8000648:	b2da      	uxtb	r2, r3
+ 800064a:	4b75      	ldr	r3, [pc, #468]	@ (8000820 <FSM_Run+0x2f8>)
+ 800064c:	701a      	strb	r2, [r3, #0]
+            UART2_SendString("> ");
+ 800064e:	4876      	ldr	r0, [pc, #472]	@ (8000828 <FSM_Run+0x300>)
+ 8000650:	f000 fce4 	bl	800101c <UART2_SendString>
+            UART2_SendString(menu[selected_index].name);
+ 8000654:	4b72      	ldr	r3, [pc, #456]	@ (8000820 <FSM_Run+0x2f8>)
+ 8000656:	781b      	ldrb	r3, [r3, #0]
+ 8000658:	461a      	mov	r2, r3
+ 800065a:	4613      	mov	r3, r2
+ 800065c:	009b      	lsls	r3, r3, #2
+ 800065e:	4413      	add	r3, r2
+ 8000660:	009b      	lsls	r3, r3, #2
+ 8000662:	4a72      	ldr	r2, [pc, #456]	@ (800082c <FSM_Run+0x304>)
+ 8000664:	4413      	add	r3, r2
+ 8000666:	4618      	mov	r0, r3
+ 8000668:	f000 fcd8 	bl	800101c <UART2_SendString>
+            UART2_SendString("\r\n");
+ 800066c:	4870      	ldr	r0, [pc, #448]	@ (8000830 <FSM_Run+0x308>)
+ 800066e:	f000 fcd5 	bl	800101c <UART2_SendString>
+        break;
+ 8000672:	e110      	b.n	8000896 <FSM_Run+0x36e>
+        else if (ok_edge != 0U) {
+ 8000674:	7b7b      	ldrb	r3, [r7, #13]
+ 8000676:	2b00      	cmp	r3, #0
+ 8000678:	d015      	beq.n	80006a6 <FSM_Run+0x17e>
+            UART2_SendString("[FSM] Confirm order: ");
+ 800067a:	486e      	ldr	r0, [pc, #440]	@ (8000834 <FSM_Run+0x30c>)
+ 800067c:	f000 fcce 	bl	800101c <UART2_SendString>
+            UART2_SendString(menu[selected_index].name);
+ 8000680:	4b67      	ldr	r3, [pc, #412]	@ (8000820 <FSM_Run+0x2f8>)
+ 8000682:	781b      	ldrb	r3, [r3, #0]
+ 8000684:	461a      	mov	r2, r3
+ 8000686:	4613      	mov	r3, r2
+ 8000688:	009b      	lsls	r3, r3, #2
+ 800068a:	4413      	add	r3, r2
+ 800068c:	009b      	lsls	r3, r3, #2
+ 800068e:	4a67      	ldr	r2, [pc, #412]	@ (800082c <FSM_Run+0x304>)
+ 8000690:	4413      	add	r3, r2
+ 8000692:	4618      	mov	r0, r3
+ 8000694:	f000 fcc2 	bl	800101c <UART2_SendString>
+            UART2_SendString(" ? (OK = Yes, BACK = Cancel)\r\n");
+ 8000698:	4867      	ldr	r0, [pc, #412]	@ (8000838 <FSM_Run+0x310>)
+ 800069a:	f000 fcbf 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_CONFIRM);
+ 800069e:	2003      	movs	r0, #3
+ 80006a0:	f000 f976 	bl	8000990 <FSM_EnterState>
+        break;
+ 80006a4:	e0f7      	b.n	8000896 <FSM_Run+0x36e>
+        else if (back_edge != 0U) {
+ 80006a6:	7b3b      	ldrb	r3, [r7, #12]
+ 80006a8:	2b00      	cmp	r3, #0
+ 80006aa:	f000 80f4 	beq.w	8000896 <FSM_Run+0x36e>
+            UART2_SendString("[FSM] Cancelled -> back to IDLE\r\n");
+ 80006ae:	4863      	ldr	r0, [pc, #396]	@ (800083c <FSM_Run+0x314>)
+ 80006b0:	f000 fcb4 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_IDLE);
+ 80006b4:	2001      	movs	r0, #1
+ 80006b6:	f000 f96b 	bl	8000990 <FSM_EnterState>
+        break;
+ 80006ba:	e0ec      	b.n	8000896 <FSM_Run+0x36e>
+
+    case STATE_CONFIRM:
+        if (ok_edge != 0U) {
+ 80006bc:	7b7b      	ldrb	r3, [r7, #13]
+ 80006be:	2b00      	cmp	r3, #0
+ 80006c0:	d003      	beq.n	80006ca <FSM_Run+0x1a2>
+            FSM_EnterState(STATE_CHECK_STOCK);
+ 80006c2:	2004      	movs	r0, #4
+ 80006c4:	f000 f964 	bl	8000990 <FSM_EnterState>
+            FSM_EnterState(STATE_SELECT_DRINK);
+        }
+        else {
+            /* รอผู้ใช้กด OK หรือ BACK */
+        }
+        break;
+ 80006c8:	e0e7      	b.n	800089a <FSM_Run+0x372>
+        else if (back_edge != 0U) {
+ 80006ca:	7b3b      	ldrb	r3, [r7, #12]
+ 80006cc:	2b00      	cmp	r3, #0
+ 80006ce:	f000 80e4 	beq.w	800089a <FSM_Run+0x372>
+            UART2_SendString("[FSM] Cancelled -> back to selection\r\n");
+ 80006d2:	485b      	ldr	r0, [pc, #364]	@ (8000840 <FSM_Run+0x318>)
+ 80006d4:	f000 fca2 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_SELECT_DRINK);
+ 80006d8:	2002      	movs	r0, #2
+ 80006da:	f000 f959 	bl	8000990 <FSM_EnterState>
+        break;
+ 80006de:	e0dc      	b.n	800089a <FSM_Run+0x372>
+
+    case STATE_CHECK_STOCK:
+        if (menu[selected_index].stock > 0U) {
+ 80006e0:	4b4f      	ldr	r3, [pc, #316]	@ (8000820 <FSM_Run+0x2f8>)
+ 80006e2:	781b      	ldrb	r3, [r3, #0]
+ 80006e4:	4619      	mov	r1, r3
+ 80006e6:	4a51      	ldr	r2, [pc, #324]	@ (800082c <FSM_Run+0x304>)
+ 80006e8:	460b      	mov	r3, r1
+ 80006ea:	009b      	lsls	r3, r3, #2
+ 80006ec:	440b      	add	r3, r1
+ 80006ee:	009b      	lsls	r3, r3, #2
+ 80006f0:	4413      	add	r3, r2
+ 80006f2:	3312      	adds	r3, #18
+ 80006f4:	781b      	ldrb	r3, [r3, #0]
+ 80006f6:	2b00      	cmp	r3, #0
+ 80006f8:	d006      	beq.n	8000708 <FSM_Run+0x1e0>
+            UART2_SendString("[FSM] Stock OK -> checking safety...\r\n");
+ 80006fa:	4852      	ldr	r0, [pc, #328]	@ (8000844 <FSM_Run+0x31c>)
+ 80006fc:	f000 fc8e 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_SAFETY_CHECK);
+ 8000700:	2005      	movs	r0, #5
+ 8000702:	f000 f945 	bl	8000990 <FSM_EnterState>
+        } else {
+            UART2_SendString("[FSM] OUT OF STOCK! Please choose another drink.\r\n");
+            FSM_EnterState(STATE_SELECT_DRINK);
+        }
+        break;
+ 8000706:	e0cf      	b.n	80008a8 <FSM_Run+0x380>
+            UART2_SendString("[FSM] OUT OF STOCK! Please choose another drink.\r\n");
+ 8000708:	484f      	ldr	r0, [pc, #316]	@ (8000848 <FSM_Run+0x320>)
+ 800070a:	f000 fc87 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_SELECT_DRINK);
+ 800070e:	2002      	movs	r0, #2
+ 8000710:	f000 f93e 	bl	8000990 <FSM_EnterState>
+        break;
+ 8000714:	e0c8      	b.n	80008a8 <FSM_Run+0x380>
+
+    case STATE_SAFETY_CHECK: {
+        float temp = ADC1_ReadTemperature();
+ 8000716:	f7ff fdc9 	bl	80002ac <ADC1_ReadTemperature>
+ 800071a:	ed87 0a00 	vstr	s0, [r7]
+        UART2_PrintTemperature(temp);
+ 800071e:	ed97 0a00 	vldr	s0, [r7]
+ 8000722:	f000 fcd1 	bl	80010c8 <UART2_PrintTemperature>
+
+        if (Safety_CheckTemperature(temp) != 0U) {
+ 8000726:	ed97 0a00 	vldr	s0, [r7]
+ 800072a:	f000 fbc1 	bl	8000eb0 <Safety_CheckTemperature>
+ 800072e:	4603      	mov	r3, r0
+ 8000730:	2b00      	cmp	r3, #0
+ 8000732:	d00c      	beq.n	800074e <FSM_Run+0x226>
+            UART2_SendString("[FSM] Preparing your drink... ");
+ 8000734:	4845      	ldr	r0, [pc, #276]	@ (800084c <FSM_Run+0x324>)
+ 8000736:	f000 fc71 	bl	800101c <UART2_SendString>
+            UART2_SendUint(PROCESSING_SECONDS);
+ 800073a:	2004      	movs	r0, #4
+ 800073c:	f000 fc84 	bl	8001048 <UART2_SendUint>
+            UART2_SendString(" sec\r\n");
+ 8000740:	4843      	ldr	r0, [pc, #268]	@ (8000850 <FSM_Run+0x328>)
+ 8000742:	f000 fc6b 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_PROCESSING);
+ 8000746:	2006      	movs	r0, #6
+ 8000748:	f000 f922 	bl	8000990 <FSM_EnterState>
+        } else {
+            FSM_EnterState(STATE_FAULT);
+        }
+        break;
+ 800074c:	e0ac      	b.n	80008a8 <FSM_Run+0x380>
+            FSM_EnterState(STATE_FAULT);
+ 800074e:	2008      	movs	r0, #8
+ 8000750:	f000 f91e 	bl	8000990 <FSM_EnterState>
+        break;
+ 8000754:	e0a8      	b.n	80008a8 <FSM_Run+0x380>
+    }
+
+    case STATE_PROCESSING:
+        /* Dispense Simulation: พิมพ์เลขนับถอยหลังทุก ๆ 1 วินาทีโดยประมาณ */
+        if ((state_tick % TICKS_PER_SECOND) == 0U) {
+ 8000756:	4b2f      	ldr	r3, [pc, #188]	@ (8000814 <FSM_Run+0x2ec>)
+ 8000758:	681a      	ldr	r2, [r3, #0]
+ 800075a:	4b3e      	ldr	r3, [pc, #248]	@ (8000854 <FSM_Run+0x32c>)
+ 800075c:	fba3 1302 	umull	r1, r3, r3, r2
+ 8000760:	091b      	lsrs	r3, r3, #4
+ 8000762:	2132      	movs	r1, #50	@ 0x32
+ 8000764:	fb01 f303 	mul.w	r3, r1, r3
+ 8000768:	1ad3      	subs	r3, r2, r3
+ 800076a:	2b00      	cmp	r3, #0
+ 800076c:	d116      	bne.n	800079c <FSM_Run+0x274>
+            uint32_t seconds_elapsed = state_tick / TICKS_PER_SECOND;
+ 800076e:	4b29      	ldr	r3, [pc, #164]	@ (8000814 <FSM_Run+0x2ec>)
+ 8000770:	681b      	ldr	r3, [r3, #0]
+ 8000772:	4a38      	ldr	r2, [pc, #224]	@ (8000854 <FSM_Run+0x32c>)
+ 8000774:	fba2 2303 	umull	r2, r3, r2, r3
+ 8000778:	091b      	lsrs	r3, r3, #4
+ 800077a:	60bb      	str	r3, [r7, #8]
+            if (seconds_elapsed < (uint32_t)PROCESSING_SECONDS) {
+ 800077c:	68bb      	ldr	r3, [r7, #8]
+ 800077e:	2b03      	cmp	r3, #3
+ 8000780:	d80c      	bhi.n	800079c <FSM_Run+0x274>
+                uint32_t seconds_left = (uint32_t)PROCESSING_SECONDS - seconds_elapsed;
+ 8000782:	68bb      	ldr	r3, [r7, #8]
+ 8000784:	f1c3 0304 	rsb	r3, r3, #4
+ 8000788:	607b      	str	r3, [r7, #4]
+                UART2_SendString("   ... ");
+ 800078a:	4833      	ldr	r0, [pc, #204]	@ (8000858 <FSM_Run+0x330>)
+ 800078c:	f000 fc46 	bl	800101c <UART2_SendString>
+                UART2_SendUint(seconds_left);
+ 8000790:	6878      	ldr	r0, [r7, #4]
+ 8000792:	f000 fc59 	bl	8001048 <UART2_SendUint>
+                UART2_SendString(" sec\r\n");
+ 8000796:	482e      	ldr	r0, [pc, #184]	@ (8000850 <FSM_Run+0x328>)
+ 8000798:	f000 fc40 	bl	800101c <UART2_SendString>
+            }
+        }
+
+        if (state_tick >= PROCESSING_TICKS) {
+ 800079c:	4b1d      	ldr	r3, [pc, #116]	@ (8000814 <FSM_Run+0x2ec>)
+ 800079e:	681b      	ldr	r3, [r3, #0]
+ 80007a0:	2bc7      	cmp	r3, #199	@ 0xc7
+ 80007a2:	d97c      	bls.n	800089e <FSM_Run+0x376>
+            /* Stock Update: ตัด Stock ลง 1 หน่วยเมื่อจ่ายเครื่องดื่มสำเร็จ (กันค่าติดลบด้วยเงื่อนไข > 0) */
+            if (menu[selected_index].stock > 0U) {
+ 80007a4:	4b1e      	ldr	r3, [pc, #120]	@ (8000820 <FSM_Run+0x2f8>)
+ 80007a6:	781b      	ldrb	r3, [r3, #0]
+ 80007a8:	4619      	mov	r1, r3
+ 80007aa:	4a20      	ldr	r2, [pc, #128]	@ (800082c <FSM_Run+0x304>)
+ 80007ac:	460b      	mov	r3, r1
+ 80007ae:	009b      	lsls	r3, r3, #2
+ 80007b0:	440b      	add	r3, r1
+ 80007b2:	009b      	lsls	r3, r3, #2
+ 80007b4:	4413      	add	r3, r2
+ 80007b6:	3312      	adds	r3, #18
+ 80007b8:	781b      	ldrb	r3, [r3, #0]
+ 80007ba:	2b00      	cmp	r3, #0
+ 80007bc:	d015      	beq.n	80007ea <FSM_Run+0x2c2>
+                menu[selected_index].stock--;
+ 80007be:	4b18      	ldr	r3, [pc, #96]	@ (8000820 <FSM_Run+0x2f8>)
+ 80007c0:	781b      	ldrb	r3, [r3, #0]
+ 80007c2:	461a      	mov	r2, r3
+ 80007c4:	4919      	ldr	r1, [pc, #100]	@ (800082c <FSM_Run+0x304>)
+ 80007c6:	4613      	mov	r3, r2
+ 80007c8:	009b      	lsls	r3, r3, #2
+ 80007ca:	4413      	add	r3, r2
+ 80007cc:	009b      	lsls	r3, r3, #2
+ 80007ce:	440b      	add	r3, r1
+ 80007d0:	3312      	adds	r3, #18
+ 80007d2:	781b      	ldrb	r3, [r3, #0]
+ 80007d4:	3b01      	subs	r3, #1
+ 80007d6:	b2d8      	uxtb	r0, r3
+ 80007d8:	4914      	ldr	r1, [pc, #80]	@ (800082c <FSM_Run+0x304>)
+ 80007da:	4613      	mov	r3, r2
+ 80007dc:	009b      	lsls	r3, r3, #2
+ 80007de:	4413      	add	r3, r2
+ 80007e0:	009b      	lsls	r3, r3, #2
+ 80007e2:	440b      	add	r3, r1
+ 80007e4:	3312      	adds	r3, #18
+ 80007e6:	4602      	mov	r2, r0
+ 80007e8:	701a      	strb	r2, [r3, #0]
+            }
+
+            UART2_SendString("[FSM] Drink prepared! Stock updated:\r\n");
+ 80007ea:	481c      	ldr	r0, [pc, #112]	@ (800085c <FSM_Run+0x334>)
+ 80007ec:	f000 fc16 	bl	800101c <UART2_SendString>
+            Menu_PrintAll();
+ 80007f0:	f000 fb10 	bl	8000e14 <Menu_PrintAll>
+
+            FSM_EnterState(STATE_COMPLETE);
+ 80007f4:	2007      	movs	r0, #7
+ 80007f6:	f000 f8cb 	bl	8000990 <FSM_EnterState>
+        }
+        break;
+ 80007fa:	e050      	b.n	800089e <FSM_Run+0x376>
+ 80007fc:	20000024 	.word	0x20000024
+ 8000800:	40020000 	.word	0x40020000
+ 8000804:	20000025 	.word	0x20000025
+ 8000808:	40020400 	.word	0x40020400
+ 800080c:	20000026 	.word	0x20000026
+ 8000810:	20000027 	.word	0x20000027
+ 8000814:	20000020 	.word	0x20000020
+ 8000818:	2000001c 	.word	0x2000001c
+ 800081c:	08001240 	.word	0x08001240
+ 8000820:	2000001d 	.word	0x2000001d
+ 8000824:	08001258 	.word	0x08001258
+ 8000828:	0800129c 	.word	0x0800129c
+ 800082c:	20000028 	.word	0x20000028
+ 8000830:	080012a0 	.word	0x080012a0
+ 8000834:	080012a4 	.word	0x080012a4
+ 8000838:	080012bc 	.word	0x080012bc
+ 800083c:	080012dc 	.word	0x080012dc
+ 8000840:	08001300 	.word	0x08001300
+ 8000844:	08001328 	.word	0x08001328
+ 8000848:	08001350 	.word	0x08001350
+ 800084c:	08001384 	.word	0x08001384
+ 8000850:	080013a4 	.word	0x080013a4
+ 8000854:	51eb851f 	.word	0x51eb851f
+ 8000858:	080013ac 	.word	0x080013ac
+ 800085c:	080013b4 	.word	0x080013b4
+
+    case STATE_COMPLETE:
+        if (state_tick >= COMPLETE_TICKS) {
+ 8000860:	4b13      	ldr	r3, [pc, #76]	@ (80008b0 <FSM_Run+0x388>)
+ 8000862:	681b      	ldr	r3, [r3, #0]
+ 8000864:	2b31      	cmp	r3, #49	@ 0x31
+ 8000866:	d91c      	bls.n	80008a2 <FSM_Run+0x37a>
+            UART2_SendString("[FSM] Enjoy your drink! -> back to IDLE\r\n");
+ 8000868:	4812      	ldr	r0, [pc, #72]	@ (80008b4 <FSM_Run+0x38c>)
+ 800086a:	f000 fbd7 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_IDLE);
+ 800086e:	2001      	movs	r0, #1
+ 8000870:	f000 f88e 	bl	8000990 <FSM_EnterState>
+        }
+        break;
+ 8000874:	e015      	b.n	80008a2 <FSM_Run+0x37a>
+
+    case STATE_FAULT:
+        if (back_edge != 0U) {
+ 8000876:	7b3b      	ldrb	r3, [r7, #12]
+ 8000878:	2b00      	cmp	r3, #0
+ 800087a:	d014      	beq.n	80008a6 <FSM_Run+0x37e>
+            UART2_SendString("[FSM] Fault acknowledged -> back to IDLE\r\n");
+ 800087c:	480e      	ldr	r0, [pc, #56]	@ (80008b8 <FSM_Run+0x390>)
+ 800087e:	f000 fbcd 	bl	800101c <UART2_SendString>
+            FSM_EnterState(STATE_IDLE);
+ 8000882:	2001      	movs	r0, #1
+ 8000884:	f000 f884 	bl	8000990 <FSM_EnterState>
+        }
+        break;
+ 8000888:	e00d      	b.n	80008a6 <FSM_Run+0x37e>
+
+    default:
+        FSM_EnterState(STATE_FAULT);
+ 800088a:	2008      	movs	r0, #8
+ 800088c:	f000 f880 	bl	8000990 <FSM_EnterState>
+        break;
+ 8000890:	e00a      	b.n	80008a8 <FSM_Run+0x380>
+        break;
+ 8000892:	bf00      	nop
+ 8000894:	e008      	b.n	80008a8 <FSM_Run+0x380>
+        break;
+ 8000896:	bf00      	nop
+ 8000898:	e006      	b.n	80008a8 <FSM_Run+0x380>
+        break;
+ 800089a:	bf00      	nop
+ 800089c:	e004      	b.n	80008a8 <FSM_Run+0x380>
+        break;
+ 800089e:	bf00      	nop
+ 80008a0:	e002      	b.n	80008a8 <FSM_Run+0x380>
+        break;
+ 80008a2:	bf00      	nop
+ 80008a4:	e000      	b.n	80008a8 <FSM_Run+0x380>
+        break;
+ 80008a6:	bf00      	nop
+    }
+}
+ 80008a8:	bf00      	nop
+ 80008aa:	3710      	adds	r7, #16
+ 80008ac:	46bd      	mov	sp, r7
+ 80008ae:	bd80      	pop	{r7, pc}
+ 80008b0:	20000020 	.word	0x20000020
+ 80008b4:	080013dc 	.word	0x080013dc
+ 80008b8:	08001408 	.word	0x08001408
+
+080008bc <EdgePressed>:
+
+/* ตรวจจับ Rising Edge ของปุ่ม (Active-Low ผ่าน BTN_IsPressed) -> คืนค่า 1 แค่ตอนเพิ่งกดครั้งแรกเท่านั้น */
+static uint8_t EdgePressed(GPIO_TypeDef *port, uint8_t pin, uint8_t *prev_state) {
+ 80008bc:	b580      	push	{r7, lr}
+ 80008be:	b086      	sub	sp, #24
+ 80008c0:	af00      	add	r7, sp, #0
+ 80008c2:	60f8      	str	r0, [r7, #12]
+ 80008c4:	460b      	mov	r3, r1
+ 80008c6:	607a      	str	r2, [r7, #4]
+ 80008c8:	72fb      	strb	r3, [r7, #11]
+    uint8_t current = BTN_IsPressed(port, pin);
+ 80008ca:	7afb      	ldrb	r3, [r7, #11]
+ 80008cc:	4619      	mov	r1, r3
+ 80008ce:	68f8      	ldr	r0, [r7, #12]
+ 80008d0:	f000 f8f3 	bl	8000aba <BTN_IsPressed>
+ 80008d4:	4603      	mov	r3, r0
+ 80008d6:	75fb      	strb	r3, [r7, #23]
+    uint8_t edge = ((current != 0U) && (*prev_state == 0U)) ? 1U : 0U;
+ 80008d8:	7dfb      	ldrb	r3, [r7, #23]
+ 80008da:	2b00      	cmp	r3, #0
+ 80008dc:	d005      	beq.n	80008ea <EdgePressed+0x2e>
+ 80008de:	687b      	ldr	r3, [r7, #4]
+ 80008e0:	781b      	ldrb	r3, [r3, #0]
+ 80008e2:	2b00      	cmp	r3, #0
+ 80008e4:	d101      	bne.n	80008ea <EdgePressed+0x2e>
+ 80008e6:	2301      	movs	r3, #1
+ 80008e8:	e000      	b.n	80008ec <EdgePressed+0x30>
+ 80008ea:	2300      	movs	r3, #0
+ 80008ec:	75bb      	strb	r3, [r7, #22]
+    *prev_state = current;
+ 80008ee:	687b      	ldr	r3, [r7, #4]
+ 80008f0:	7dfa      	ldrb	r2, [r7, #23]
+ 80008f2:	701a      	strb	r2, [r3, #0]
+    return edge;
+ 80008f4:	7dbb      	ldrb	r3, [r7, #22]
+}
+ 80008f6:	4618      	mov	r0, r3
+ 80008f8:	3718      	adds	r7, #24
+ 80008fa:	46bd      	mov	sp, r7
+ 80008fc:	bd80      	pop	{r7, pc}
+	...
+
+08000900 <FSM_UpdateOutputs>:
+
+/* ผูกสถานะ LED เข้ากับ State ปัจจุบัน (เรียกทุกครั้งที่เปลี่ยน State เท่านั้น ไม่ใช่ทุก Loop) */
+static void FSM_UpdateOutputs(void) {
+ 8000900:	b580      	push	{r7, lr}
+ 8000902:	af00      	add	r7, sp, #0
+    LED_Off(LED1_PORT, LED1_PIN);
+ 8000904:	2105      	movs	r1, #5
+ 8000906:	481f      	ldr	r0, [pc, #124]	@ (8000984 <FSM_UpdateOutputs+0x84>)
+ 8000908:	f000 f8c5 	bl	8000a96 <LED_Off>
+    LED_Off(LED2_PORT, LED2_PIN);
+ 800090c:	2106      	movs	r1, #6
+ 800090e:	481d      	ldr	r0, [pc, #116]	@ (8000984 <FSM_UpdateOutputs+0x84>)
+ 8000910:	f000 f8c1 	bl	8000a96 <LED_Off>
+    LED_Off(LED3_PORT, LED3_PIN);
+ 8000914:	2107      	movs	r1, #7
+ 8000916:	481b      	ldr	r0, [pc, #108]	@ (8000984 <FSM_UpdateOutputs+0x84>)
+ 8000918:	f000 f8bd 	bl	8000a96 <LED_Off>
+    LED_Off(LED4_PORT, LED4_PIN);
+ 800091c:	2106      	movs	r1, #6
+ 800091e:	481a      	ldr	r0, [pc, #104]	@ (8000988 <FSM_UpdateOutputs+0x88>)
+ 8000920:	f000 f8b9 	bl	8000a96 <LED_Off>
+
+    switch (current_state) {
+ 8000924:	4b19      	ldr	r3, [pc, #100]	@ (800098c <FSM_UpdateOutputs+0x8c>)
+ 8000926:	781b      	ldrb	r3, [r3, #0]
+ 8000928:	3b01      	subs	r3, #1
+ 800092a:	2b07      	cmp	r3, #7
+ 800092c:	d826      	bhi.n	800097c <FSM_UpdateOutputs+0x7c>
+ 800092e:	a201      	add	r2, pc, #4	@ (adr r2, 8000934 <FSM_UpdateOutputs+0x34>)
+ 8000930:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
+ 8000934:	08000955 	.word	0x08000955
+ 8000938:	0800095f 	.word	0x0800095f
+ 800093c:	0800095f 	.word	0x0800095f
+ 8000940:	08000969 	.word	0x08000969
+ 8000944:	08000969 	.word	0x08000969
+ 8000948:	08000969 	.word	0x08000969
+ 800094c:	08000969 	.word	0x08000969
+ 8000950:	08000973 	.word	0x08000973
+    case STATE_IDLE:
+        LED_On(LED1_PORT, LED1_PIN);   /* ระบบพร้อมใช้งาน */
+ 8000954:	2105      	movs	r1, #5
+ 8000956:	480b      	ldr	r0, [pc, #44]	@ (8000984 <FSM_UpdateOutputs+0x84>)
+ 8000958:	f000 f88c 	bl	8000a74 <LED_On>
+        break;
+ 800095c:	e00f      	b.n	800097e <FSM_UpdateOutputs+0x7e>
+
+    case STATE_SELECT_DRINK:
+    case STATE_CONFIRM:
+        LED_On(LED2_PORT, LED2_PIN);   /* กำลังเลือก/ยืนยันเมนู */
+ 800095e:	2106      	movs	r1, #6
+ 8000960:	4808      	ldr	r0, [pc, #32]	@ (8000984 <FSM_UpdateOutputs+0x84>)
+ 8000962:	f000 f887 	bl	8000a74 <LED_On>
+        break;
+ 8000966:	e00a      	b.n	800097e <FSM_UpdateOutputs+0x7e>
+
+    case STATE_CHECK_STOCK:
+    case STATE_SAFETY_CHECK:
+    case STATE_PROCESSING:
+    case STATE_COMPLETE:
+        LED_On(LED3_PORT, LED3_PIN);   /* กำลังประมวลผล/เตรียมเครื่องดื่ม */
+ 8000968:	2107      	movs	r1, #7
+ 800096a:	4806      	ldr	r0, [pc, #24]	@ (8000984 <FSM_UpdateOutputs+0x84>)
+ 800096c:	f000 f882 	bl	8000a74 <LED_On>
+        break;
+ 8000970:	e005      	b.n	800097e <FSM_UpdateOutputs+0x7e>
+
+    case STATE_FAULT:
+        LED_On(LED4_PORT, LED4_PIN);   /* สถานะผิดพลาด */
+ 8000972:	2106      	movs	r1, #6
+ 8000974:	4804      	ldr	r0, [pc, #16]	@ (8000988 <FSM_UpdateOutputs+0x88>)
+ 8000976:	f000 f87d 	bl	8000a74 <LED_On>
+        break;
+ 800097a:	e000      	b.n	800097e <FSM_UpdateOutputs+0x7e>
+
+    default:
+        break;
+ 800097c:	bf00      	nop
+    }
+}
+ 800097e:	bf00      	nop
+ 8000980:	bd80      	pop	{r7, pc}
+ 8000982:	bf00      	nop
+ 8000984:	40020000 	.word	0x40020000
+ 8000988:	40020400 	.word	0x40020400
+ 800098c:	2000001c 	.word	0x2000001c
+
+08000990 <FSM_EnterState>:
+
+static void FSM_EnterState(SystemState_t new_state) {
+ 8000990:	b580      	push	{r7, lr}
+ 8000992:	b082      	sub	sp, #8
+ 8000994:	af00      	add	r7, sp, #0
+ 8000996:	4603      	mov	r3, r0
+ 8000998:	71fb      	strb	r3, [r7, #7]
+    current_state = new_state;
+ 800099a:	4a06      	ldr	r2, [pc, #24]	@ (80009b4 <FSM_EnterState+0x24>)
+ 800099c:	79fb      	ldrb	r3, [r7, #7]
+ 800099e:	7013      	strb	r3, [r2, #0]
+    state_tick = 0U;
+ 80009a0:	4b05      	ldr	r3, [pc, #20]	@ (80009b8 <FSM_EnterState+0x28>)
+ 80009a2:	2200      	movs	r2, #0
+ 80009a4:	601a      	str	r2, [r3, #0]
+    FSM_UpdateOutputs();
+ 80009a6:	f7ff ffab 	bl	8000900 <FSM_UpdateOutputs>
+}
+ 80009aa:	bf00      	nop
+ 80009ac:	3708      	adds	r7, #8
+ 80009ae:	46bd      	mov	sp, r7
+ 80009b0:	bd80      	pop	{r7, pc}
+ 80009b2:	bf00      	nop
+ 80009b4:	2000001c 	.word	0x2000001c
+ 80009b8:	20000020 	.word	0x20000020
+
+080009bc <GPIO_Init>:
 #include "gpio_driver.h"
 
 void GPIO_Init(void) {
- 80001d4:	b580      	push	{r7, lr}
- 80001d6:	af00      	add	r7, sp, #0
+ 80009bc:	b580      	push	{r7, lr}
+ 80009be:	af00      	add	r7, sp, #0
     /* 1. เปิด Clock จ่ายไฟให้ GPIOA และ GPIOB */
     RCC->AHB1ENR |= (1U << 0) | (1U << 1);
- 80001d8:	4b29      	ldr	r3, [pc, #164]	@ (8000280 <GPIO_Init+0xac>)
- 80001da:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
- 80001dc:	4a28      	ldr	r2, [pc, #160]	@ (8000280 <GPIO_Init+0xac>)
- 80001de:	f043 0303 	orr.w	r3, r3, #3
- 80001e2:	6313      	str	r3, [r2, #48]	@ 0x30
+ 80009c0:	4b29      	ldr	r3, [pc, #164]	@ (8000a68 <GPIO_Init+0xac>)
+ 80009c2:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
+ 80009c4:	4a28      	ldr	r2, [pc, #160]	@ (8000a68 <GPIO_Init+0xac>)
+ 80009c6:	f043 0303 	orr.w	r3, r3, #3
+ 80009ca:	6313      	str	r3, [r2, #48]	@ 0x30
 
     /* 2. ตั้งค่า LED เป็น Output (PA5, PA6, PA7, PB6) */
     GPIOA->MODER &= ~((3U << (5*2)) | (3U << (6*2)) | (3U << (7*2)));
- 80001e4:	4b27      	ldr	r3, [pc, #156]	@ (8000284 <GPIO_Init+0xb0>)
- 80001e6:	681b      	ldr	r3, [r3, #0]
- 80001e8:	4a26      	ldr	r2, [pc, #152]	@ (8000284 <GPIO_Init+0xb0>)
- 80001ea:	f423 437c 	bic.w	r3, r3, #64512	@ 0xfc00
- 80001ee:	6013      	str	r3, [r2, #0]
+ 80009cc:	4b27      	ldr	r3, [pc, #156]	@ (8000a6c <GPIO_Init+0xb0>)
+ 80009ce:	681b      	ldr	r3, [r3, #0]
+ 80009d0:	4a26      	ldr	r2, [pc, #152]	@ (8000a6c <GPIO_Init+0xb0>)
+ 80009d2:	f423 437c 	bic.w	r3, r3, #64512	@ 0xfc00
+ 80009d6:	6013      	str	r3, [r2, #0]
     GPIOA->MODER |=  ((1U << (5*2)) | (1U << (6*2)) | (1U << (7*2)));
- 80001f0:	4b24      	ldr	r3, [pc, #144]	@ (8000284 <GPIO_Init+0xb0>)
- 80001f2:	681b      	ldr	r3, [r3, #0]
- 80001f4:	4a23      	ldr	r2, [pc, #140]	@ (8000284 <GPIO_Init+0xb0>)
- 80001f6:	f443 43a8 	orr.w	r3, r3, #21504	@ 0x5400
- 80001fa:	6013      	str	r3, [r2, #0]
+ 80009d8:	4b24      	ldr	r3, [pc, #144]	@ (8000a6c <GPIO_Init+0xb0>)
+ 80009da:	681b      	ldr	r3, [r3, #0]
+ 80009dc:	4a23      	ldr	r2, [pc, #140]	@ (8000a6c <GPIO_Init+0xb0>)
+ 80009de:	f443 43a8 	orr.w	r3, r3, #21504	@ 0x5400
+ 80009e2:	6013      	str	r3, [r2, #0]
 
     GPIOB->MODER &= ~(3U << (6*2));
- 80001fc:	4b22      	ldr	r3, [pc, #136]	@ (8000288 <GPIO_Init+0xb4>)
- 80001fe:	681b      	ldr	r3, [r3, #0]
- 8000200:	4a21      	ldr	r2, [pc, #132]	@ (8000288 <GPIO_Init+0xb4>)
- 8000202:	f423 5340 	bic.w	r3, r3, #12288	@ 0x3000
- 8000206:	6013      	str	r3, [r2, #0]
+ 80009e4:	4b22      	ldr	r3, [pc, #136]	@ (8000a70 <GPIO_Init+0xb4>)
+ 80009e6:	681b      	ldr	r3, [r3, #0]
+ 80009e8:	4a21      	ldr	r2, [pc, #132]	@ (8000a70 <GPIO_Init+0xb4>)
+ 80009ea:	f423 5340 	bic.w	r3, r3, #12288	@ 0x3000
+ 80009ee:	6013      	str	r3, [r2, #0]
     GPIOB->MODER |=  (1U << (6*2));
- 8000208:	4b1f      	ldr	r3, [pc, #124]	@ (8000288 <GPIO_Init+0xb4>)
- 800020a:	681b      	ldr	r3, [r3, #0]
- 800020c:	4a1e      	ldr	r2, [pc, #120]	@ (8000288 <GPIO_Init+0xb4>)
- 800020e:	f443 5380 	orr.w	r3, r3, #4096	@ 0x1000
- 8000212:	6013      	str	r3, [r2, #0]
+ 80009f0:	4b1f      	ldr	r3, [pc, #124]	@ (8000a70 <GPIO_Init+0xb4>)
+ 80009f2:	681b      	ldr	r3, [r3, #0]
+ 80009f4:	4a1e      	ldr	r2, [pc, #120]	@ (8000a70 <GPIO_Init+0xb4>)
+ 80009f6:	f443 5380 	orr.w	r3, r3, #4096	@ 0x1000
+ 80009fa:	6013      	str	r3, [r2, #0]
 
     /* ดับ LED ทั้งหมดก่อนเริ่มงาน */
     LED_Off(LED1_PORT, LED1_PIN);
- 8000214:	2105      	movs	r1, #5
- 8000216:	481b      	ldr	r0, [pc, #108]	@ (8000284 <GPIO_Init+0xb0>)
- 8000218:	f000 f849 	bl	80002ae <LED_Off>
+ 80009fc:	2105      	movs	r1, #5
+ 80009fe:	481b      	ldr	r0, [pc, #108]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a00:	f000 f849 	bl	8000a96 <LED_Off>
     LED_Off(LED2_PORT, LED2_PIN);
- 800021c:	2106      	movs	r1, #6
- 800021e:	4819      	ldr	r0, [pc, #100]	@ (8000284 <GPIO_Init+0xb0>)
- 8000220:	f000 f845 	bl	80002ae <LED_Off>
+ 8000a04:	2106      	movs	r1, #6
+ 8000a06:	4819      	ldr	r0, [pc, #100]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a08:	f000 f845 	bl	8000a96 <LED_Off>
     LED_Off(LED3_PORT, LED3_PIN);
- 8000224:	2107      	movs	r1, #7
- 8000226:	4817      	ldr	r0, [pc, #92]	@ (8000284 <GPIO_Init+0xb0>)
- 8000228:	f000 f841 	bl	80002ae <LED_Off>
+ 8000a0c:	2107      	movs	r1, #7
+ 8000a0e:	4817      	ldr	r0, [pc, #92]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a10:	f000 f841 	bl	8000a96 <LED_Off>
     LED_Off(LED4_PORT, LED4_PIN);
- 800022c:	2106      	movs	r1, #6
- 800022e:	4816      	ldr	r0, [pc, #88]	@ (8000288 <GPIO_Init+0xb4>)
- 8000230:	f000 f83d 	bl	80002ae <LED_Off>
+ 8000a14:	2106      	movs	r1, #6
+ 8000a16:	4816      	ldr	r0, [pc, #88]	@ (8000a70 <GPIO_Init+0xb4>)
+ 8000a18:	f000 f83d 	bl	8000a96 <LED_Off>
 
     /* 3. ตั้งค่า ปุ่มกด เป็น Input + Pull-up (PA10, PB3, PB5, PB4) */
     GPIOA->MODER &= ~(3U << (10*2));                         // PA10 = Input
- 8000234:	4b13      	ldr	r3, [pc, #76]	@ (8000284 <GPIO_Init+0xb0>)
- 8000236:	681b      	ldr	r3, [r3, #0]
- 8000238:	4a12      	ldr	r2, [pc, #72]	@ (8000284 <GPIO_Init+0xb0>)
- 800023a:	f423 1340 	bic.w	r3, r3, #3145728	@ 0x300000
- 800023e:	6013      	str	r3, [r2, #0]
+ 8000a1c:	4b13      	ldr	r3, [pc, #76]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a1e:	681b      	ldr	r3, [r3, #0]
+ 8000a20:	4a12      	ldr	r2, [pc, #72]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a22:	f423 1340 	bic.w	r3, r3, #3145728	@ 0x300000
+ 8000a26:	6013      	str	r3, [r2, #0]
     GPIOA->PUPDR &= ~(3U << (10*2));
- 8000240:	4b10      	ldr	r3, [pc, #64]	@ (8000284 <GPIO_Init+0xb0>)
- 8000242:	68db      	ldr	r3, [r3, #12]
- 8000244:	4a0f      	ldr	r2, [pc, #60]	@ (8000284 <GPIO_Init+0xb0>)
- 8000246:	f423 1340 	bic.w	r3, r3, #3145728	@ 0x300000
- 800024a:	60d3      	str	r3, [r2, #12]
+ 8000a28:	4b10      	ldr	r3, [pc, #64]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a2a:	68db      	ldr	r3, [r3, #12]
+ 8000a2c:	4a0f      	ldr	r2, [pc, #60]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a2e:	f423 1340 	bic.w	r3, r3, #3145728	@ 0x300000
+ 8000a32:	60d3      	str	r3, [r2, #12]
     GPIOA->PUPDR |=  (1U << (10*2));                         // Pull-up
- 800024c:	4b0d      	ldr	r3, [pc, #52]	@ (8000284 <GPIO_Init+0xb0>)
- 800024e:	68db      	ldr	r3, [r3, #12]
- 8000250:	4a0c      	ldr	r2, [pc, #48]	@ (8000284 <GPIO_Init+0xb0>)
- 8000252:	f443 1380 	orr.w	r3, r3, #1048576	@ 0x100000
- 8000256:	60d3      	str	r3, [r2, #12]
+ 8000a34:	4b0d      	ldr	r3, [pc, #52]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a36:	68db      	ldr	r3, [r3, #12]
+ 8000a38:	4a0c      	ldr	r2, [pc, #48]	@ (8000a6c <GPIO_Init+0xb0>)
+ 8000a3a:	f443 1380 	orr.w	r3, r3, #1048576	@ 0x100000
+ 8000a3e:	60d3      	str	r3, [r2, #12]
 
     GPIOB->MODER &= ~((3U << (3*2)) | (3U << (4*2)) | (3U << (5*2))); // PB3, PB4, PB5 = Input
- 8000258:	4b0b      	ldr	r3, [pc, #44]	@ (8000288 <GPIO_Init+0xb4>)
- 800025a:	681b      	ldr	r3, [r3, #0]
- 800025c:	4a0a      	ldr	r2, [pc, #40]	@ (8000288 <GPIO_Init+0xb4>)
- 800025e:	f423 637c 	bic.w	r3, r3, #4032	@ 0xfc0
- 8000262:	6013      	str	r3, [r2, #0]
+ 8000a40:	4b0b      	ldr	r3, [pc, #44]	@ (8000a70 <GPIO_Init+0xb4>)
+ 8000a42:	681b      	ldr	r3, [r3, #0]
+ 8000a44:	4a0a      	ldr	r2, [pc, #40]	@ (8000a70 <GPIO_Init+0xb4>)
+ 8000a46:	f423 637c 	bic.w	r3, r3, #4032	@ 0xfc0
+ 8000a4a:	6013      	str	r3, [r2, #0]
     GPIOB->PUPDR &= ~((3U << (3*2)) | (3U << (4*2)) | (3U << (5*2)));
- 8000264:	4b08      	ldr	r3, [pc, #32]	@ (8000288 <GPIO_Init+0xb4>)
- 8000266:	68db      	ldr	r3, [r3, #12]
- 8000268:	4a07      	ldr	r2, [pc, #28]	@ (8000288 <GPIO_Init+0xb4>)
- 800026a:	f423 637c 	bic.w	r3, r3, #4032	@ 0xfc0
- 800026e:	60d3      	str	r3, [r2, #12]
+ 8000a4c:	4b08      	ldr	r3, [pc, #32]	@ (8000a70 <GPIO_Init+0xb4>)
+ 8000a4e:	68db      	ldr	r3, [r3, #12]
+ 8000a50:	4a07      	ldr	r2, [pc, #28]	@ (8000a70 <GPIO_Init+0xb4>)
+ 8000a52:	f423 637c 	bic.w	r3, r3, #4032	@ 0xfc0
+ 8000a56:	60d3      	str	r3, [r2, #12]
     GPIOB->PUPDR |=  ((1U << (3*2)) | (1U << (4*2)) | (1U << (5*2))); // Pull-up
- 8000270:	4b05      	ldr	r3, [pc, #20]	@ (8000288 <GPIO_Init+0xb4>)
- 8000272:	68db      	ldr	r3, [r3, #12]
- 8000274:	4a04      	ldr	r2, [pc, #16]	@ (8000288 <GPIO_Init+0xb4>)
- 8000276:	f443 63a8 	orr.w	r3, r3, #1344	@ 0x540
- 800027a:	60d3      	str	r3, [r2, #12]
+ 8000a58:	4b05      	ldr	r3, [pc, #20]	@ (8000a70 <GPIO_Init+0xb4>)
+ 8000a5a:	68db      	ldr	r3, [r3, #12]
+ 8000a5c:	4a04      	ldr	r2, [pc, #16]	@ (8000a70 <GPIO_Init+0xb4>)
+ 8000a5e:	f443 63a8 	orr.w	r3, r3, #1344	@ 0x540
+ 8000a62:	60d3      	str	r3, [r2, #12]
 }
- 800027c:	bf00      	nop
- 800027e:	bd80      	pop	{r7, pc}
- 8000280:	40023800 	.word	0x40023800
- 8000284:	40020000 	.word	0x40020000
- 8000288:	40020400 	.word	0x40020400
+ 8000a64:	bf00      	nop
+ 8000a66:	bd80      	pop	{r7, pc}
+ 8000a68:	40023800 	.word	0x40023800
+ 8000a6c:	40020000 	.word	0x40020000
+ 8000a70:	40020400 	.word	0x40020400
 
-0800028c <LED_On>:
+08000a74 <LED_On>:
 
 void LED_On(GPIO_TypeDef *GPIOx, uint8_t pin) {
- 800028c:	b480      	push	{r7}
- 800028e:	b083      	sub	sp, #12
- 8000290:	af00      	add	r7, sp, #0
- 8000292:	6078      	str	r0, [r7, #4]
- 8000294:	460b      	mov	r3, r1
- 8000296:	70fb      	strb	r3, [r7, #3]
+ 8000a74:	b480      	push	{r7}
+ 8000a76:	b083      	sub	sp, #12
+ 8000a78:	af00      	add	r7, sp, #0
+ 8000a7a:	6078      	str	r0, [r7, #4]
+ 8000a7c:	460b      	mov	r3, r1
+ 8000a7e:	70fb      	strb	r3, [r7, #3]
     GPIOx->BSRR = (1U << pin);
- 8000298:	78fb      	ldrb	r3, [r7, #3]
- 800029a:	2201      	movs	r2, #1
- 800029c:	409a      	lsls	r2, r3
- 800029e:	687b      	ldr	r3, [r7, #4]
- 80002a0:	619a      	str	r2, [r3, #24]
+ 8000a80:	78fb      	ldrb	r3, [r7, #3]
+ 8000a82:	2201      	movs	r2, #1
+ 8000a84:	409a      	lsls	r2, r3
+ 8000a86:	687b      	ldr	r3, [r7, #4]
+ 8000a88:	619a      	str	r2, [r3, #24]
 }
- 80002a2:	bf00      	nop
- 80002a4:	370c      	adds	r7, #12
- 80002a6:	46bd      	mov	sp, r7
- 80002a8:	f85d 7b04 	ldr.w	r7, [sp], #4
- 80002ac:	4770      	bx	lr
+ 8000a8a:	bf00      	nop
+ 8000a8c:	370c      	adds	r7, #12
+ 8000a8e:	46bd      	mov	sp, r7
+ 8000a90:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000a94:	4770      	bx	lr
 
-080002ae <LED_Off>:
+08000a96 <LED_Off>:
 
 void LED_Off(GPIO_TypeDef *GPIOx, uint8_t pin) {
- 80002ae:	b480      	push	{r7}
- 80002b0:	b083      	sub	sp, #12
- 80002b2:	af00      	add	r7, sp, #0
- 80002b4:	6078      	str	r0, [r7, #4]
- 80002b6:	460b      	mov	r3, r1
- 80002b8:	70fb      	strb	r3, [r7, #3]
+ 8000a96:	b480      	push	{r7}
+ 8000a98:	b083      	sub	sp, #12
+ 8000a9a:	af00      	add	r7, sp, #0
+ 8000a9c:	6078      	str	r0, [r7, #4]
+ 8000a9e:	460b      	mov	r3, r1
+ 8000aa0:	70fb      	strb	r3, [r7, #3]
     GPIOx->BSRR = (1U << (pin + 16));
- 80002ba:	78fb      	ldrb	r3, [r7, #3]
- 80002bc:	3310      	adds	r3, #16
- 80002be:	2201      	movs	r2, #1
- 80002c0:	409a      	lsls	r2, r3
- 80002c2:	687b      	ldr	r3, [r7, #4]
- 80002c4:	619a      	str	r2, [r3, #24]
+ 8000aa2:	78fb      	ldrb	r3, [r7, #3]
+ 8000aa4:	3310      	adds	r3, #16
+ 8000aa6:	2201      	movs	r2, #1
+ 8000aa8:	409a      	lsls	r2, r3
+ 8000aaa:	687b      	ldr	r3, [r7, #4]
+ 8000aac:	619a      	str	r2, [r3, #24]
 }
- 80002c6:	bf00      	nop
- 80002c8:	370c      	adds	r7, #12
- 80002ca:	46bd      	mov	sp, r7
- 80002cc:	f85d 7b04 	ldr.w	r7, [sp], #4
- 80002d0:	4770      	bx	lr
+ 8000aae:	bf00      	nop
+ 8000ab0:	370c      	adds	r7, #12
+ 8000ab2:	46bd      	mov	sp, r7
+ 8000ab4:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000ab8:	4770      	bx	lr
 
-080002d2 <BTN_IsPressed>:
+08000aba <BTN_IsPressed>:
 
 void LED_Toggle(GPIO_TypeDef *GPIOx, uint8_t pin) {
     GPIOx->ODR ^= (1U << pin);
 }
 
 uint8_t BTN_IsPressed(GPIO_TypeDef *GPIOx, uint8_t pin) {
- 80002d2:	b480      	push	{r7}
- 80002d4:	b083      	sub	sp, #12
- 80002d6:	af00      	add	r7, sp, #0
- 80002d8:	6078      	str	r0, [r7, #4]
- 80002da:	460b      	mov	r3, r1
- 80002dc:	70fb      	strb	r3, [r7, #3]
-    return ((GPIOx->IDR & (1U << pin)) == 0) ? 1 : 0;
- 80002de:	687b      	ldr	r3, [r7, #4]
- 80002e0:	691a      	ldr	r2, [r3, #16]
- 80002e2:	78fb      	ldrb	r3, [r7, #3]
- 80002e4:	2101      	movs	r1, #1
- 80002e6:	fa01 f303 	lsl.w	r3, r1, r3
- 80002ea:	4013      	ands	r3, r2
- 80002ec:	2b00      	cmp	r3, #0
- 80002ee:	bf0c      	ite	eq
- 80002f0:	2301      	moveq	r3, #1
- 80002f2:	2300      	movne	r3, #0
- 80002f4:	b2db      	uxtb	r3, r3
+ 8000aba:	b480      	push	{r7}
+ 8000abc:	b083      	sub	sp, #12
+ 8000abe:	af00      	add	r7, sp, #0
+ 8000ac0:	6078      	str	r0, [r7, #4]
+ 8000ac2:	460b      	mov	r3, r1
+ 8000ac4:	70fb      	strb	r3, [r7, #3]
+    return ((GPIOx->IDR & (1U << pin)) == 0U) ? 1U : 0U;
+ 8000ac6:	687b      	ldr	r3, [r7, #4]
+ 8000ac8:	691a      	ldr	r2, [r3, #16]
+ 8000aca:	78fb      	ldrb	r3, [r7, #3]
+ 8000acc:	2101      	movs	r1, #1
+ 8000ace:	fa01 f303 	lsl.w	r3, r1, r3
+ 8000ad2:	4013      	ands	r3, r2
+ 8000ad4:	2b00      	cmp	r3, #0
+ 8000ad6:	d101      	bne.n	8000adc <BTN_IsPressed+0x22>
+ 8000ad8:	2301      	movs	r3, #1
+ 8000ada:	e000      	b.n	8000ade <BTN_IsPressed+0x24>
+ 8000adc:	2300      	movs	r3, #0
 }
- 80002f6:	4618      	mov	r0, r3
- 80002f8:	370c      	adds	r7, #12
- 80002fa:	46bd      	mov	sp, r7
- 80002fc:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000300:	4770      	bx	lr
+ 8000ade:	4618      	mov	r0, r3
+ 8000ae0:	370c      	adds	r7, #12
+ 8000ae2:	46bd      	mov	sp, r7
+ 8000ae4:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000ae8:	4770      	bx	lr
 
-08000302 <delay_ms>:
-#include "stm32f411xx_custom.h"
-#include "gpio_driver.h"
-#include "uart_driver.h"
+08000aea <GPIO_SetPinMode>:
+
+/* ตั้งค่า Mode ของขา (Input/Output/AF/Analog) ทีละขา ใช้เวลาต้องสลับ Direction แบบ Dynamic
+ * เช่น DHT11 ที่ต้องเป็น Output ตอนส่ง Start Signal แล้วสลับเป็น Input ตอนอ่านข้อมูลกลับ
+ */
+void GPIO_SetPinMode(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t mode) {
+ 8000aea:	b480      	push	{r7}
+ 8000aec:	b083      	sub	sp, #12
+ 8000aee:	af00      	add	r7, sp, #0
+ 8000af0:	6078      	str	r0, [r7, #4]
+ 8000af2:	460b      	mov	r3, r1
+ 8000af4:	70fb      	strb	r3, [r7, #3]
+ 8000af6:	4613      	mov	r3, r2
+ 8000af8:	70bb      	strb	r3, [r7, #2]
+    GPIOx->MODER &= ~(3U << ((uint32_t)pin * 2U));
+ 8000afa:	687b      	ldr	r3, [r7, #4]
+ 8000afc:	681a      	ldr	r2, [r3, #0]
+ 8000afe:	78fb      	ldrb	r3, [r7, #3]
+ 8000b00:	005b      	lsls	r3, r3, #1
+ 8000b02:	2103      	movs	r1, #3
+ 8000b04:	fa01 f303 	lsl.w	r3, r1, r3
+ 8000b08:	43db      	mvns	r3, r3
+ 8000b0a:	401a      	ands	r2, r3
+ 8000b0c:	687b      	ldr	r3, [r7, #4]
+ 8000b0e:	601a      	str	r2, [r3, #0]
+    GPIOx->MODER |= ((uint32_t)mode << ((uint32_t)pin * 2U));
+ 8000b10:	687b      	ldr	r3, [r7, #4]
+ 8000b12:	681a      	ldr	r2, [r3, #0]
+ 8000b14:	78b9      	ldrb	r1, [r7, #2]
+ 8000b16:	78fb      	ldrb	r3, [r7, #3]
+ 8000b18:	005b      	lsls	r3, r3, #1
+ 8000b1a:	fa01 f303 	lsl.w	r3, r1, r3
+ 8000b1e:	431a      	orrs	r2, r3
+ 8000b20:	687b      	ldr	r3, [r7, #4]
+ 8000b22:	601a      	str	r2, [r3, #0]
+}
+ 8000b24:	bf00      	nop
+ 8000b26:	370c      	adds	r7, #12
+ 8000b28:	46bd      	mov	sp, r7
+ 8000b2a:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000b2e:	4770      	bx	lr
+
+08000b30 <GPIO_SetPinPull>:
+
+/* ตั้งค่า Pull-up/Pull-down ของขา (0=ไม่ต่อ, 1=Pull-up, 2=Pull-down) */
+void GPIO_SetPinPull(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t pull) {
+ 8000b30:	b480      	push	{r7}
+ 8000b32:	b083      	sub	sp, #12
+ 8000b34:	af00      	add	r7, sp, #0
+ 8000b36:	6078      	str	r0, [r7, #4]
+ 8000b38:	460b      	mov	r3, r1
+ 8000b3a:	70fb      	strb	r3, [r7, #3]
+ 8000b3c:	4613      	mov	r3, r2
+ 8000b3e:	70bb      	strb	r3, [r7, #2]
+    GPIOx->PUPDR &= ~(3U << ((uint32_t)pin * 2U));
+ 8000b40:	687b      	ldr	r3, [r7, #4]
+ 8000b42:	68da      	ldr	r2, [r3, #12]
+ 8000b44:	78fb      	ldrb	r3, [r7, #3]
+ 8000b46:	005b      	lsls	r3, r3, #1
+ 8000b48:	2103      	movs	r1, #3
+ 8000b4a:	fa01 f303 	lsl.w	r3, r1, r3
+ 8000b4e:	43db      	mvns	r3, r3
+ 8000b50:	401a      	ands	r2, r3
+ 8000b52:	687b      	ldr	r3, [r7, #4]
+ 8000b54:	60da      	str	r2, [r3, #12]
+    GPIOx->PUPDR |= ((uint32_t)pull << ((uint32_t)pin * 2U));
+ 8000b56:	687b      	ldr	r3, [r7, #4]
+ 8000b58:	68da      	ldr	r2, [r3, #12]
+ 8000b5a:	78b9      	ldrb	r1, [r7, #2]
+ 8000b5c:	78fb      	ldrb	r3, [r7, #3]
+ 8000b5e:	005b      	lsls	r3, r3, #1
+ 8000b60:	fa01 f303 	lsl.w	r3, r1, r3
+ 8000b64:	431a      	orrs	r2, r3
+ 8000b66:	687b      	ldr	r3, [r7, #4]
+ 8000b68:	60da      	str	r2, [r3, #12]
+}
+ 8000b6a:	bf00      	nop
+ 8000b6c:	370c      	adds	r7, #12
+ 8000b6e:	46bd      	mov	sp, r7
+ 8000b70:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000b74:	4770      	bx	lr
+
+08000b76 <GPIO_WritePin>:
+
+/* เขียนค่า Digital Output ของขา (state: 0=Low, 1=High) ผ่าน BSRR (Atomic, ปลอดภัยกว่าการแก้ ODR ตรง ๆ) */
+void GPIO_WritePin(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t state) {
+ 8000b76:	b480      	push	{r7}
+ 8000b78:	b083      	sub	sp, #12
+ 8000b7a:	af00      	add	r7, sp, #0
+ 8000b7c:	6078      	str	r0, [r7, #4]
+ 8000b7e:	460b      	mov	r3, r1
+ 8000b80:	70fb      	strb	r3, [r7, #3]
+ 8000b82:	4613      	mov	r3, r2
+ 8000b84:	70bb      	strb	r3, [r7, #2]
+    if (state != 0U) {
+ 8000b86:	78bb      	ldrb	r3, [r7, #2]
+ 8000b88:	2b00      	cmp	r3, #0
+ 8000b8a:	d005      	beq.n	8000b98 <GPIO_WritePin+0x22>
+        GPIOx->BSRR = (1U << pin);
+ 8000b8c:	78fb      	ldrb	r3, [r7, #3]
+ 8000b8e:	2201      	movs	r2, #1
+ 8000b90:	409a      	lsls	r2, r3
+ 8000b92:	687b      	ldr	r3, [r7, #4]
+ 8000b94:	619a      	str	r2, [r3, #24]
+    } else {
+        GPIOx->BSRR = (1U << (pin + 16U));
+    }
+}
+ 8000b96:	e005      	b.n	8000ba4 <GPIO_WritePin+0x2e>
+        GPIOx->BSRR = (1U << (pin + 16U));
+ 8000b98:	78fb      	ldrb	r3, [r7, #3]
+ 8000b9a:	3310      	adds	r3, #16
+ 8000b9c:	2201      	movs	r2, #1
+ 8000b9e:	409a      	lsls	r2, r3
+ 8000ba0:	687b      	ldr	r3, [r7, #4]
+ 8000ba2:	619a      	str	r2, [r3, #24]
+}
+ 8000ba4:	bf00      	nop
+ 8000ba6:	370c      	adds	r7, #12
+ 8000ba8:	46bd      	mov	sp, r7
+ 8000baa:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000bae:	4770      	bx	lr
+
+08000bb0 <GPIO_ReadPin>:
+
+/* อ่านค่า Digital Input ของขา คืนค่า 0 หรือ 1 */
+uint8_t GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint8_t pin) {
+ 8000bb0:	b480      	push	{r7}
+ 8000bb2:	b083      	sub	sp, #12
+ 8000bb4:	af00      	add	r7, sp, #0
+ 8000bb6:	6078      	str	r0, [r7, #4]
+ 8000bb8:	460b      	mov	r3, r1
+ 8000bba:	70fb      	strb	r3, [r7, #3]
+    return ((GPIOx->IDR & (1U << pin)) != 0U) ? 1U : 0U;
+ 8000bbc:	687b      	ldr	r3, [r7, #4]
+ 8000bbe:	691a      	ldr	r2, [r3, #16]
+ 8000bc0:	78fb      	ldrb	r3, [r7, #3]
+ 8000bc2:	2101      	movs	r1, #1
+ 8000bc4:	fa01 f303 	lsl.w	r3, r1, r3
+ 8000bc8:	4013      	ands	r3, r2
+ 8000bca:	2b00      	cmp	r3, #0
+ 8000bcc:	d001      	beq.n	8000bd2 <GPIO_ReadPin+0x22>
+ 8000bce:	2301      	movs	r3, #1
+ 8000bd0:	e000      	b.n	8000bd4 <GPIO_ReadPin+0x24>
+ 8000bd2:	2300      	movs	r3, #0
+}
+ 8000bd4:	4618      	mov	r0, r3
+ 8000bd6:	370c      	adds	r7, #12
+ 8000bd8:	46bd      	mov	sp, r7
+ 8000bda:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000bde:	4770      	bx	lr
+
+08000be0 <IWDG_Init>:
+/* IWDG ทำงานด้วย LSI Clock ภายใน (~32 kHz) และแยกอิสระจาก Clock หลักของระบบ
+ * Timeout = (Prescaler * (RLR + 1)) / LSI_Freq
+ * เลือก Prescaler = /32, RLR = 999 -> Timeout ~= (32 * 1000) / 32000 = 1.0 วินาที
+ * ดังนั้นในโปรแกรมหลักต้องเรียก IWDG_Refresh() อย่างน้อยทุก 1 วินาที ไม่เช่นนั้น MCU จะ Reset ตัวเอง
+ */
+void IWDG_Init(void) {
+ 8000be0:	b480      	push	{r7}
+ 8000be2:	af00      	add	r7, sp, #0
+    IWDG->KR = 0x5555U;                 // ปลดล็อกการเขียน PR และ RLR
+ 8000be4:	4b12      	ldr	r3, [pc, #72]	@ (8000c30 <IWDG_Init+0x50>)
+ 8000be6:	f245 5255 	movw	r2, #21845	@ 0x5555
+ 8000bea:	601a      	str	r2, [r3, #0]
+    while ((IWDG->SR & (1U << 0)) != 0U) { } /* รอจนบิต PVU (Prescaler Value Update) ว่าง */
+ 8000bec:	bf00      	nop
+ 8000bee:	4b10      	ldr	r3, [pc, #64]	@ (8000c30 <IWDG_Init+0x50>)
+ 8000bf0:	68db      	ldr	r3, [r3, #12]
+ 8000bf2:	f003 0301 	and.w	r3, r3, #1
+ 8000bf6:	2b00      	cmp	r3, #0
+ 8000bf8:	d1f9      	bne.n	8000bee <IWDG_Init+0xe>
+
+    IWDG->PR = 0x03U;                   // Prescaler = /32
+ 8000bfa:	4b0d      	ldr	r3, [pc, #52]	@ (8000c30 <IWDG_Init+0x50>)
+ 8000bfc:	2203      	movs	r2, #3
+ 8000bfe:	605a      	str	r2, [r3, #4]
+
+    while ((IWDG->SR & (1U << 1)) != 0U) { } /* รอจนบิต RVU (Reload Value Update) ว่าง */
+ 8000c00:	bf00      	nop
+ 8000c02:	4b0b      	ldr	r3, [pc, #44]	@ (8000c30 <IWDG_Init+0x50>)
+ 8000c04:	68db      	ldr	r3, [r3, #12]
+ 8000c06:	f003 0302 	and.w	r3, r3, #2
+ 8000c0a:	2b00      	cmp	r3, #0
+ 8000c0c:	d1f9      	bne.n	8000c02 <IWDG_Init+0x22>
+    IWDG->RLR = 999U;                   // Reload value -> Timeout ~ 1 วินาที
+ 8000c0e:	4b08      	ldr	r3, [pc, #32]	@ (8000c30 <IWDG_Init+0x50>)
+ 8000c10:	f240 32e7 	movw	r2, #999	@ 0x3e7
+ 8000c14:	609a      	str	r2, [r3, #8]
+
+    IWDG->KR = 0xAAAAU;                 // Refresh ครั้งแรก เพื่อโหลดค่า RLR เข้า Down-counter
+ 8000c16:	4b06      	ldr	r3, [pc, #24]	@ (8000c30 <IWDG_Init+0x50>)
+ 8000c18:	f64a 22aa 	movw	r2, #43690	@ 0xaaaa
+ 8000c1c:	601a      	str	r2, [r3, #0]
+    IWDG->KR = 0xCCCCU;                 // เริ่มการทำงานของ Watchdog (เริ่มนับถอยหลัง)
+ 8000c1e:	4b04      	ldr	r3, [pc, #16]	@ (8000c30 <IWDG_Init+0x50>)
+ 8000c20:	f64c 42cc 	movw	r2, #52428	@ 0xcccc
+ 8000c24:	601a      	str	r2, [r3, #0]
+}
+ 8000c26:	bf00      	nop
+ 8000c28:	46bd      	mov	sp, r7
+ 8000c2a:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000c2e:	4770      	bx	lr
+ 8000c30:	40003000 	.word	0x40003000
+
+08000c34 <IWDG_Refresh>:
+
+void IWDG_Refresh(void) {
+ 8000c34:	b480      	push	{r7}
+ 8000c36:	af00      	add	r7, sp, #0
+    IWDG->KR = 0xAAAAU;                 // "เลี้ยง" Watchdog (Kick the dog) ป้องกันการ Reset
+ 8000c38:	4b04      	ldr	r3, [pc, #16]	@ (8000c4c <IWDG_Refresh+0x18>)
+ 8000c3a:	f64a 22aa 	movw	r2, #43690	@ 0xaaaa
+ 8000c3e:	601a      	str	r2, [r3, #0]
+}
+ 8000c40:	bf00      	nop
+ 8000c42:	46bd      	mov	sp, r7
+ 8000c44:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000c48:	4770      	bx	lr
+ 8000c4a:	bf00      	nop
+ 8000c4c:	40003000 	.word	0x40003000
+
+08000c50 <delay_ms>:
+/* DHT11 อ่านค่าได้ไม่เร็วกว่า 1 ครั้ง/วินาที จึงอ่านทุก ๆ ~2 วินาทีแทนที่จะอ่านทุกรอบ Loop
+ * (Loop หลักวิ่งทุก ~20ms ดังนั้น 100 รอบ Loop โดยประมาณ = 2 วินาที)
+ */
+#define DHT11_READ_INTERVAL_TICKS   100U
 
 static void delay_ms(volatile uint32_t ms) {
- 8000302:	b480      	push	{r7}
- 8000304:	b085      	sub	sp, #20
- 8000306:	af00      	add	r7, sp, #0
- 8000308:	6078      	str	r0, [r7, #4]
+ 8000c50:	b480      	push	{r7}
+ 8000c52:	b085      	sub	sp, #20
+ 8000c54:	af00      	add	r7, sp, #0
+ 8000c56:	6078      	str	r0, [r7, #4]
     for (volatile uint32_t i = 0; i < ms * 3000; i++) {
- 800030a:	2300      	movs	r3, #0
- 800030c:	60fb      	str	r3, [r7, #12]
- 800030e:	e003      	b.n	8000318 <delay_ms+0x16>
+ 8000c58:	2300      	movs	r3, #0
+ 8000c5a:	60fb      	str	r3, [r7, #12]
+ 8000c5c:	e003      	b.n	8000c66 <delay_ms+0x16>
         __asm("NOP");
- 8000310:	bf00      	nop
+ 8000c5e:	bf00      	nop
     for (volatile uint32_t i = 0; i < ms * 3000; i++) {
- 8000312:	68fb      	ldr	r3, [r7, #12]
- 8000314:	3301      	adds	r3, #1
- 8000316:	60fb      	str	r3, [r7, #12]
- 8000318:	687b      	ldr	r3, [r7, #4]
- 800031a:	f640 32b8 	movw	r2, #3000	@ 0xbb8
- 800031e:	fb03 f202 	mul.w	r2, r3, r2
- 8000322:	68fb      	ldr	r3, [r7, #12]
- 8000324:	429a      	cmp	r2, r3
- 8000326:	d8f3      	bhi.n	8000310 <delay_ms+0xe>
+ 8000c60:	68fb      	ldr	r3, [r7, #12]
+ 8000c62:	3301      	adds	r3, #1
+ 8000c64:	60fb      	str	r3, [r7, #12]
+ 8000c66:	687b      	ldr	r3, [r7, #4]
+ 8000c68:	f640 32b8 	movw	r2, #3000	@ 0xbb8
+ 8000c6c:	fb03 f202 	mul.w	r2, r3, r2
+ 8000c70:	68fb      	ldr	r3, [r7, #12]
+ 8000c72:	429a      	cmp	r2, r3
+ 8000c74:	d8f3      	bhi.n	8000c5e <delay_ms+0xe>
     }
 }
- 8000328:	bf00      	nop
- 800032a:	bf00      	nop
- 800032c:	3714      	adds	r7, #20
- 800032e:	46bd      	mov	sp, r7
- 8000330:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000334:	4770      	bx	lr
-	...
+ 8000c76:	bf00      	nop
+ 8000c78:	bf00      	nop
+ 8000c7a:	3714      	adds	r7, #20
+ 8000c7c:	46bd      	mov	sp, r7
+ 8000c7e:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000c82:	4770      	bx	lr
 
-08000338 <UART2_PrintTemperature>:
-/* ฟังก์ชันสำหรับส่งค่าอุณหภูมิ float (ทศนิยม 2 ตำแหน่ง) ออกทาง UART */
-void UART2_PrintTemperature(float temp) {
- 8000338:	b580      	push	{r7, lr}
- 800033a:	b088      	sub	sp, #32
- 800033c:	af00      	add	r7, sp, #0
- 800033e:	ed87 0a01 	vstr	s0, [r7, #4]
-    if (temp < 0.0f) {
- 8000342:	edd7 7a01 	vldr	s15, [r7, #4]
- 8000346:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 800034a:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 800034e:	d503      	bpl.n	8000358 <UART2_PrintTemperature+0x20>
-        UART2_SendString("TIMEOUT ERROR!\r\n");
- 8000350:	4850      	ldr	r0, [pc, #320]	@ (8000494 <UART2_PrintTemperature+0x15c>)
- 8000352:	f000 f985 	bl	8000660 <UART2_SendString>
- 8000356:	e099      	b.n	800048c <UART2_PrintTemperature+0x154>
-        return;
-    }
+08000c84 <FPU_Enable>:
 
-    int integer_part = (int)temp;
- 8000358:	edd7 7a01 	vldr	s15, [r7, #4]
- 800035c:	eefd 7ae7 	vcvt.s32.f32	s15, s15
- 8000360:	ee17 3a90 	vmov	r3, s15
- 8000364:	61fb      	str	r3, [r7, #28]
-    int decimal_part = (int)((temp - (float)integer_part) * 100.0f);
- 8000366:	69fb      	ldr	r3, [r7, #28]
- 8000368:	ee07 3a90 	vmov	s15, r3
- 800036c:	eef8 7ae7 	vcvt.f32.s32	s15, s15
- 8000370:	ed97 7a01 	vldr	s14, [r7, #4]
- 8000374:	ee77 7a67 	vsub.f32	s15, s14, s15
- 8000378:	ed9f 7a47 	vldr	s14, [pc, #284]	@ 8000498 <UART2_PrintTemperature+0x160>
- 800037c:	ee67 7a87 	vmul.f32	s15, s15, s14
- 8000380:	eefd 7ae7 	vcvt.s32.f32	s15, s15
- 8000384:	ee17 3a90 	vmov	r3, s15
- 8000388:	61bb      	str	r3, [r7, #24]
-
-    UART2_SendString("Current Temp: ");
- 800038a:	4844      	ldr	r0, [pc, #272]	@ (800049c <UART2_PrintTemperature+0x164>)
- 800038c:	f000 f968 	bl	8000660 <UART2_SendString>
-
-    /* แปลงและส่งเลขส่วนจำนวนเต็ม */
-    char buf[10];
-    int i = 0;
- 8000390:	2300      	movs	r3, #0
- 8000392:	617b      	str	r3, [r7, #20]
-    if (integer_part == 0) UART2_SendChar('0');
- 8000394:	69fb      	ldr	r3, [r7, #28]
- 8000396:	2b00      	cmp	r3, #0
- 8000398:	d121      	bne.n	80003de <UART2_PrintTemperature+0xa6>
- 800039a:	2030      	movs	r0, #48	@ 0x30
- 800039c:	f000 f948 	bl	8000630 <UART2_SendChar>
-    while (integer_part > 0) {
- 80003a0:	e01d      	b.n	80003de <UART2_PrintTemperature+0xa6>
-        buf[i++] = (integer_part % 10) + '0';
- 80003a2:	69fa      	ldr	r2, [r7, #28]
- 80003a4:	4b3e      	ldr	r3, [pc, #248]	@ (80004a0 <UART2_PrintTemperature+0x168>)
- 80003a6:	fb83 1302 	smull	r1, r3, r3, r2
- 80003aa:	1099      	asrs	r1, r3, #2
- 80003ac:	17d3      	asrs	r3, r2, #31
- 80003ae:	1ac9      	subs	r1, r1, r3
- 80003b0:	460b      	mov	r3, r1
- 80003b2:	009b      	lsls	r3, r3, #2
- 80003b4:	440b      	add	r3, r1
- 80003b6:	005b      	lsls	r3, r3, #1
- 80003b8:	1ad1      	subs	r1, r2, r3
- 80003ba:	b2ca      	uxtb	r2, r1
- 80003bc:	697b      	ldr	r3, [r7, #20]
- 80003be:	1c59      	adds	r1, r3, #1
- 80003c0:	6179      	str	r1, [r7, #20]
- 80003c2:	3230      	adds	r2, #48	@ 0x30
- 80003c4:	b2d2      	uxtb	r2, r2
- 80003c6:	3320      	adds	r3, #32
- 80003c8:	443b      	add	r3, r7
- 80003ca:	f803 2c18 	strb.w	r2, [r3, #-24]
-        integer_part /= 10;
- 80003ce:	69fb      	ldr	r3, [r7, #28]
- 80003d0:	4a33      	ldr	r2, [pc, #204]	@ (80004a0 <UART2_PrintTemperature+0x168>)
- 80003d2:	fb82 1203 	smull	r1, r2, r2, r3
- 80003d6:	1092      	asrs	r2, r2, #2
- 80003d8:	17db      	asrs	r3, r3, #31
- 80003da:	1ad3      	subs	r3, r2, r3
- 80003dc:	61fb      	str	r3, [r7, #28]
-    while (integer_part > 0) {
- 80003de:	69fb      	ldr	r3, [r7, #28]
- 80003e0:	2b00      	cmp	r3, #0
- 80003e2:	dcde      	bgt.n	80003a2 <UART2_PrintTemperature+0x6a>
-    }
-    while (i > 0) UART2_SendChar(buf[--i]);
- 80003e4:	e00a      	b.n	80003fc <UART2_PrintTemperature+0xc4>
- 80003e6:	697b      	ldr	r3, [r7, #20]
- 80003e8:	3b01      	subs	r3, #1
- 80003ea:	617b      	str	r3, [r7, #20]
- 80003ec:	f107 0208 	add.w	r2, r7, #8
- 80003f0:	697b      	ldr	r3, [r7, #20]
- 80003f2:	4413      	add	r3, r2
- 80003f4:	781b      	ldrb	r3, [r3, #0]
- 80003f6:	4618      	mov	r0, r3
- 80003f8:	f000 f91a 	bl	8000630 <UART2_SendChar>
- 80003fc:	697b      	ldr	r3, [r7, #20]
- 80003fe:	2b00      	cmp	r3, #0
- 8000400:	dcf1      	bgt.n	80003e6 <UART2_PrintTemperature+0xae>
-
-    UART2_SendString(".");
- 8000402:	4828      	ldr	r0, [pc, #160]	@ (80004a4 <UART2_PrintTemperature+0x16c>)
- 8000404:	f000 f92c 	bl	8000660 <UART2_SendString>
-
-    /* เติม 0 นำหน้ากรณีทศนิยมหลักเดียว เช่น .05 */
-    if (decimal_part < 10) UART2_SendString("0");
- 8000408:	69bb      	ldr	r3, [r7, #24]
- 800040a:	2b09      	cmp	r3, #9
- 800040c:	dc02      	bgt.n	8000414 <UART2_PrintTemperature+0xdc>
- 800040e:	4826      	ldr	r0, [pc, #152]	@ (80004a8 <UART2_PrintTemperature+0x170>)
- 8000410:	f000 f926 	bl	8000660 <UART2_SendString>
-
-    /* แปลงและส่งเลขส่วนทศนิยม */
-    i = 0;
- 8000414:	2300      	movs	r3, #0
- 8000416:	617b      	str	r3, [r7, #20]
-    if (decimal_part == 0) UART2_SendChar('0');
- 8000418:	69bb      	ldr	r3, [r7, #24]
- 800041a:	2b00      	cmp	r3, #0
- 800041c:	d121      	bne.n	8000462 <UART2_PrintTemperature+0x12a>
- 800041e:	2030      	movs	r0, #48	@ 0x30
- 8000420:	f000 f906 	bl	8000630 <UART2_SendChar>
-    while (decimal_part > 0) {
- 8000424:	e01d      	b.n	8000462 <UART2_PrintTemperature+0x12a>
-        buf[i++] = (decimal_part % 10) + '0';
- 8000426:	69ba      	ldr	r2, [r7, #24]
- 8000428:	4b1d      	ldr	r3, [pc, #116]	@ (80004a0 <UART2_PrintTemperature+0x168>)
- 800042a:	fb83 1302 	smull	r1, r3, r3, r2
- 800042e:	1099      	asrs	r1, r3, #2
- 8000430:	17d3      	asrs	r3, r2, #31
- 8000432:	1ac9      	subs	r1, r1, r3
- 8000434:	460b      	mov	r3, r1
- 8000436:	009b      	lsls	r3, r3, #2
- 8000438:	440b      	add	r3, r1
- 800043a:	005b      	lsls	r3, r3, #1
- 800043c:	1ad1      	subs	r1, r2, r3
- 800043e:	b2ca      	uxtb	r2, r1
- 8000440:	697b      	ldr	r3, [r7, #20]
- 8000442:	1c59      	adds	r1, r3, #1
- 8000444:	6179      	str	r1, [r7, #20]
- 8000446:	3230      	adds	r2, #48	@ 0x30
- 8000448:	b2d2      	uxtb	r2, r2
- 800044a:	3320      	adds	r3, #32
- 800044c:	443b      	add	r3, r7
- 800044e:	f803 2c18 	strb.w	r2, [r3, #-24]
-        decimal_part /= 10;
- 8000452:	69bb      	ldr	r3, [r7, #24]
- 8000454:	4a12      	ldr	r2, [pc, #72]	@ (80004a0 <UART2_PrintTemperature+0x168>)
- 8000456:	fb82 1203 	smull	r1, r2, r2, r3
- 800045a:	1092      	asrs	r2, r2, #2
- 800045c:	17db      	asrs	r3, r3, #31
- 800045e:	1ad3      	subs	r3, r2, r3
- 8000460:	61bb      	str	r3, [r7, #24]
-    while (decimal_part > 0) {
- 8000462:	69bb      	ldr	r3, [r7, #24]
- 8000464:	2b00      	cmp	r3, #0
- 8000466:	dcde      	bgt.n	8000426 <UART2_PrintTemperature+0xee>
-    }
-    while (i > 0) UART2_SendChar(buf[--i]);
- 8000468:	e00a      	b.n	8000480 <UART2_PrintTemperature+0x148>
- 800046a:	697b      	ldr	r3, [r7, #20]
- 800046c:	3b01      	subs	r3, #1
- 800046e:	617b      	str	r3, [r7, #20]
- 8000470:	f107 0208 	add.w	r2, r7, #8
- 8000474:	697b      	ldr	r3, [r7, #20]
- 8000476:	4413      	add	r3, r2
- 8000478:	781b      	ldrb	r3, [r3, #0]
- 800047a:	4618      	mov	r0, r3
- 800047c:	f000 f8d8 	bl	8000630 <UART2_SendChar>
- 8000480:	697b      	ldr	r3, [r7, #20]
- 8000482:	2b00      	cmp	r3, #0
- 8000484:	dcf1      	bgt.n	800046a <UART2_PrintTemperature+0x132>
-
-    UART2_SendString(" C\r\n");
- 8000486:	4809      	ldr	r0, [pc, #36]	@ (80004ac <UART2_PrintTemperature+0x174>)
- 8000488:	f000 f8ea 	bl	8000660 <UART2_SendString>
+/* เปิดใช้งาน Hardware FPU ของ Cortex-M4 (ต้องเรียกก่อนมีการใช้ float/double ใด ๆ ทั้งหมด)
+ * ให้สิทธิ์ Full Access กับ Coprocessor 10 และ 11 (บิต 20-23 ของ CPACR)
+ * ตามด้วย DSB/ISB เพื่อให้แน่ใจว่าการตั้งค่ามีผลก่อนคำสั่งถัดไปจะถูกดึงมา Execute
+ */
+static void FPU_Enable(void) {
+ 8000c84:	b480      	push	{r7}
+ 8000c86:	af00      	add	r7, sp, #0
+    SCB_CPACR |= (0xFU << 20);
+ 8000c88:	4b07      	ldr	r3, [pc, #28]	@ (8000ca8 <FPU_Enable+0x24>)
+ 8000c8a:	681b      	ldr	r3, [r3, #0]
+ 8000c8c:	4a06      	ldr	r2, [pc, #24]	@ (8000ca8 <FPU_Enable+0x24>)
+ 8000c8e:	f443 0370 	orr.w	r3, r3, #15728640	@ 0xf00000
+ 8000c92:	6013      	str	r3, [r2, #0]
+    __asm volatile ("dsb");
+ 8000c94:	f3bf 8f4f 	dsb	sy
+    __asm volatile ("isb");
+ 8000c98:	f3bf 8f6f 	isb	sy
 }
- 800048c:	3720      	adds	r7, #32
- 800048e:	46bd      	mov	sp, r7
- 8000490:	bd80      	pop	{r7, pc}
- 8000492:	bf00      	nop
- 8000494:	08000740 	.word	0x08000740
- 8000498:	42c80000 	.word	0x42c80000
- 800049c:	08000754 	.word	0x08000754
- 80004a0:	66666667 	.word	0x66666667
- 80004a4:	08000764 	.word	0x08000764
- 80004a8:	08000768 	.word	0x08000768
- 80004ac:	0800076c 	.word	0x0800076c
+ 8000c9c:	bf00      	nop
+ 8000c9e:	46bd      	mov	sp, r7
+ 8000ca0:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000ca4:	4770      	bx	lr
+ 8000ca6:	bf00      	nop
+ 8000ca8:	e000ed88 	.word	0xe000ed88
 
-080004b0 <main>:
+08000cac <main>:
+
 int main(void) {
- 80004b0:	b580      	push	{r7, lr}
- 80004b2:	af00      	add	r7, sp, #0
+ 8000cac:	b580      	push	{r7, lr}
+ 8000cae:	b082      	sub	sp, #8
+ 8000cb0:	af00      	add	r7, sp, #0
+    uint32_t dht11_tick = 0U;
+ 8000cb2:	2300      	movs	r3, #0
+ 8000cb4:	607b      	str	r3, [r7, #4]
+
+    FPU_Enable();  /* ต้องเป็นบรรทัดแรกสุดของ main() เสมอ ก่อนโค้ดส่วนอื่นที่อาจมี float แฝงอยู่ */
+ 8000cb6:	f7ff ffe5 	bl	8000c84 <FPU_Enable>
+
     GPIO_Init();
- 80004b4:	f7ff fe8e 	bl	80001d4 <GPIO_Init>
+ 8000cba:	f7ff fe7f 	bl	80009bc <GPIO_Init>
     UART2_Init();
- 80004b8:	f000 f87e 	bl	80005b8 <UART2_Init>
+ 8000cbe:	f000 f959 	bl	8000f74 <UART2_Init>
+    ADC1_Init();
+ 8000cc2:	f7ff fa87 	bl	80001d4 <ADC1_Init>
+    DHT11_Init();
+ 8000cc6:	f7ff fb2d 	bl	8000324 <DHT11_Init>
+    Menu_Init();
+ 8000cca:	f000 f85f 	bl	8000d8c <Menu_Init>
+    FSM_Init();
+ 8000cce:	f7ff fc01 	bl	80004d4 <FSM_Init>
+    IWDG_Init();   /* ทำเป็นลำดับสุดท้ายของการ Init เสมอ เผื่อ Init ตัวอื่นค้างจะได้โดน Reset */
+ 8000cd2:	f7ff ff85 	bl	8000be0 <IWDG_Init>
 
     UART2_SendString("\r\n========================================\r\n");
- 80004bc:	4834      	ldr	r0, [pc, #208]	@ (8000590 <main+0xe0>)
- 80004be:	f000 f8cf 	bl	8000660 <UART2_SendString>
+ 8000cd6:	4824      	ldr	r0, [pc, #144]	@ (8000d68 <main+0xbc>)
+ 8000cd8:	f000 f9a0 	bl	800101c <UART2_SendString>
     UART2_SendString("   Smart Vending Machine Controller     \r\n");
- 80004c2:	4834      	ldr	r0, [pc, #208]	@ (8000594 <main+0xe4>)
- 80004c4:	f000 f8cc 	bl	8000660 <UART2_SendString>
-    UART2_SendString("   Day 1: Hardware & Comms Initialized  \r\n");
- 80004c8:	4833      	ldr	r0, [pc, #204]	@ (8000598 <main+0xe8>)
- 80004ca:	f000 f8c9 	bl	8000660 <UART2_SendString>
+ 8000cdc:	4823      	ldr	r0, [pc, #140]	@ (8000d6c <main+0xc0>)
+ 8000cde:	f000 f99d 	bl	800101c <UART2_SendString>
+    UART2_SendString("   Day 4: Simulation, Refactor & Test    \r\n");
+ 8000ce2:	4823      	ldr	r0, [pc, #140]	@ (8000d70 <main+0xc4>)
+ 8000ce4:	f000 f99a 	bl	800101c <UART2_SendString>
     UART2_SendString("========================================\r\n");
- 80004ce:	4833      	ldr	r0, [pc, #204]	@ (800059c <main+0xec>)
- 80004d0:	f000 f8c6 	bl	8000660 <UART2_SendString>
+ 8000ce8:	4822      	ldr	r0, [pc, #136]	@ (8000d74 <main+0xc8>)
+ 8000cea:	f000 f997 	bl	800101c <UART2_SendString>
+
+    Menu_PrintAll();
+ 8000cee:	f000 f891 	bl	8000e14 <Menu_PrintAll>
 
     while (1) {
-        /* ใช้ else if เพื่อให้ประมวลผลได้ทีละ 1 ปุ่มเท่านั้น ป้องกันการกดพร้อมกัน */
-        if (BTN_IsPressed(BTN_UP_PORT, BTN_UP_PIN)) {
- 80004d4:	210a      	movs	r1, #10
- 80004d6:	4832      	ldr	r0, [pc, #200]	@ (80005a0 <main+0xf0>)
- 80004d8:	f7ff fefb 	bl	80002d2 <BTN_IsPressed>
- 80004dc:	4603      	mov	r3, r0
- 80004de:	2b00      	cmp	r3, #0
- 80004e0:	d00a      	beq.n	80004f8 <main+0x48>
-            LED_On(LED1_PORT, LED1_PIN);
- 80004e2:	2105      	movs	r1, #5
- 80004e4:	482e      	ldr	r0, [pc, #184]	@ (80005a0 <main+0xf0>)
- 80004e6:	f7ff fed1 	bl	800028c <LED_On>
-            UART2_SendString("[INPUT] Button UP Pressed\r\n");
- 80004ea:	482e      	ldr	r0, [pc, #184]	@ (80005a4 <main+0xf4>)
- 80004ec:	f000 f8b8 	bl	8000660 <UART2_SendString>
-            delay_ms(250); // กันกดซ้ำ/กดค้าง
- 80004f0:	20fa      	movs	r0, #250	@ 0xfa
- 80004f2:	f7ff ff06 	bl	8000302 <delay_ms>
- 80004f6:	e7ed      	b.n	80004d4 <main+0x24>
-        }
-        else if (BTN_IsPressed(BTN_DOWN_PORT, BTN_DOWN_PIN)) {
- 80004f8:	2103      	movs	r1, #3
- 80004fa:	482b      	ldr	r0, [pc, #172]	@ (80005a8 <main+0xf8>)
- 80004fc:	f7ff fee9 	bl	80002d2 <BTN_IsPressed>
- 8000500:	4603      	mov	r3, r0
- 8000502:	2b00      	cmp	r3, #0
- 8000504:	d00a      	beq.n	800051c <main+0x6c>
-            LED_On(LED2_PORT, LED2_PIN);
- 8000506:	2106      	movs	r1, #6
- 8000508:	4825      	ldr	r0, [pc, #148]	@ (80005a0 <main+0xf0>)
- 800050a:	f7ff febf 	bl	800028c <LED_On>
-            UART2_SendString("[INPUT] Button DOWN Pressed\r\n");
- 800050e:	4827      	ldr	r0, [pc, #156]	@ (80005ac <main+0xfc>)
- 8000510:	f000 f8a6 	bl	8000660 <UART2_SendString>
-            delay_ms(250);
- 8000514:	20fa      	movs	r0, #250	@ 0xfa
- 8000516:	f7ff fef4 	bl	8000302 <delay_ms>
- 800051a:	e7db      	b.n	80004d4 <main+0x24>
-        }
-        else if (BTN_IsPressed(BTN_OK_PORT, BTN_OK_PIN)) {
- 800051c:	2105      	movs	r1, #5
- 800051e:	4822      	ldr	r0, [pc, #136]	@ (80005a8 <main+0xf8>)
- 8000520:	f7ff fed7 	bl	80002d2 <BTN_IsPressed>
- 8000524:	4603      	mov	r3, r0
- 8000526:	2b00      	cmp	r3, #0
- 8000528:	d00a      	beq.n	8000540 <main+0x90>
-            LED_On(LED3_PORT, LED3_PIN);
- 800052a:	2107      	movs	r1, #7
- 800052c:	481c      	ldr	r0, [pc, #112]	@ (80005a0 <main+0xf0>)
- 800052e:	f7ff fead 	bl	800028c <LED_On>
-            UART2_SendString("[INPUT] Button OK Pressed\r\n");
- 8000532:	481f      	ldr	r0, [pc, #124]	@ (80005b0 <main+0x100>)
- 8000534:	f000 f894 	bl	8000660 <UART2_SendString>
-            delay_ms(250);
- 8000538:	20fa      	movs	r0, #250	@ 0xfa
- 800053a:	f7ff fee2 	bl	8000302 <delay_ms>
- 800053e:	e7c9      	b.n	80004d4 <main+0x24>
-        }
-        else if (BTN_IsPressed(BTN_BACK_PORT, BTN_BACK_PIN)) {
- 8000540:	2104      	movs	r1, #4
- 8000542:	4819      	ldr	r0, [pc, #100]	@ (80005a8 <main+0xf8>)
- 8000544:	f7ff fec5 	bl	80002d2 <BTN_IsPressed>
- 8000548:	4603      	mov	r3, r0
- 800054a:	2b00      	cmp	r3, #0
- 800054c:	d00e      	beq.n	800056c <main+0xbc>
-            LED_On(LED4_PORT, LED4_PIN);
- 800054e:	2106      	movs	r1, #6
- 8000550:	4815      	ldr	r0, [pc, #84]	@ (80005a8 <main+0xf8>)
- 8000552:	f7ff fe9b 	bl	800028c <LED_On>
-            UART2_SendString("[INPUT] Button BACK Pressed\r\n");
- 8000556:	4817      	ldr	r0, [pc, #92]	@ (80005b4 <main+0x104>)
- 8000558:	f000 f882 	bl	8000660 <UART2_SendString>
-            delay_ms(250);
- 800055c:	20fa      	movs	r0, #250	@ 0xfa
- 800055e:	f7ff fed0 	bl	8000302 <delay_ms>
-            UART2_PrintTemperature(10);
- 8000562:	eeb2 0a04 	vmov.f32	s0, #36	@ 0x41200000  10.0
- 8000566:	f7ff fee7 	bl	8000338 <UART2_PrintTemperature>
- 800056a:	e7b3      	b.n	80004d4 <main+0x24>
-        }
-        else {
-            /* เมื่อไม่มีการกดปุ่มใดๆ ให้ปิด LED ทั้งหมด */
-            LED_Off(LED1_PORT, LED1_PIN);
- 800056c:	2105      	movs	r1, #5
- 800056e:	480c      	ldr	r0, [pc, #48]	@ (80005a0 <main+0xf0>)
- 8000570:	f7ff fe9d 	bl	80002ae <LED_Off>
-            LED_Off(LED2_PORT, LED2_PIN);
- 8000574:	2106      	movs	r1, #6
- 8000576:	480a      	ldr	r0, [pc, #40]	@ (80005a0 <main+0xf0>)
- 8000578:	f7ff fe99 	bl	80002ae <LED_Off>
-            LED_Off(LED3_PORT, LED3_PIN);
- 800057c:	2107      	movs	r1, #7
- 800057e:	4808      	ldr	r0, [pc, #32]	@ (80005a0 <main+0xf0>)
- 8000580:	f7ff fe95 	bl	80002ae <LED_Off>
-            LED_Off(LED4_PORT, LED4_PIN);
- 8000584:	2106      	movs	r1, #6
- 8000586:	4808      	ldr	r0, [pc, #32]	@ (80005a8 <main+0xf8>)
- 8000588:	f7ff fe91 	bl	80002ae <LED_Off>
-        if (BTN_IsPressed(BTN_UP_PORT, BTN_UP_PIN)) {
- 800058c:	e7a2      	b.n	80004d4 <main+0x24>
- 800058e:	bf00      	nop
- 8000590:	08000774 	.word	0x08000774
- 8000594:	080007a4 	.word	0x080007a4
- 8000598:	080007d0 	.word	0x080007d0
- 800059c:	080007fc 	.word	0x080007fc
- 80005a0:	40020000 	.word	0x40020000
- 80005a4:	08000828 	.word	0x08000828
- 80005a8:	40020400 	.word	0x40020400
- 80005ac:	08000844 	.word	0x08000844
- 80005b0:	08000864 	.word	0x08000864
- 80005b4:	08000880 	.word	0x08000880
+        IWDG_Refresh(); /* เลี้ยง Watchdog ทุกรอบ Loop ป้องกันโปรแกรมค้างแล้วไม่มีใครรู้ */
+ 8000cf2:	f7ff ff9f 	bl	8000c34 <IWDG_Refresh>
 
-080005b8 <UART2_Init>:
+        FSM_Run();       /* อ่านปุ่ม + ประมวลผล 1 Tick ของ State ปัจจุบัน (ไม่ Block) */
+ 8000cf6:	f7ff fc17 	bl	8000528 <FSM_Run>
+
+        dht11_tick++;
+ 8000cfa:	687b      	ldr	r3, [r7, #4]
+ 8000cfc:	3301      	adds	r3, #1
+ 8000cfe:	607b      	str	r3, [r7, #4]
+        if (dht11_tick >= DHT11_READ_INTERVAL_TICKS) {
+ 8000d00:	687b      	ldr	r3, [r7, #4]
+ 8000d02:	2b63      	cmp	r3, #99	@ 0x63
+ 8000d04:	d92c      	bls.n	8000d60 <main+0xb4>
+            DHT11_Data_t dht_data;
+
+            dht11_tick = 0U;
+ 8000d06:	2300      	movs	r3, #0
+ 8000d08:	607b      	str	r3, [r7, #4]
+
+            if (DHT11_Read(&dht_data) != 0U) {
+ 8000d0a:	463b      	mov	r3, r7
+ 8000d0c:	4618      	mov	r0, r3
+ 8000d0e:	f7ff fb79 	bl	8000404 <DHT11_Read>
+ 8000d12:	4603      	mov	r3, r0
+ 8000d14:	2b00      	cmp	r3, #0
+ 8000d16:	d020      	beq.n	8000d5a <main+0xae>
+                UART2_SendString("[DHT11] Humidity: ");
+ 8000d18:	4817      	ldr	r0, [pc, #92]	@ (8000d78 <main+0xcc>)
+ 8000d1a:	f000 f97f 	bl	800101c <UART2_SendString>
+                UART2_SendUint(dht_data.humidity);
+ 8000d1e:	783b      	ldrb	r3, [r7, #0]
+ 8000d20:	4618      	mov	r0, r3
+ 8000d22:	f000 f991 	bl	8001048 <UART2_SendUint>
+                UART2_SendString(" %RH | Temp: ");
+ 8000d26:	4815      	ldr	r0, [pc, #84]	@ (8000d7c <main+0xd0>)
+ 8000d28:	f000 f978 	bl	800101c <UART2_SendString>
+                if (dht_data.temperature < 0) {
+ 8000d2c:	f997 3001 	ldrsb.w	r3, [r7, #1]
+ 8000d30:	2b00      	cmp	r3, #0
+ 8000d32:	da09      	bge.n	8000d48 <main+0x9c>
+                    UART2_SendString("-");
+ 8000d34:	4812      	ldr	r0, [pc, #72]	@ (8000d80 <main+0xd4>)
+ 8000d36:	f000 f971 	bl	800101c <UART2_SendString>
+                    UART2_SendUint((uint32_t)(-(int32_t)dht_data.temperature));
+ 8000d3a:	f997 3001 	ldrsb.w	r3, [r7, #1]
+ 8000d3e:	425b      	negs	r3, r3
+ 8000d40:	4618      	mov	r0, r3
+ 8000d42:	f000 f981 	bl	8001048 <UART2_SendUint>
+ 8000d46:	e004      	b.n	8000d52 <main+0xa6>
+                } else {
+                    UART2_SendUint((uint32_t)dht_data.temperature);
+ 8000d48:	f997 3001 	ldrsb.w	r3, [r7, #1]
+ 8000d4c:	4618      	mov	r0, r3
+ 8000d4e:	f000 f97b 	bl	8001048 <UART2_SendUint>
+                }
+                UART2_SendString(" C\r\n");
+ 8000d52:	480c      	ldr	r0, [pc, #48]	@ (8000d84 <main+0xd8>)
+ 8000d54:	f000 f962 	bl	800101c <UART2_SendString>
+ 8000d58:	e002      	b.n	8000d60 <main+0xb4>
+            } else {
+                UART2_SendString("[DHT11] Read failed (timeout/checksum) - check wiring\r\n");
+ 8000d5a:	480b      	ldr	r0, [pc, #44]	@ (8000d88 <main+0xdc>)
+ 8000d5c:	f000 f95e 	bl	800101c <UART2_SendString>
+            }
+        }
+
+        delay_ms(20);    /* คาบเวลาสุ่มตรวจปุ่ม ~20ms ช่วย Debounce เบื้องต้น และเป็นฐานเวลาให้ FSM/DHT11 นับ Tick */
+ 8000d60:	2014      	movs	r0, #20
+ 8000d62:	f7ff ff75 	bl	8000c50 <delay_ms>
+        IWDG_Refresh(); /* เลี้ยง Watchdog ทุกรอบ Loop ป้องกันโปรแกรมค้างแล้วไม่มีใครรู้ */
+ 8000d66:	e7c4      	b.n	8000cf2 <main+0x46>
+ 8000d68:	08001434 	.word	0x08001434
+ 8000d6c:	08001464 	.word	0x08001464
+ 8000d70:	08001490 	.word	0x08001490
+ 8000d74:	080014bc 	.word	0x080014bc
+ 8000d78:	080014e8 	.word	0x080014e8
+ 8000d7c:	080014fc 	.word	0x080014fc
+ 8000d80:	0800150c 	.word	0x0800150c
+ 8000d84:	08001510 	.word	0x08001510
+ 8000d88:	08001518 	.word	0x08001518
+
+08000d8c <Menu_Init>:
+MenuItem_t menu[MENU_ITEM_COUNT];
+
+/* หมายเหตุ: เอกสารภาพรวมโครงงานระบุเฉพาะชื่อเมนูและ Stock เริ่มต้นเท่านั้น
+ * ราคาด้านล่างเป็นค่าตัวอย่าง (สมมติ) สามารถแก้ไขให้ตรงกับราคาจริงที่ต้องการได้
+ */
+void Menu_Init(void) {
+ 8000d8c:	b580      	push	{r7, lr}
+ 8000d8e:	af00      	add	r7, sp, #0
+    (void)strncpy(menu[0].name, "Coffee", MENU_NAME_MAXLEN - 1U);
+ 8000d90:	220f      	movs	r2, #15
+ 8000d92:	4918      	ldr	r1, [pc, #96]	@ (8000df4 <Menu_Init+0x68>)
+ 8000d94:	4818      	ldr	r0, [pc, #96]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000d96:	f000 fa10 	bl	80011ba <strncpy>
+    menu[0].price = 15U;
+ 8000d9a:	4b17      	ldr	r3, [pc, #92]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000d9c:	220f      	movs	r2, #15
+ 8000d9e:	821a      	strh	r2, [r3, #16]
+    menu[0].stock = 3U;
+ 8000da0:	4b15      	ldr	r3, [pc, #84]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000da2:	2203      	movs	r2, #3
+ 8000da4:	749a      	strb	r2, [r3, #18]
+
+    (void)strncpy(menu[1].name, "Green Tea", MENU_NAME_MAXLEN - 1U);
+ 8000da6:	220f      	movs	r2, #15
+ 8000da8:	4914      	ldr	r1, [pc, #80]	@ (8000dfc <Menu_Init+0x70>)
+ 8000daa:	4815      	ldr	r0, [pc, #84]	@ (8000e00 <Menu_Init+0x74>)
+ 8000dac:	f000 fa05 	bl	80011ba <strncpy>
+    menu[1].price = 15U;
+ 8000db0:	4b11      	ldr	r3, [pc, #68]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000db2:	220f      	movs	r2, #15
+ 8000db4:	849a      	strh	r2, [r3, #36]	@ 0x24
+    menu[1].stock = 2U;
+ 8000db6:	4b10      	ldr	r3, [pc, #64]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000db8:	2202      	movs	r2, #2
+ 8000dba:	f883 2026 	strb.w	r2, [r3, #38]	@ 0x26
+
+    (void)strncpy(menu[2].name, "Cocoa", MENU_NAME_MAXLEN - 1U);
+ 8000dbe:	220f      	movs	r2, #15
+ 8000dc0:	4910      	ldr	r1, [pc, #64]	@ (8000e04 <Menu_Init+0x78>)
+ 8000dc2:	4811      	ldr	r0, [pc, #68]	@ (8000e08 <Menu_Init+0x7c>)
+ 8000dc4:	f000 f9f9 	bl	80011ba <strncpy>
+    menu[2].price = 20U;
+ 8000dc8:	4b0b      	ldr	r3, [pc, #44]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000dca:	2214      	movs	r2, #20
+ 8000dcc:	871a      	strh	r2, [r3, #56]	@ 0x38
+    menu[2].stock = 1U;
+ 8000dce:	4b0a      	ldr	r3, [pc, #40]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000dd0:	2201      	movs	r2, #1
+ 8000dd2:	f883 203a 	strb.w	r2, [r3, #58]	@ 0x3a
+
+    (void)strncpy(menu[3].name, "Milk Tea", MENU_NAME_MAXLEN - 1U);
+ 8000dd6:	220f      	movs	r2, #15
+ 8000dd8:	490c      	ldr	r1, [pc, #48]	@ (8000e0c <Menu_Init+0x80>)
+ 8000dda:	480d      	ldr	r0, [pc, #52]	@ (8000e10 <Menu_Init+0x84>)
+ 8000ddc:	f000 f9ed 	bl	80011ba <strncpy>
+    menu[3].price = 20U;
+ 8000de0:	4b05      	ldr	r3, [pc, #20]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000de2:	2214      	movs	r2, #20
+ 8000de4:	f8a3 204c 	strh.w	r2, [r3, #76]	@ 0x4c
+    menu[3].stock = 0U;
+ 8000de8:	4b03      	ldr	r3, [pc, #12]	@ (8000df8 <Menu_Init+0x6c>)
+ 8000dea:	2200      	movs	r2, #0
+ 8000dec:	f883 204e 	strb.w	r2, [r3, #78]	@ 0x4e
+}
+ 8000df0:	bf00      	nop
+ 8000df2:	bd80      	pop	{r7, pc}
+ 8000df4:	08001550 	.word	0x08001550
+ 8000df8:	20000028 	.word	0x20000028
+ 8000dfc:	08001558 	.word	0x08001558
+ 8000e00:	2000003c 	.word	0x2000003c
+ 8000e04:	08001564 	.word	0x08001564
+ 8000e08:	20000050 	.word	0x20000050
+ 8000e0c:	0800156c 	.word	0x0800156c
+ 8000e10:	20000064 	.word	0x20000064
+
+08000e14 <Menu_PrintAll>:
+
+void Menu_PrintAll(void) {
+ 8000e14:	b580      	push	{r7, lr}
+ 8000e16:	b082      	sub	sp, #8
+ 8000e18:	af00      	add	r7, sp, #0
+    uint8_t i;
+
+    UART2_SendString("\r\n----------- MENU -----------\r\n");
+ 8000e1a:	481f      	ldr	r0, [pc, #124]	@ (8000e98 <Menu_PrintAll+0x84>)
+ 8000e1c:	f000 f8fe 	bl	800101c <UART2_SendString>
+    for (i = 0U; i < MENU_ITEM_COUNT; i++) {
+ 8000e20:	2300      	movs	r3, #0
+ 8000e22:	71fb      	strb	r3, [r7, #7]
+ 8000e24:	e02d      	b.n	8000e82 <Menu_PrintAll+0x6e>
+        UART2_SendString(menu[i].name);
+ 8000e26:	79fa      	ldrb	r2, [r7, #7]
+ 8000e28:	4613      	mov	r3, r2
+ 8000e2a:	009b      	lsls	r3, r3, #2
+ 8000e2c:	4413      	add	r3, r2
+ 8000e2e:	009b      	lsls	r3, r3, #2
+ 8000e30:	4a1a      	ldr	r2, [pc, #104]	@ (8000e9c <Menu_PrintAll+0x88>)
+ 8000e32:	4413      	add	r3, r2
+ 8000e34:	4618      	mov	r0, r3
+ 8000e36:	f000 f8f1 	bl	800101c <UART2_SendString>
+        UART2_SendString(" | Price: ");
+ 8000e3a:	4819      	ldr	r0, [pc, #100]	@ (8000ea0 <Menu_PrintAll+0x8c>)
+ 8000e3c:	f000 f8ee 	bl	800101c <UART2_SendString>
+        UART2_SendUint(menu[i].price);
+ 8000e40:	79fa      	ldrb	r2, [r7, #7]
+ 8000e42:	4916      	ldr	r1, [pc, #88]	@ (8000e9c <Menu_PrintAll+0x88>)
+ 8000e44:	4613      	mov	r3, r2
+ 8000e46:	009b      	lsls	r3, r3, #2
+ 8000e48:	4413      	add	r3, r2
+ 8000e4a:	009b      	lsls	r3, r3, #2
+ 8000e4c:	440b      	add	r3, r1
+ 8000e4e:	3310      	adds	r3, #16
+ 8000e50:	881b      	ldrh	r3, [r3, #0]
+ 8000e52:	4618      	mov	r0, r3
+ 8000e54:	f000 f8f8 	bl	8001048 <UART2_SendUint>
+        UART2_SendString(" Baht | Stock: ");
+ 8000e58:	4812      	ldr	r0, [pc, #72]	@ (8000ea4 <Menu_PrintAll+0x90>)
+ 8000e5a:	f000 f8df 	bl	800101c <UART2_SendString>
+        UART2_SendUint(menu[i].stock);
+ 8000e5e:	79fa      	ldrb	r2, [r7, #7]
+ 8000e60:	490e      	ldr	r1, [pc, #56]	@ (8000e9c <Menu_PrintAll+0x88>)
+ 8000e62:	4613      	mov	r3, r2
+ 8000e64:	009b      	lsls	r3, r3, #2
+ 8000e66:	4413      	add	r3, r2
+ 8000e68:	009b      	lsls	r3, r3, #2
+ 8000e6a:	440b      	add	r3, r1
+ 8000e6c:	3312      	adds	r3, #18
+ 8000e6e:	781b      	ldrb	r3, [r3, #0]
+ 8000e70:	4618      	mov	r0, r3
+ 8000e72:	f000 f8e9 	bl	8001048 <UART2_SendUint>
+        UART2_SendString("\r\n");
+ 8000e76:	480c      	ldr	r0, [pc, #48]	@ (8000ea8 <Menu_PrintAll+0x94>)
+ 8000e78:	f000 f8d0 	bl	800101c <UART2_SendString>
+    for (i = 0U; i < MENU_ITEM_COUNT; i++) {
+ 8000e7c:	79fb      	ldrb	r3, [r7, #7]
+ 8000e7e:	3301      	adds	r3, #1
+ 8000e80:	71fb      	strb	r3, [r7, #7]
+ 8000e82:	79fb      	ldrb	r3, [r7, #7]
+ 8000e84:	2b03      	cmp	r3, #3
+ 8000e86:	d9ce      	bls.n	8000e26 <Menu_PrintAll+0x12>
+    }
+    UART2_SendString("-----------------------------\r\n");
+ 8000e88:	4808      	ldr	r0, [pc, #32]	@ (8000eac <Menu_PrintAll+0x98>)
+ 8000e8a:	f000 f8c7 	bl	800101c <UART2_SendString>
+}
+ 8000e8e:	bf00      	nop
+ 8000e90:	3708      	adds	r7, #8
+ 8000e92:	46bd      	mov	sp, r7
+ 8000e94:	bd80      	pop	{r7, pc}
+ 8000e96:	bf00      	nop
+ 8000e98:	08001578 	.word	0x08001578
+ 8000e9c:	20000028 	.word	0x20000028
+ 8000ea0:	0800159c 	.word	0x0800159c
+ 8000ea4:	080015a8 	.word	0x080015a8
+ 8000ea8:	080015b8 	.word	0x080015b8
+ 8000eac:	080015bc 	.word	0x080015bc
+
+08000eb0 <Safety_CheckTemperature>:
+#include "safety.h"
+#include "uart_driver.h"
+
+uint8_t Safety_CheckTemperature(float current_temp_c) {
+ 8000eb0:	b580      	push	{r7, lr}
+ 8000eb2:	b082      	sub	sp, #8
+ 8000eb4:	af00      	add	r7, sp, #0
+ 8000eb6:	ed87 0a01 	vstr	s0, [r7, #4]
+    if (current_temp_c > SAFETY_TEMP_MAX_C) {
+ 8000eba:	edd7 7a01 	vldr	s15, [r7, #4]
+ 8000ebe:	eeb3 7a0e 	vmov.f32	s14, #62	@ 0x41f00000  30.0
+ 8000ec2:	eef4 7ac7 	vcmpe.f32	s15, s14
+ 8000ec6:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 8000eca:	dd04      	ble.n	8000ed6 <Safety_CheckTemperature+0x26>
+        UART2_SendString("[SAFETY] WARNING: MCU temperature exceeds safe limit (30 C)!\r\n");
+ 8000ecc:	4804      	ldr	r0, [pc, #16]	@ (8000ee0 <Safety_CheckTemperature+0x30>)
+ 8000ece:	f000 f8a5 	bl	800101c <UART2_SendString>
+        return 0U; // ไม่ปลอดภัย -> ผู้เรียกต้องเปลี่ยน State ไปที่ FAULT
+ 8000ed2:	2300      	movs	r3, #0
+ 8000ed4:	e000      	b.n	8000ed8 <Safety_CheckTemperature+0x28>
+    }
+
+    return 1U; // ปลอดภัย -> ทำงานต่อได้ตามปกติ
+ 8000ed6:	2301      	movs	r3, #1
+}
+ 8000ed8:	4618      	mov	r0, r3
+ 8000eda:	3708      	adds	r7, #8
+ 8000edc:	46bd      	mov	sp, r7
+ 8000ede:	bd80      	pop	{r7, pc}
+ 8000ee0:	080015dc 	.word	0x080015dc
+
+08000ee4 <TIM2_Init>:
+/* ตั้งค่า TIM2 ให้เป็น Free-running Counter ที่นับ 1 Tick = 1 microsecond
+ * ใช้แทนการหน่วงเวลาแบบ NOP loop เดิม เพราะ DHT11 ต้องการความแม่นยำระดับ us
+ * สมมติ Core Clock = HSI 16MHz, APB1 Prescaler = /1 (ค่า Default ของระบบ ไม่เคยถูกแก้ไข)
+ * ดังนั้น TIM2CLK = 16MHz -> ตั้ง Prescaler = 16 เพื่อให้ได้ Counter Clock = 1MHz (1 Tick = 1us)
+ */
+void TIM2_Init(void) {
+ 8000ee4:	b480      	push	{r7}
+ 8000ee6:	af00      	add	r7, sp, #0
+    RCC->APB1ENR |= (1U << 0); // TIM2EN
+ 8000ee8:	4b11      	ldr	r3, [pc, #68]	@ (8000f30 <TIM2_Init+0x4c>)
+ 8000eea:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
+ 8000eec:	4a10      	ldr	r2, [pc, #64]	@ (8000f30 <TIM2_Init+0x4c>)
+ 8000eee:	f043 0301 	orr.w	r3, r3, #1
+ 8000ef2:	6413      	str	r3, [r2, #64]	@ 0x40
+
+    TIM2->PSC = 16U - 1U;
+ 8000ef4:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000ef8:	220f      	movs	r2, #15
+ 8000efa:	629a      	str	r2, [r3, #40]	@ 0x28
+    TIM2->ARR = 0xFFFFFFFFU;   // Free-running นับสูงสุด (TIM2 เป็น Counter 32-bit)
+ 8000efc:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000f00:	f04f 32ff 	mov.w	r2, #4294967295
+ 8000f04:	62da      	str	r2, [r3, #44]	@ 0x2c
+    TIM2->EGR |= (1U << 0);    // UG: บังคับ Update ทันที ให้ค่า Prescaler มีผลจริง
+ 8000f06:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000f0a:	695b      	ldr	r3, [r3, #20]
+ 8000f0c:	f04f 4280 	mov.w	r2, #1073741824	@ 0x40000000
+ 8000f10:	f043 0301 	orr.w	r3, r3, #1
+ 8000f14:	6153      	str	r3, [r2, #20]
+    TIM2->CR1 |= (1U << 0);    // CEN: เริ่มนับ
+ 8000f16:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000f1a:	681b      	ldr	r3, [r3, #0]
+ 8000f1c:	f04f 4280 	mov.w	r2, #1073741824	@ 0x40000000
+ 8000f20:	f043 0301 	orr.w	r3, r3, #1
+ 8000f24:	6013      	str	r3, [r2, #0]
+}
+ 8000f26:	bf00      	nop
+ 8000f28:	46bd      	mov	sp, r7
+ 8000f2a:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000f2e:	4770      	bx	lr
+ 8000f30:	40023800 	.word	0x40023800
+
+08000f34 <TIM2_GetMicros>:
+
+uint32_t TIM2_GetMicros(void) {
+ 8000f34:	b480      	push	{r7}
+ 8000f36:	af00      	add	r7, sp, #0
+    return TIM2->CNT;
+ 8000f38:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000f3c:	6a5b      	ldr	r3, [r3, #36]	@ 0x24
+}
+ 8000f3e:	4618      	mov	r0, r3
+ 8000f40:	46bd      	mov	sp, r7
+ 8000f42:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000f46:	4770      	bx	lr
+
+08000f48 <TIM2_DelayUs>:
+
+/* หน่วงเวลาแบบแม่นยำระดับ microsecond โดยใช้ค่า Counter จริงของ TIM2
+ * การลบแบบ Unsigned ทำให้ถูกต้องแม้ Counter จะ Overflow วนกลับมาระหว่างรอ
+ */
+void TIM2_DelayUs(uint32_t us) {
+ 8000f48:	b580      	push	{r7, lr}
+ 8000f4a:	b084      	sub	sp, #16
+ 8000f4c:	af00      	add	r7, sp, #0
+ 8000f4e:	6078      	str	r0, [r7, #4]
+    uint32_t start = TIM2_GetMicros();
+ 8000f50:	f7ff fff0 	bl	8000f34 <TIM2_GetMicros>
+ 8000f54:	60f8      	str	r0, [r7, #12]
+    while ((TIM2_GetMicros() - start) < us) { }
+ 8000f56:	bf00      	nop
+ 8000f58:	f7ff ffec 	bl	8000f34 <TIM2_GetMicros>
+ 8000f5c:	4602      	mov	r2, r0
+ 8000f5e:	68fb      	ldr	r3, [r7, #12]
+ 8000f60:	1ad3      	subs	r3, r2, r3
+ 8000f62:	687a      	ldr	r2, [r7, #4]
+ 8000f64:	429a      	cmp	r2, r3
+ 8000f66:	d8f7      	bhi.n	8000f58 <TIM2_DelayUs+0x10>
+}
+ 8000f68:	bf00      	nop
+ 8000f6a:	bf00      	nop
+ 8000f6c:	3710      	adds	r7, #16
+ 8000f6e:	46bd      	mov	sp, r7
+ 8000f70:	bd80      	pop	{r7, pc}
+	...
+
+08000f74 <UART2_Init>:
 #include "uart_driver.h"
 
 void UART2_Init(void) {
- 80005b8:	b480      	push	{r7}
- 80005ba:	af00      	add	r7, sp, #0
+ 8000f74:	b480      	push	{r7}
+ 8000f76:	af00      	add	r7, sp, #0
     /* 1. เปิด Clock ให้ GPIOA และ USART2 */
     RCC->AHB1ENR |= (1U << 0);          // GPIOA Clock Enable
- 80005bc:	4b19      	ldr	r3, [pc, #100]	@ (8000624 <UART2_Init+0x6c>)
- 80005be:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
- 80005c0:	4a18      	ldr	r2, [pc, #96]	@ (8000624 <UART2_Init+0x6c>)
- 80005c2:	f043 0301 	orr.w	r3, r3, #1
- 80005c6:	6313      	str	r3, [r2, #48]	@ 0x30
+ 8000f78:	4b19      	ldr	r3, [pc, #100]	@ (8000fe0 <UART2_Init+0x6c>)
+ 8000f7a:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
+ 8000f7c:	4a18      	ldr	r2, [pc, #96]	@ (8000fe0 <UART2_Init+0x6c>)
+ 8000f7e:	f043 0301 	orr.w	r3, r3, #1
+ 8000f82:	6313      	str	r3, [r2, #48]	@ 0x30
     RCC->APB1ENR |= (1U << 17);         // USART2 Clock Enable
- 80005c8:	4b16      	ldr	r3, [pc, #88]	@ (8000624 <UART2_Init+0x6c>)
- 80005ca:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
- 80005cc:	4a15      	ldr	r2, [pc, #84]	@ (8000624 <UART2_Init+0x6c>)
- 80005ce:	f443 3300 	orr.w	r3, r3, #131072	@ 0x20000
- 80005d2:	6413      	str	r3, [r2, #64]	@ 0x40
+ 8000f84:	4b16      	ldr	r3, [pc, #88]	@ (8000fe0 <UART2_Init+0x6c>)
+ 8000f86:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
+ 8000f88:	4a15      	ldr	r2, [pc, #84]	@ (8000fe0 <UART2_Init+0x6c>)
+ 8000f8a:	f443 3300 	orr.w	r3, r3, #131072	@ 0x20000
+ 8000f8e:	6413      	str	r3, [r2, #64]	@ 0x40
 
     /* 2. ตั้งค่า PA2 (TX) และ PA3 (RX) เป็น Alternate Function 7 (AF07) */
     GPIOA->MODER &= ~((3U << (2 * 2)) | (3U << (3 * 2)));
- 80005d4:	4b14      	ldr	r3, [pc, #80]	@ (8000628 <UART2_Init+0x70>)
- 80005d6:	681b      	ldr	r3, [r3, #0]
- 80005d8:	4a13      	ldr	r2, [pc, #76]	@ (8000628 <UART2_Init+0x70>)
- 80005da:	f023 03f0 	bic.w	r3, r3, #240	@ 0xf0
- 80005de:	6013      	str	r3, [r2, #0]
+ 8000f90:	4b14      	ldr	r3, [pc, #80]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000f92:	681b      	ldr	r3, [r3, #0]
+ 8000f94:	4a13      	ldr	r2, [pc, #76]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000f96:	f023 03f0 	bic.w	r3, r3, #240	@ 0xf0
+ 8000f9a:	6013      	str	r3, [r2, #0]
     GPIOA->MODER |=  ((2U << (2 * 2)) | (2U << (3 * 2))); // Alternate Function mode
- 80005e0:	4b11      	ldr	r3, [pc, #68]	@ (8000628 <UART2_Init+0x70>)
- 80005e2:	681b      	ldr	r3, [r3, #0]
- 80005e4:	4a10      	ldr	r2, [pc, #64]	@ (8000628 <UART2_Init+0x70>)
- 80005e6:	f043 03a0 	orr.w	r3, r3, #160	@ 0xa0
- 80005ea:	6013      	str	r3, [r2, #0]
+ 8000f9c:	4b11      	ldr	r3, [pc, #68]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000f9e:	681b      	ldr	r3, [r3, #0]
+ 8000fa0:	4a10      	ldr	r2, [pc, #64]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000fa2:	f043 03a0 	orr.w	r3, r3, #160	@ 0xa0
+ 8000fa6:	6013      	str	r3, [r2, #0]
 
     GPIOA->AFR[0] &= ~((0xFU << (2 * 4)) | (0xFU << (3 * 4)));
- 80005ec:	4b0e      	ldr	r3, [pc, #56]	@ (8000628 <UART2_Init+0x70>)
- 80005ee:	6a1b      	ldr	r3, [r3, #32]
- 80005f0:	4a0d      	ldr	r2, [pc, #52]	@ (8000628 <UART2_Init+0x70>)
- 80005f2:	f423 437f 	bic.w	r3, r3, #65280	@ 0xff00
- 80005f6:	6213      	str	r3, [r2, #32]
+ 8000fa8:	4b0e      	ldr	r3, [pc, #56]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000faa:	6a1b      	ldr	r3, [r3, #32]
+ 8000fac:	4a0d      	ldr	r2, [pc, #52]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000fae:	f423 437f 	bic.w	r3, r3, #65280	@ 0xff00
+ 8000fb2:	6213      	str	r3, [r2, #32]
     GPIOA->AFR[0] |=  ((0x7U << (2 * 4)) | (0x7U << (3 * 4))); // AF07 (USART2)
- 80005f8:	4b0b      	ldr	r3, [pc, #44]	@ (8000628 <UART2_Init+0x70>)
- 80005fa:	6a1b      	ldr	r3, [r3, #32]
- 80005fc:	4a0a      	ldr	r2, [pc, #40]	@ (8000628 <UART2_Init+0x70>)
- 80005fe:	f443 43ee 	orr.w	r3, r3, #30464	@ 0x7700
- 8000602:	6213      	str	r3, [r2, #32]
+ 8000fb4:	4b0b      	ldr	r3, [pc, #44]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000fb6:	6a1b      	ldr	r3, [r3, #32]
+ 8000fb8:	4a0a      	ldr	r2, [pc, #40]	@ (8000fe4 <UART2_Init+0x70>)
+ 8000fba:	f443 43ee 	orr.w	r3, r3, #30464	@ 0x7700
+ 8000fbe:	6213      	str	r3, [r2, #32]
 
     /* 3. ตั้งค่า Baud Rate = 115200 (คำนวณจาก Clock HSI 16 MHz) */
     USART2->BRR = 0x008A;
- 8000604:	4b09      	ldr	r3, [pc, #36]	@ (800062c <UART2_Init+0x74>)
- 8000606:	228a      	movs	r2, #138	@ 0x8a
- 8000608:	609a      	str	r2, [r3, #8]
+ 8000fc0:	4b09      	ldr	r3, [pc, #36]	@ (8000fe8 <UART2_Init+0x74>)
+ 8000fc2:	228a      	movs	r2, #138	@ 0x8a
+ 8000fc4:	609a      	str	r2, [r3, #8]
 
     /* 4. เปิดใช้งาน Transmitter, Receiver และ USART2 */
     USART2->CR1 |= (1U << 3) | (1U << 2) | (1U << 13); // TE, RE, UE
- 800060a:	4b08      	ldr	r3, [pc, #32]	@ (800062c <UART2_Init+0x74>)
- 800060c:	68db      	ldr	r3, [r3, #12]
- 800060e:	4a07      	ldr	r2, [pc, #28]	@ (800062c <UART2_Init+0x74>)
- 8000610:	f443 5300 	orr.w	r3, r3, #8192	@ 0x2000
- 8000614:	f043 030c 	orr.w	r3, r3, #12
- 8000618:	60d3      	str	r3, [r2, #12]
+ 8000fc6:	4b08      	ldr	r3, [pc, #32]	@ (8000fe8 <UART2_Init+0x74>)
+ 8000fc8:	68db      	ldr	r3, [r3, #12]
+ 8000fca:	4a07      	ldr	r2, [pc, #28]	@ (8000fe8 <UART2_Init+0x74>)
+ 8000fcc:	f443 5300 	orr.w	r3, r3, #8192	@ 0x2000
+ 8000fd0:	f043 030c 	orr.w	r3, r3, #12
+ 8000fd4:	60d3      	str	r3, [r2, #12]
 }
- 800061a:	bf00      	nop
- 800061c:	46bd      	mov	sp, r7
- 800061e:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000622:	4770      	bx	lr
- 8000624:	40023800 	.word	0x40023800
- 8000628:	40020000 	.word	0x40020000
- 800062c:	40004400 	.word	0x40004400
+ 8000fd6:	bf00      	nop
+ 8000fd8:	46bd      	mov	sp, r7
+ 8000fda:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000fde:	4770      	bx	lr
+ 8000fe0:	40023800 	.word	0x40023800
+ 8000fe4:	40020000 	.word	0x40020000
+ 8000fe8:	40004400 	.word	0x40004400
 
-08000630 <UART2_SendChar>:
+08000fec <UART2_SendChar>:
 
 void UART2_SendChar(char c) {
- 8000630:	b480      	push	{r7}
- 8000632:	b083      	sub	sp, #12
- 8000634:	af00      	add	r7, sp, #0
- 8000636:	4603      	mov	r3, r0
- 8000638:	71fb      	strb	r3, [r7, #7]
-    while (!(USART2->SR & (1U << 7))); // รอจน TXE = 1 (พร้อมส่ง)
- 800063a:	bf00      	nop
- 800063c:	4b07      	ldr	r3, [pc, #28]	@ (800065c <UART2_SendChar+0x2c>)
- 800063e:	681b      	ldr	r3, [r3, #0]
- 8000640:	f003 0380 	and.w	r3, r3, #128	@ 0x80
- 8000644:	2b00      	cmp	r3, #0
- 8000646:	d0f9      	beq.n	800063c <UART2_SendChar+0xc>
-    USART2->DR = (c & 0xFF);
- 8000648:	4a04      	ldr	r2, [pc, #16]	@ (800065c <UART2_SendChar+0x2c>)
- 800064a:	79fb      	ldrb	r3, [r7, #7]
- 800064c:	6053      	str	r3, [r2, #4]
+ 8000fec:	b480      	push	{r7}
+ 8000fee:	b083      	sub	sp, #12
+ 8000ff0:	af00      	add	r7, sp, #0
+ 8000ff2:	4603      	mov	r3, r0
+ 8000ff4:	71fb      	strb	r3, [r7, #7]
+    while (!(USART2->SR & (1U << 7))) { } /* รอจน TXE = 1 (พร้อมส่ง) */
+ 8000ff6:	bf00      	nop
+ 8000ff8:	4b07      	ldr	r3, [pc, #28]	@ (8001018 <UART2_SendChar+0x2c>)
+ 8000ffa:	681b      	ldr	r3, [r3, #0]
+ 8000ffc:	f003 0380 	and.w	r3, r3, #128	@ 0x80
+ 8001000:	2b00      	cmp	r3, #0
+ 8001002:	d0f9      	beq.n	8000ff8 <UART2_SendChar+0xc>
+    USART2->DR = ((uint32_t)c & 0xFFU);
+ 8001004:	4a04      	ldr	r2, [pc, #16]	@ (8001018 <UART2_SendChar+0x2c>)
+ 8001006:	79fb      	ldrb	r3, [r7, #7]
+ 8001008:	6053      	str	r3, [r2, #4]
 }
- 800064e:	bf00      	nop
- 8000650:	370c      	adds	r7, #12
- 8000652:	46bd      	mov	sp, r7
- 8000654:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000658:	4770      	bx	lr
- 800065a:	bf00      	nop
- 800065c:	40004400 	.word	0x40004400
+ 800100a:	bf00      	nop
+ 800100c:	370c      	adds	r7, #12
+ 800100e:	46bd      	mov	sp, r7
+ 8001010:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8001014:	4770      	bx	lr
+ 8001016:	bf00      	nop
+ 8001018:	40004400 	.word	0x40004400
 
-08000660 <UART2_SendString>:
+0800101c <UART2_SendString>:
 
 void UART2_SendString(char *str) {
- 8000660:	b580      	push	{r7, lr}
- 8000662:	b082      	sub	sp, #8
- 8000664:	af00      	add	r7, sp, #0
- 8000666:	6078      	str	r0, [r7, #4]
-    while (*str) {
- 8000668:	e006      	b.n	8000678 <UART2_SendString+0x18>
-        UART2_SendChar(*str++);
- 800066a:	687b      	ldr	r3, [r7, #4]
- 800066c:	1c5a      	adds	r2, r3, #1
- 800066e:	607a      	str	r2, [r7, #4]
- 8000670:	781b      	ldrb	r3, [r3, #0]
- 8000672:	4618      	mov	r0, r3
- 8000674:	f7ff ffdc 	bl	8000630 <UART2_SendChar>
-    while (*str) {
- 8000678:	687b      	ldr	r3, [r7, #4]
- 800067a:	781b      	ldrb	r3, [r3, #0]
- 800067c:	2b00      	cmp	r3, #0
- 800067e:	d1f4      	bne.n	800066a <UART2_SendString+0xa>
+ 800101c:	b580      	push	{r7, lr}
+ 800101e:	b082      	sub	sp, #8
+ 8001020:	af00      	add	r7, sp, #0
+ 8001022:	6078      	str	r0, [r7, #4]
+    while (*str != '\0') {
+ 8001024:	e007      	b.n	8001036 <UART2_SendString+0x1a>
+        UART2_SendChar(*str);
+ 8001026:	687b      	ldr	r3, [r7, #4]
+ 8001028:	781b      	ldrb	r3, [r3, #0]
+ 800102a:	4618      	mov	r0, r3
+ 800102c:	f7ff ffde 	bl	8000fec <UART2_SendChar>
+        str++;
+ 8001030:	687b      	ldr	r3, [r7, #4]
+ 8001032:	3301      	adds	r3, #1
+ 8001034:	607b      	str	r3, [r7, #4]
+    while (*str != '\0') {
+ 8001036:	687b      	ldr	r3, [r7, #4]
+ 8001038:	781b      	ldrb	r3, [r3, #0]
+ 800103a:	2b00      	cmp	r3, #0
+ 800103c:	d1f3      	bne.n	8001026 <UART2_SendString+0xa>
     }
 }
- 8000680:	bf00      	nop
- 8000682:	bf00      	nop
- 8000684:	3708      	adds	r7, #8
- 8000686:	46bd      	mov	sp, r7
- 8000688:	bd80      	pop	{r7, pc}
-	...
+ 800103e:	bf00      	nop
+ 8001040:	bf00      	nop
+ 8001042:	3708      	adds	r7, #8
+ 8001044:	46bd      	mov	sp, r7
+ 8001046:	bd80      	pop	{r7, pc}
 
-0800068c <Reset_Handler>:
+08001048 <UART2_SendUint>:
+
+/* ส่งค่าจำนวนเต็มไม่ติดลบ (เช่น ราคา, Stock) ออกทาง UART โดยไม่ใช้ sprintf/printf
+ * (หลีกเลี่ยงการพึ่งพา Standard I/O Library ซึ่งกินพื้นที่ Flash มากบนระบบ Bare-metal)
+ */
+void UART2_SendUint(uint32_t value) {
+ 8001048:	b580      	push	{r7, lr}
+ 800104a:	b086      	sub	sp, #24
+ 800104c:	af00      	add	r7, sp, #0
+ 800104e:	6078      	str	r0, [r7, #4]
+    char buf[10];
+    uint8_t i = 0U;
+ 8001050:	2300      	movs	r3, #0
+ 8001052:	75fb      	strb	r3, [r7, #23]
+
+    if (value == 0U) {
+ 8001054:	687b      	ldr	r3, [r7, #4]
+ 8001056:	2b00      	cmp	r3, #0
+ 8001058:	d11e      	bne.n	8001098 <UART2_SendUint+0x50>
+        UART2_SendChar('0');
+ 800105a:	2030      	movs	r0, #48	@ 0x30
+ 800105c:	f7ff ffc6 	bl	8000fec <UART2_SendChar>
+ 8001060:	e02c      	b.n	80010bc <UART2_SendUint+0x74>
+        return;
+    }
+
+    while (value > 0U) {
+        buf[i] = (char)((value % 10U) + '0');
+ 8001062:	6879      	ldr	r1, [r7, #4]
+ 8001064:	4b17      	ldr	r3, [pc, #92]	@ (80010c4 <UART2_SendUint+0x7c>)
+ 8001066:	fba3 2301 	umull	r2, r3, r3, r1
+ 800106a:	08da      	lsrs	r2, r3, #3
+ 800106c:	4613      	mov	r3, r2
+ 800106e:	009b      	lsls	r3, r3, #2
+ 8001070:	4413      	add	r3, r2
+ 8001072:	005b      	lsls	r3, r3, #1
+ 8001074:	1aca      	subs	r2, r1, r3
+ 8001076:	b2d2      	uxtb	r2, r2
+ 8001078:	7dfb      	ldrb	r3, [r7, #23]
+ 800107a:	3230      	adds	r2, #48	@ 0x30
+ 800107c:	b2d2      	uxtb	r2, r2
+ 800107e:	3318      	adds	r3, #24
+ 8001080:	443b      	add	r3, r7
+ 8001082:	f803 2c0c 	strb.w	r2, [r3, #-12]
+        i++;
+ 8001086:	7dfb      	ldrb	r3, [r7, #23]
+ 8001088:	3301      	adds	r3, #1
+ 800108a:	75fb      	strb	r3, [r7, #23]
+        value /= 10U;
+ 800108c:	687b      	ldr	r3, [r7, #4]
+ 800108e:	4a0d      	ldr	r2, [pc, #52]	@ (80010c4 <UART2_SendUint+0x7c>)
+ 8001090:	fba2 2303 	umull	r2, r3, r2, r3
+ 8001094:	08db      	lsrs	r3, r3, #3
+ 8001096:	607b      	str	r3, [r7, #4]
+    while (value > 0U) {
+ 8001098:	687b      	ldr	r3, [r7, #4]
+ 800109a:	2b00      	cmp	r3, #0
+ 800109c:	d1e1      	bne.n	8001062 <UART2_SendUint+0x1a>
+    }
+
+    while (i > 0U) {
+ 800109e:	e00a      	b.n	80010b6 <UART2_SendUint+0x6e>
+        i--;
+ 80010a0:	7dfb      	ldrb	r3, [r7, #23]
+ 80010a2:	3b01      	subs	r3, #1
+ 80010a4:	75fb      	strb	r3, [r7, #23]
+        UART2_SendChar(buf[i]);
+ 80010a6:	7dfb      	ldrb	r3, [r7, #23]
+ 80010a8:	3318      	adds	r3, #24
+ 80010aa:	443b      	add	r3, r7
+ 80010ac:	f813 3c0c 	ldrb.w	r3, [r3, #-12]
+ 80010b0:	4618      	mov	r0, r3
+ 80010b2:	f7ff ff9b 	bl	8000fec <UART2_SendChar>
+    while (i > 0U) {
+ 80010b6:	7dfb      	ldrb	r3, [r7, #23]
+ 80010b8:	2b00      	cmp	r3, #0
+ 80010ba:	d1f1      	bne.n	80010a0 <UART2_SendUint+0x58>
+    }
+}
+ 80010bc:	3718      	adds	r7, #24
+ 80010be:	46bd      	mov	sp, r7
+ 80010c0:	bd80      	pop	{r7, pc}
+ 80010c2:	bf00      	nop
+ 80010c4:	cccccccd 	.word	0xcccccccd
+
+080010c8 <UART2_PrintTemperature>:
+
+/* ส่งค่าอุณหภูมิ float (ทศนิยม 2 ตำแหน่ง) ออกทาง UART
+ * (ย้ายมาจาก main.c เดิมของ Day 1 และปรับให้ใช้ UART2_SendUint ร่วมกัน ลดโค้ดซ้ำซ้อน)
+ */
+void UART2_PrintTemperature(float temp) {
+ 80010c8:	b580      	push	{r7, lr}
+ 80010ca:	b084      	sub	sp, #16
+ 80010cc:	af00      	add	r7, sp, #0
+ 80010ce:	ed87 0a01 	vstr	s0, [r7, #4]
+    int32_t integer_part;
+    int32_t decimal_part;
+
+    if (temp < 0.0f) {
+ 80010d2:	edd7 7a01 	vldr	s15, [r7, #4]
+ 80010d6:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 80010da:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 80010de:	d503      	bpl.n	80010e8 <UART2_PrintTemperature+0x20>
+        UART2_SendString("TIMEOUT ERROR!\r\n");
+ 80010e0:	481b      	ldr	r0, [pc, #108]	@ (8001150 <UART2_PrintTemperature+0x88>)
+ 80010e2:	f7ff ff9b 	bl	800101c <UART2_SendString>
+        return;
+ 80010e6:	e02f      	b.n	8001148 <UART2_PrintTemperature+0x80>
+    }
+
+    integer_part = (int32_t)temp;
+ 80010e8:	edd7 7a01 	vldr	s15, [r7, #4]
+ 80010ec:	eefd 7ae7 	vcvt.s32.f32	s15, s15
+ 80010f0:	ee17 3a90 	vmov	r3, s15
+ 80010f4:	60fb      	str	r3, [r7, #12]
+    decimal_part = (int32_t)((temp - (float)integer_part) * 100.0f);
+ 80010f6:	68fb      	ldr	r3, [r7, #12]
+ 80010f8:	ee07 3a90 	vmov	s15, r3
+ 80010fc:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+ 8001100:	ed97 7a01 	vldr	s14, [r7, #4]
+ 8001104:	ee77 7a67 	vsub.f32	s15, s14, s15
+ 8001108:	ed9f 7a12 	vldr	s14, [pc, #72]	@ 8001154 <UART2_PrintTemperature+0x8c>
+ 800110c:	ee67 7a87 	vmul.f32	s15, s15, s14
+ 8001110:	eefd 7ae7 	vcvt.s32.f32	s15, s15
+ 8001114:	ee17 3a90 	vmov	r3, s15
+ 8001118:	60bb      	str	r3, [r7, #8]
+
+    UART2_SendString("Current Temp: ");
+ 800111a:	480f      	ldr	r0, [pc, #60]	@ (8001158 <UART2_PrintTemperature+0x90>)
+ 800111c:	f7ff ff7e 	bl	800101c <UART2_SendString>
+    UART2_SendUint((uint32_t)integer_part);
+ 8001120:	68fb      	ldr	r3, [r7, #12]
+ 8001122:	4618      	mov	r0, r3
+ 8001124:	f7ff ff90 	bl	8001048 <UART2_SendUint>
+    UART2_SendString(".");
+ 8001128:	480c      	ldr	r0, [pc, #48]	@ (800115c <UART2_PrintTemperature+0x94>)
+ 800112a:	f7ff ff77 	bl	800101c <UART2_SendString>
+
+    if (decimal_part < 10) {
+ 800112e:	68bb      	ldr	r3, [r7, #8]
+ 8001130:	2b09      	cmp	r3, #9
+ 8001132:	dc02      	bgt.n	800113a <UART2_PrintTemperature+0x72>
+        UART2_SendString("0"); /* เติม 0 นำหน้ากรณีทศนิยมหลักเดียว เช่น .05 */
+ 8001134:	480a      	ldr	r0, [pc, #40]	@ (8001160 <UART2_PrintTemperature+0x98>)
+ 8001136:	f7ff ff71 	bl	800101c <UART2_SendString>
+    }
+    UART2_SendUint((uint32_t)decimal_part);
+ 800113a:	68bb      	ldr	r3, [r7, #8]
+ 800113c:	4618      	mov	r0, r3
+ 800113e:	f7ff ff83 	bl	8001048 <UART2_SendUint>
+    UART2_SendString(" C\r\n");
+ 8001142:	4808      	ldr	r0, [pc, #32]	@ (8001164 <UART2_PrintTemperature+0x9c>)
+ 8001144:	f7ff ff6a 	bl	800101c <UART2_SendString>
+}
+ 8001148:	3710      	adds	r7, #16
+ 800114a:	46bd      	mov	sp, r7
+ 800114c:	bd80      	pop	{r7, pc}
+ 800114e:	bf00      	nop
+ 8001150:	0800161c 	.word	0x0800161c
+ 8001154:	42c80000 	.word	0x42c80000
+ 8001158:	08001630 	.word	0x08001630
+ 800115c:	08001640 	.word	0x08001640
+ 8001160:	08001644 	.word	0x08001644
+ 8001164:	08001648 	.word	0x08001648
+
+08001168 <Reset_Handler>:
 
   .section .text.Reset_Handler
   .weak Reset_Handler
   .type Reset_Handler, %function
 Reset_Handler:
   ldr   r0, =_estack
- 800068c:	480d      	ldr	r0, [pc, #52]	@ (80006c4 <LoopForever+0x2>)
+ 8001168:	480d      	ldr	r0, [pc, #52]	@ (80011a0 <LoopForever+0x2>)
   mov   sp, r0          /* set stack pointer */
- 800068e:	4685      	mov	sp, r0
+ 800116a:	4685      	mov	sp, r0
 /* Call the clock system initialization function.*/
   bl  SystemInit
- 8000690:	f3af 8000 	nop.w
+ 800116c:	f3af 8000 	nop.w
 
 /* Copy the data segment initializers from flash to SRAM */
   ldr r0, =_sdata
- 8000694:	480c      	ldr	r0, [pc, #48]	@ (80006c8 <LoopForever+0x6>)
+ 8001170:	480c      	ldr	r0, [pc, #48]	@ (80011a4 <LoopForever+0x6>)
   ldr r1, =_edata
- 8000696:	490d      	ldr	r1, [pc, #52]	@ (80006cc <LoopForever+0xa>)
+ 8001172:	490d      	ldr	r1, [pc, #52]	@ (80011a8 <LoopForever+0xa>)
   ldr r2, =_sidata
- 8000698:	4a0d      	ldr	r2, [pc, #52]	@ (80006d0 <LoopForever+0xe>)
+ 8001174:	4a0d      	ldr	r2, [pc, #52]	@ (80011ac <LoopForever+0xe>)
   movs r3, #0
- 800069a:	2300      	movs	r3, #0
+ 8001176:	2300      	movs	r3, #0
   b LoopCopyDataInit
- 800069c:	e002      	b.n	80006a4 <LoopCopyDataInit>
+ 8001178:	e002      	b.n	8001180 <LoopCopyDataInit>
 
-0800069e <CopyDataInit>:
+0800117a <CopyDataInit>:
 
 CopyDataInit:
   ldr r4, [r2, r3]
- 800069e:	58d4      	ldr	r4, [r2, r3]
+ 800117a:	58d4      	ldr	r4, [r2, r3]
   str r4, [r0, r3]
- 80006a0:	50c4      	str	r4, [r0, r3]
+ 800117c:	50c4      	str	r4, [r0, r3]
   adds r3, r3, #4
- 80006a2:	3304      	adds	r3, #4
+ 800117e:	3304      	adds	r3, #4
 
-080006a4 <LoopCopyDataInit>:
+08001180 <LoopCopyDataInit>:
 
 LoopCopyDataInit:
   adds r4, r0, r3
- 80006a4:	18c4      	adds	r4, r0, r3
+ 8001180:	18c4      	adds	r4, r0, r3
   cmp r4, r1
- 80006a6:	428c      	cmp	r4, r1
+ 8001182:	428c      	cmp	r4, r1
   bcc CopyDataInit
- 80006a8:	d3f9      	bcc.n	800069e <CopyDataInit>
+ 8001184:	d3f9      	bcc.n	800117a <CopyDataInit>
 
 /* Zero fill the bss segment. */
   ldr r2, =_sbss
- 80006aa:	4a0a      	ldr	r2, [pc, #40]	@ (80006d4 <LoopForever+0x12>)
+ 8001186:	4a0a      	ldr	r2, [pc, #40]	@ (80011b0 <LoopForever+0x12>)
   ldr r4, =_ebss
- 80006ac:	4c0a      	ldr	r4, [pc, #40]	@ (80006d8 <LoopForever+0x16>)
+ 8001188:	4c0a      	ldr	r4, [pc, #40]	@ (80011b4 <LoopForever+0x16>)
   movs r3, #0
- 80006ae:	2300      	movs	r3, #0
+ 800118a:	2300      	movs	r3, #0
   b LoopFillZerobss
- 80006b0:	e001      	b.n	80006b6 <LoopFillZerobss>
+ 800118c:	e001      	b.n	8001192 <LoopFillZerobss>
 
-080006b2 <FillZerobss>:
+0800118e <FillZerobss>:
 
 FillZerobss:
   str  r3, [r2]
- 80006b2:	6013      	str	r3, [r2, #0]
+ 800118e:	6013      	str	r3, [r2, #0]
   adds r2, r2, #4
- 80006b4:	3204      	adds	r2, #4
+ 8001190:	3204      	adds	r2, #4
 
-080006b6 <LoopFillZerobss>:
+08001192 <LoopFillZerobss>:
 
 LoopFillZerobss:
   cmp r2, r4
- 80006b6:	42a2      	cmp	r2, r4
+ 8001192:	42a2      	cmp	r2, r4
   bcc FillZerobss
- 80006b8:	d3fb      	bcc.n	80006b2 <FillZerobss>
+ 8001194:	d3fb      	bcc.n	800118e <FillZerobss>
 
 
 /* Call static constructors */
   bl __libc_init_array
- 80006ba:	f000 f811 	bl	80006e0 <__libc_init_array>
+ 8001196:	f000 f823 	bl	80011e0 <__libc_init_array>
 /* Call the application's entry point.*/
 
   bl main
- 80006be:	f7ff fef7 	bl	80004b0 <main>
+ 800119a:	f7ff fd87 	bl	8000cac <main>
 
-080006c2 <LoopForever>:
+0800119e <LoopForever>:
 
 LoopForever:
   b LoopForever
- 80006c2:	e7fe      	b.n	80006c2 <LoopForever>
+ 800119e:	e7fe      	b.n	800119e <LoopForever>
   ldr   r0, =_estack
- 80006c4:	20018000 	.word	0x20018000
+ 80011a0:	20018000 	.word	0x20018000
   ldr r0, =_sdata
- 80006c8:	20000000 	.word	0x20000000
+ 80011a4:	20000000 	.word	0x20000000
   ldr r1, =_edata
- 80006cc:	20000000 	.word	0x20000000
+ 80011a8:	20000000 	.word	0x20000000
   ldr r2, =_sidata
- 80006d0:	080008a8 	.word	0x080008a8
+ 80011ac:	08001658 	.word	0x08001658
   ldr r2, =_sbss
- 80006d4:	20000000 	.word	0x20000000
+ 80011b0:	20000000 	.word	0x20000000
   ldr r4, =_ebss
- 80006d8:	2000001c 	.word	0x2000001c
+ 80011b4:	20000078 	.word	0x20000078
 
-080006dc <ADC_IRQHandler>:
+080011b8 <ADC_IRQHandler>:
  * @retval : None
 */
   .section .text.Default_Handler,"ax",%progbits
 Default_Handler:
 Infinite_Loop:
   b Infinite_Loop
- 80006dc:	e7fe      	b.n	80006dc <ADC_IRQHandler>
-	...
+ 80011b8:	e7fe      	b.n	80011b8 <ADC_IRQHandler>
 
-080006e0 <__libc_init_array>:
- 80006e0:	b570      	push	{r4, r5, r6, lr}
- 80006e2:	4d0d      	ldr	r5, [pc, #52]	@ (8000718 <__libc_init_array+0x38>)
- 80006e4:	4c0d      	ldr	r4, [pc, #52]	@ (800071c <__libc_init_array+0x3c>)
- 80006e6:	1b64      	subs	r4, r4, r5
- 80006e8:	10a4      	asrs	r4, r4, #2
- 80006ea:	2600      	movs	r6, #0
- 80006ec:	42a6      	cmp	r6, r4
- 80006ee:	d109      	bne.n	8000704 <__libc_init_array+0x24>
- 80006f0:	4d0b      	ldr	r5, [pc, #44]	@ (8000720 <__libc_init_array+0x40>)
- 80006f2:	4c0c      	ldr	r4, [pc, #48]	@ (8000724 <__libc_init_array+0x44>)
- 80006f4:	f000 f818 	bl	8000728 <_init>
- 80006f8:	1b64      	subs	r4, r4, r5
- 80006fa:	10a4      	asrs	r4, r4, #2
- 80006fc:	2600      	movs	r6, #0
- 80006fe:	42a6      	cmp	r6, r4
- 8000700:	d105      	bne.n	800070e <__libc_init_array+0x2e>
- 8000702:	bd70      	pop	{r4, r5, r6, pc}
- 8000704:	f855 3b04 	ldr.w	r3, [r5], #4
- 8000708:	4798      	blx	r3
- 800070a:	3601      	adds	r6, #1
- 800070c:	e7ee      	b.n	80006ec <__libc_init_array+0xc>
- 800070e:	f855 3b04 	ldr.w	r3, [r5], #4
- 8000712:	4798      	blx	r3
- 8000714:	3601      	adds	r6, #1
- 8000716:	e7f2      	b.n	80006fe <__libc_init_array+0x1e>
- 8000718:	080008a0 	.word	0x080008a0
- 800071c:	080008a0 	.word	0x080008a0
- 8000720:	080008a0 	.word	0x080008a0
- 8000724:	080008a4 	.word	0x080008a4
+080011ba <strncpy>:
+ 80011ba:	b510      	push	{r4, lr}
+ 80011bc:	3901      	subs	r1, #1
+ 80011be:	4603      	mov	r3, r0
+ 80011c0:	b132      	cbz	r2, 80011d0 <strncpy+0x16>
+ 80011c2:	f811 4f01 	ldrb.w	r4, [r1, #1]!
+ 80011c6:	f803 4b01 	strb.w	r4, [r3], #1
+ 80011ca:	3a01      	subs	r2, #1
+ 80011cc:	2c00      	cmp	r4, #0
+ 80011ce:	d1f7      	bne.n	80011c0 <strncpy+0x6>
+ 80011d0:	441a      	add	r2, r3
+ 80011d2:	2100      	movs	r1, #0
+ 80011d4:	4293      	cmp	r3, r2
+ 80011d6:	d100      	bne.n	80011da <strncpy+0x20>
+ 80011d8:	bd10      	pop	{r4, pc}
+ 80011da:	f803 1b01 	strb.w	r1, [r3], #1
+ 80011de:	e7f9      	b.n	80011d4 <strncpy+0x1a>
 
-08000728 <_init>:
- 8000728:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
- 800072a:	bf00      	nop
- 800072c:	bcf8      	pop	{r3, r4, r5, r6, r7}
- 800072e:	bc08      	pop	{r3}
- 8000730:	469e      	mov	lr, r3
- 8000732:	4770      	bx	lr
+080011e0 <__libc_init_array>:
+ 80011e0:	b570      	push	{r4, r5, r6, lr}
+ 80011e2:	4d0d      	ldr	r5, [pc, #52]	@ (8001218 <__libc_init_array+0x38>)
+ 80011e4:	4c0d      	ldr	r4, [pc, #52]	@ (800121c <__libc_init_array+0x3c>)
+ 80011e6:	1b64      	subs	r4, r4, r5
+ 80011e8:	10a4      	asrs	r4, r4, #2
+ 80011ea:	2600      	movs	r6, #0
+ 80011ec:	42a6      	cmp	r6, r4
+ 80011ee:	d109      	bne.n	8001204 <__libc_init_array+0x24>
+ 80011f0:	4d0b      	ldr	r5, [pc, #44]	@ (8001220 <__libc_init_array+0x40>)
+ 80011f2:	4c0c      	ldr	r4, [pc, #48]	@ (8001224 <__libc_init_array+0x44>)
+ 80011f4:	f000 f818 	bl	8001228 <_init>
+ 80011f8:	1b64      	subs	r4, r4, r5
+ 80011fa:	10a4      	asrs	r4, r4, #2
+ 80011fc:	2600      	movs	r6, #0
+ 80011fe:	42a6      	cmp	r6, r4
+ 8001200:	d105      	bne.n	800120e <__libc_init_array+0x2e>
+ 8001202:	bd70      	pop	{r4, r5, r6, pc}
+ 8001204:	f855 3b04 	ldr.w	r3, [r5], #4
+ 8001208:	4798      	blx	r3
+ 800120a:	3601      	adds	r6, #1
+ 800120c:	e7ee      	b.n	80011ec <__libc_init_array+0xc>
+ 800120e:	f855 3b04 	ldr.w	r3, [r5], #4
+ 8001212:	4798      	blx	r3
+ 8001214:	3601      	adds	r6, #1
+ 8001216:	e7f2      	b.n	80011fe <__libc_init_array+0x1e>
+ 8001218:	08001650 	.word	0x08001650
+ 800121c:	08001650 	.word	0x08001650
+ 8001220:	08001650 	.word	0x08001650
+ 8001224:	08001654 	.word	0x08001654
 
-08000734 <_fini>:
- 8000734:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
- 8000736:	bf00      	nop
- 8000738:	bcf8      	pop	{r3, r4, r5, r6, r7}
- 800073a:	bc08      	pop	{r3}
- 800073c:	469e      	mov	lr, r3
- 800073e:	4770      	bx	lr
+08001228 <_init>:
+ 8001228:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800122a:	bf00      	nop
+ 800122c:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 800122e:	bc08      	pop	{r3}
+ 8001230:	469e      	mov	lr, r3
+ 8001232:	4770      	bx	lr
+
+08001234 <_fini>:
+ 8001234:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 8001236:	bf00      	nop
+ 8001238:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 800123a:	bc08      	pop	{r3}
+ 800123c:	469e      	mov	lr, r3
+ 800123e:	4770      	bx	lr

@@ -2,4 +2,8 @@
 ../Src/gpio_driver.c:30:6:LED_On	1
 ../Src/gpio_driver.c:34:6:LED_Off	1
 ../Src/gpio_driver.c:38:6:LED_Toggle	1
-../Src/gpio_driver.c:42:9:BTN_IsPressed	1
+../Src/gpio_driver.c:42:9:BTN_IsPressed	2
+../Src/gpio_driver.c:49:6:GPIO_SetPinMode	1
+../Src/gpio_driver.c:55:6:GPIO_SetPinPull	1
+../Src/gpio_driver.c:61:6:GPIO_WritePin	2
+../Src/gpio_driver.c:70:9:GPIO_ReadPin	2

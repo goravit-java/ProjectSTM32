@@ -1,0 +1,3 @@
+../Src/tim2_driver.c:8:6:TIM2_Init	1
+../Src/tim2_driver.c:17:10:TIM2_GetMicros	1
+../Src/tim2_driver.c:24:6:TIM2_DelayUs	2

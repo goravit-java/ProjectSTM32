@@ -1,0 +1,4 @@
+../Src/dht11_driver.c:16:6:DHT11_Init	8	static
+../Src/dht11_driver.c:26:16:DHT11_WaitForLevel	24	static
+../Src/dht11_driver.c:40:16:DHT11_ReadByte	24	static
+../Src/dht11_driver.c:63:9:DHT11_Read	32	static

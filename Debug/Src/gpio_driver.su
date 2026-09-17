@@ -3,3 +3,7 @@
 ../Src/gpio_driver.c:34:6:LED_Off	16	static
 ../Src/gpio_driver.c:38:6:LED_Toggle	16	static
 ../Src/gpio_driver.c:42:9:BTN_IsPressed	16	static
+../Src/gpio_driver.c:49:6:GPIO_SetPinMode	16	static
+../Src/gpio_driver.c:55:6:GPIO_SetPinPull	16	static
+../Src/gpio_driver.c:61:6:GPIO_WritePin	16	static
+../Src/gpio_driver.c:70:9:GPIO_ReadPin	16	static

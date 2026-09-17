@@ -36,4 +36,19 @@ void LED_Off(GPIO_TypeDef *GPIOx, uint8_t pin);
 void LED_Toggle(GPIO_TypeDef *GPIOx, uint8_t pin);
 uint8_t BTN_IsPressed(GPIO_TypeDef *GPIOx, uint8_t pin);
 
+/* ฟังก์ชันทั่วไปสำหรับควบคุมขา GPIO แบบ Dynamic (ใช้กับ Sensor ที่ต้องสลับ Input/Output เช่น DHT11) */
+#define GPIO_MODE_INPUT     0U
+#define GPIO_MODE_OUTPUT    1U
+#define GPIO_MODE_AF        2U
+#define GPIO_MODE_ANALOG    3U
+
+#define GPIO_PULL_NONE      0U
+#define GPIO_PULL_UP        1U
+#define GPIO_PULL_DOWN      2U
+
+void GPIO_SetPinMode(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t mode);
+void GPIO_SetPinPull(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t pull);
+void GPIO_WritePin(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t state);
+uint8_t GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint8_t pin);
+
 #endif /* GPIO_DRIVER_H_ */

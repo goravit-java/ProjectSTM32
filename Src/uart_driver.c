@@ -20,12 +20,63 @@ void UART2_Init(void) {
 }
 
 void UART2_SendChar(char c) {
-    while (!(USART2->SR & (1U << 7))); // รอจน TXE = 1 (พร้อมส่ง)
-    USART2->DR = (c & 0xFF);
+    while (!(USART2->SR & (1U << 7))) { } /* รอจน TXE = 1 (พร้อมส่ง) */
+    USART2->DR = ((uint32_t)c & 0xFFU);
 }
 
 void UART2_SendString(char *str) {
-    while (*str) {
-        UART2_SendChar(*str++);
+    while (*str != '\0') {
+        UART2_SendChar(*str);
+        str++;
     }
+}
+
+/* ส่งค่าจำนวนเต็มไม่ติดลบ (เช่น ราคา, Stock) ออกทาง UART โดยไม่ใช้ sprintf/printf
+ * (หลีกเลี่ยงการพึ่งพา Standard I/O Library ซึ่งกินพื้นที่ Flash มากบนระบบ Bare-metal)
+ */
+void UART2_SendUint(uint32_t value) {
+    char buf[10];
+    uint8_t i = 0U;
+
+    if (value == 0U) {
+        UART2_SendChar('0');
+        return;
+    }
+
+    while (value > 0U) {
+        buf[i] = (char)((value % 10U) + '0');
+        i++;
+        value /= 10U;
+    }
+
+    while (i > 0U) {
+        i--;
+        UART2_SendChar(buf[i]);
+    }
+}
+
+/* ส่งค่าอุณหภูมิ float (ทศนิยม 2 ตำแหน่ง) ออกทาง UART
+ * (ย้ายมาจาก main.c เดิมของ Day 1 และปรับให้ใช้ UART2_SendUint ร่วมกัน ลดโค้ดซ้ำซ้อน)
+ */
+void UART2_PrintTemperature(float temp) {
+    int32_t integer_part;
+    int32_t decimal_part;
+
+    if (temp < 0.0f) {
+        UART2_SendString("TIMEOUT ERROR!\r\n");
+        return;
+    }
+
+    integer_part = (int32_t)temp;
+    decimal_part = (int32_t)((temp - (float)integer_part) * 100.0f);
+
+    UART2_SendString("Current Temp: ");
+    UART2_SendUint((uint32_t)integer_part);
+    UART2_SendString(".");
+
+    if (decimal_part < 10) {
+        UART2_SendString("0"); /* เติม 0 นำหน้ากรณีทศนิยมหลักเดียว เช่น .05 */
+    }
+    UART2_SendUint((uint32_t)decimal_part);
+    UART2_SendString(" C\r\n");
 }
