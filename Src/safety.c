@@ -1,11 +1,95 @@
 #include "safety.h"
 #include "uart_driver.h"
+#include "gpio_driver.h"
 
-uint8_t Safety_CheckTemperature(float current_temp_c) {
-    if (current_temp_c > SAFETY_TEMP_MAX_C) {
-        UART2_SendString("[SAFETY] WARNING: MCU temperature exceeds safe limit (30 C)!\r\n");
-        return 0U; // ไม่ปลอดภัย -> ผู้เรียกต้องเปลี่ยน State ไปที่ FAULT
+/* Lockout ถูกเก็บเป็น Static เพราะ safety.c เป็นเจ้าของ State นี้แต่เพียงผู้เดียว
+ * (fsm.c อ่านผ่าน Safety_IsLockout() เท่านั้น ไม่แก้ไขค่าเอง)
+ */
+static uint8_t lockout_active = 0U;
+
+void Safety_Init(void) {
+    lockout_active = 0U;
+
+    /* ตั้งค่าขา PC2 เป็น Digital Output สำหรับ Temperature Alarm (แยกจาก LED2 บนบอร์ด)
+     * เริ่มต้นที่ LOW ไปก่อน จนกว่าจะเกินเกณฑ์อุณหภูมิจริงผ่าน Safety_Update()
+     */
+    GPIO_SetPinMode(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, GPIO_MODE_OUTPUT);
+    GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
+
+    /* ตั้งต้นเป็นสถานะปกติไปก่อน จนกว่าจะมีค่า Sensor จริงเข้ามาผ่าน Safety_Update() ครั้งแรก */
+    LED_On(LED1_PORT, LED1_PIN);
+    LED_Off(LED2_PORT, LED2_PIN);
+    LED_Off(LED3_PORT, LED3_PIN);
+}
+
+void Safety_Update(float temp_c, uint8_t humidity_pct) {
+    uint8_t temp_bad = (temp_c > SAFETY_TEMP_MAX_C) ? 1U : 0U;
+    uint8_t humid_bad = (humidity_pct > SAFETY_HUMID_MAX_PCT) ? 1U : 0U;
+    uint8_t abnormal = (uint8_t)(((temp_bad != 0U) || (humid_bad != 0U)) ? 1U : 0U);
+
+    /* 1. ควบคุม LED1 (Normal) / LED2 (Temp Alarm) / LED3 (Humid Alarm)
+     * (ไม่มีการพิมพ์สถานะออก UART ตอนปกติ — เงียบสนิท ต่อเมื่อเกินเกณฑ์เท่านั้นถึงจะเห็นข้อความ ดูข้อ 2)
+     */
+    if (abnormal != 0U) {
+        LED_Off(LED1_PORT, LED1_PIN);
+    } else {
+        LED_On(LED1_PORT, LED1_PIN);
     }
 
-    return 1U; // ปลอดภัย -> ทำงานต่อได้ตามปกติ
+    /* LED2 (บนบอร์ด) และขา PC2 (Output ภายนอก) ทั้งคู่ผูกกับ temp_bad เท่านั้น ไม่ผูกกับความชื้น
+     * ตามที่ต้องการ: "เวลาอุณหภูมิเกินค่าที่ตั้งไว้ให้ปล่อย output ออก pin PC2"
+     */
+    if (temp_bad != 0U) {
+        LED_On(LED2_PORT, LED2_PIN);
+        // GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 1U);
+    } else {
+        LED_Off(LED2_PORT, LED2_PIN);
+        // GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
+    }
+
+    if (humid_bad != 0U) {
+        LED_On(LED3_PORT, LED3_PIN);
+        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 1U);
+    } else {
+        LED_Off(LED3_PORT, LED3_PIN);
+        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
+    }
+
+    /* 2. ข้อความแจ้งเตือนวนซ้ำทุกครั้งที่ Update (~ทุก 2 วินาที) ตราบใดที่ยังเกินเกณฑ์อยู่
+     *    แสดงค่าอุณหภูมิ/ความชื้นปัจจุบันกำกับไปด้วยทุกครั้ง ตามที่ต้องการ (Loop จนกว่าจะกลับปกติ)
+     */
+    if ((temp_bad != 0U) && (humid_bad != 0U)) {
+        UART2_SendString("[WARNING] BOTH Temp & Humidity Exceeded! (Temp: ");
+        UART2_SendFloat1(temp_c);
+        UART2_SendString(" C, Humid: ");
+        UART2_SendUint(humidity_pct);
+        UART2_SendString(" %)\r\n");
+    } else if (temp_bad != 0U) {
+        UART2_SendString("[WARNING] Temp Exceeded! (Current Temp: ");
+        UART2_SendFloat1(temp_c);
+        UART2_SendString(" C | Limit: 40 C)\r\n");
+    } else if (humid_bad != 0U) {
+        UART2_SendString("[WARNING] Humidity Exceeded! (Current Humid: ");
+        UART2_SendUint(humidity_pct);
+        UART2_SendString(" % | Limit: 50 %)\r\n");
+    } else {
+        /* ปกติ ไม่ต้องพิมพ์ข้อความเตือนซ้ำ */
+    }
+
+    /* 3. ตรวจจับการเปลี่ยนสถานะ Lock/Unlock (Edge) เพื่อพิมพ์ข้อความแค่ครั้งเดียวตอนเปลี่ยนสถานะ
+     *    (ไม่วนซ้ำ — ต่างจากข้อ 2 ที่วนซ้ำทุกรอบขณะยังผิดปกติ)
+     */
+    if ((abnormal != 0U) && (lockout_active == 0U)) {
+        lockout_active = 1U;
+        UART2_SendString("[SYSTEM] Environment Abnormal - System Locked\r\n");
+    } else if ((abnormal == 0U) && (lockout_active != 0U)) {
+        lockout_active = 0U;
+        UART2_SendString("[SYSTEM] Environment Restored - System Ready\r\n");
+    } else {
+        /* สถานะเดิมไม่เปลี่ยน ไม่ต้องพิมพ์ซ้ำ */
+    }
+}
+
+uint8_t Safety_IsLockout(void) {
+    return lockout_active;
 }

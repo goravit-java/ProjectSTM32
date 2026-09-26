@@ -3,18 +3,21 @@
 
 #include "stm32f411xx_custom.h"
 
-/* LED Pins (Active High) */
+/* LED Pins (Active High)
+ * หมายเหตุ (ฉบับปรับปรุง): LED1-3 ถูกควบคุมโดย safety.c แบบ Background Task ต่อเนื่อง
+ * ไม่ผูกกับ State ของ FSM อีกต่อไป ส่วน LED4 ยังคงเป็นหน้าที่ของ fsm.c (Busy/Dispensing)
+ */
 #define LED1_PORT   GPIOA
-#define LED1_PIN    5       /* D13 Blue */
+#define LED1_PIN    5       /* D13 Blue   -> NORMAL STATUS (safety.c) */
 
 #define LED2_PORT   GPIOA
-#define LED2_PIN    6       /* D12 Red */
+#define LED2_PIN    6       /* D12 Red    -> TEMPERATURE ALARM (safety.c) */
 
 #define LED3_PORT   GPIOA
-#define LED3_PIN    7       /* D11 Yellow */
+#define LED3_PIN    7       /* D11 Yellow -> HUMIDITY ALARM (safety.c) */
 
 #define LED4_PORT   GPIOB
-#define LED4_PIN    6       /* D10 Green */
+#define LED4_PIN    6       /* D10 Green  -> DISPENSING/BUSY STATUS (fsm.c) */
 
 /* Button Pins (Active Low) */
 #define BTN_UP_PORT     GPIOA

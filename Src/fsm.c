@@ -1,7 +1,6 @@
 #include "fsm.h"
 #include "gpio_driver.h"
 #include "uart_driver.h"
-#include "adc_driver.h"
 #include "safety.h"
 #include "menu.h"
 
@@ -48,6 +47,11 @@ void FSM_Run(void) {
     uint8_t ok_edge   = EdgePressed(BTN_OK_PORT,   BTN_OK_PIN,   &prev_ok);
     uint8_t back_edge = EdgePressed(BTN_BACK_PORT, BTN_BACK_PIN, &prev_back);
 
+    /* Flag สภาวะแวดล้อมจาก safety.c (Background Task ที่อัปเดตทุก ๆ รอบอ่าน Sensor)
+     * อ่านครั้งเดียวต่อ Tick เพื่อให้ทุก case ในรอบนี้เห็นค่าเดียวกัน ไม่มีโอกาส Race ระหว่าง case
+     */
+    uint8_t locked = Safety_IsLockout();
+
     state_tick++;
 
     switch (current_state) {
@@ -58,18 +62,27 @@ void FSM_Run(void) {
         break;
 
     case STATE_IDLE:
-        if (ok_edge != 0U) {
+        if (locked != 0U) {
+            /* ระบบถูกล็อกจากสภาวะแวดล้อมผิดปกติ -> ไม่ตอบสนองปุ่มใด ๆ (ดู LED1-3 และ UART WARNING) */
+        }
+        else if (ok_edge != 0U) {
             selected_index = 0U;
-            UART2_SendString("[FSM] Welcome! Select a drink (UP/DOWN = scroll, OK = confirm)\r\n");
+            UART2_SendString("[FSM] Welcome! Select an item (UP/DOWN = scroll, OK = confirm)\r\n");
             UART2_SendString("> ");
             UART2_SendString(menu[selected_index].name);
             UART2_SendString("\r\n");
             FSM_EnterState(STATE_SELECT_DRINK);
         }
+        else {
+            /* ไม่มี Event ใหม่ -> ไม่ต้องทำอะไร */
+        }
         break;
 
     case STATE_SELECT_DRINK:
-        if (up_edge != 0U) {
+        if (locked != 0U) {
+            /* ระงับการทำงานขณะสภาวะแวดล้อมผิดปกติ (ไม่ตอบสนอง UP/DOWN/OK/BACK) */
+        }
+        else if (up_edge != 0U) {
             selected_index = (selected_index == 0U) ? (uint8_t)(MENU_ITEM_COUNT - 1U) : (uint8_t)(selected_index - 1U);
             UART2_SendString("> ");
             UART2_SendString(menu[selected_index].name);
@@ -97,7 +110,10 @@ void FSM_Run(void) {
         break;
 
     case STATE_CONFIRM:
-        if (ok_edge != 0U) {
+        if (locked != 0U) {
+            /* ระงับการทำงานขณะสภาวะแวดล้อมผิดปกติ */
+        }
+        else if (ok_edge != 0U) {
             FSM_EnterState(STATE_CHECK_STOCK);
         }
         else if (back_edge != 0U) {
@@ -110,31 +126,39 @@ void FSM_Run(void) {
         break;
 
     case STATE_CHECK_STOCK:
-        if (menu[selected_index].stock > 0U) {
+        if (locked != 0U) {
+            /* เผื่อกรณีสภาวะแวดล้อมเพิ่งเปลี่ยนเป็นผิดปกติระหว่างขั้นตอนนี้พอดี (Race เล็กน้อย) */
+            UART2_SendString("[FSM] Environment alert triggered mid-order -> aborting\r\n");
+            FSM_EnterState(STATE_FAULT);
+        }
+        else if (menu[selected_index].stock > 0U) {
             UART2_SendString("[FSM] Stock OK -> checking safety...\r\n");
             FSM_EnterState(STATE_SAFETY_CHECK);
-        } else {
-            UART2_SendString("[FSM] OUT OF STOCK! Please choose another drink.\r\n");
+        }
+        else {
+            UART2_SendString("[FSM] OUT OF STOCK! Please choose another item.\r\n");
             FSM_EnterState(STATE_SELECT_DRINK);
         }
         break;
 
-    case STATE_SAFETY_CHECK: {
-        float temp = ADC1_ReadTemperature();
-        UART2_PrintTemperature(temp);
-
-        if (Safety_CheckTemperature(temp) != 0U) {
-            UART2_SendString("[FSM] Preparing your drink... ");
+    case STATE_SAFETY_CHECK:
+        /* ไม่ต้องอ่าน ADC ซ้ำที่นี่ -> ใช้ผลของ Background Task (safety.c) ที่อัปเดตต่อเนื่องอยู่แล้ว */
+        if (locked != 0U) {
+            FSM_EnterState(STATE_FAULT);
+        } else {
+            UART2_SendString("[FSM] Environment OK -> Preparing your item... ");
             UART2_SendUint(PROCESSING_SECONDS);
             UART2_SendString(" sec\r\n");
             FSM_EnterState(STATE_PROCESSING);
-        } else {
-            FSM_EnterState(STATE_FAULT);
         }
         break;
-    }
 
     case STATE_PROCESSING:
+        /* LED4 กระพริบระหว่างกำลังจ่ายสินค้า (Toggle ทุก ๆ ~0.5 วินาที) */
+        if ((state_tick % 25U) == 0U) {
+            LED_Toggle(LED4_PORT, LED4_PIN);
+        }
+
         /* Dispense Simulation: พิมพ์เลขนับถอยหลังทุก ๆ 1 วินาทีโดยประมาณ */
         if ((state_tick % TICKS_PER_SECOND) == 0U) {
             uint32_t seconds_elapsed = state_tick / TICKS_PER_SECOND;
@@ -147,12 +171,12 @@ void FSM_Run(void) {
         }
 
         if (state_tick >= PROCESSING_TICKS) {
-            /* Stock Update: ตัด Stock ลง 1 หน่วยเมื่อจ่ายเครื่องดื่มสำเร็จ (กันค่าติดลบด้วยเงื่อนไข > 0) */
+            /* Stock Update: ตัด Stock ลง 1 หน่วยเมื่อจ่ายสินค้าสำเร็จ (กันค่าติดลบด้วยเงื่อนไข > 0) */
             if (menu[selected_index].stock > 0U) {
                 menu[selected_index].stock--;
             }
 
-            UART2_SendString("[FSM] Drink prepared! Stock updated:\r\n");
+            UART2_SendString("[FSM] Item prepared! Stock updated:\r\n");
             Menu_PrintAll();
 
             FSM_EnterState(STATE_COMPLETE);
@@ -161,14 +185,17 @@ void FSM_Run(void) {
 
     case STATE_COMPLETE:
         if (state_tick >= COMPLETE_TICKS) {
-            UART2_SendString("[FSM] Enjoy your drink! -> back to IDLE\r\n");
+            UART2_SendString("[FSM] Enjoy your fresh pick! -> back to IDLE\r\n");
             FSM_EnterState(STATE_IDLE);
         }
         break;
 
     case STATE_FAULT:
-        if (back_edge != 0U) {
-            UART2_SendString("[FSM] Fault acknowledged -> back to IDLE\r\n");
+        /* Auto-Recovery: ไม่ต้องกด BACK เอง -> กลับ IDLE ทันทีที่สภาวะแวดล้อมกลับมาปกติ
+         * (ข้อความ "[SYSTEM] Environment Restored - System Ready" พิมพ์แล้วโดย safety.c)
+         */
+        if (locked == 0U) {
+            UART2_SendString("[FSM] Resuming normal operation -> IDLE\r\n");
             FSM_EnterState(STATE_IDLE);
         }
         break;
@@ -187,35 +214,21 @@ static uint8_t EdgePressed(GPIO_TypeDef *port, uint8_t pin, uint8_t *prev_state)
     return edge;
 }
 
-/* ผูกสถานะ LED เข้ากับ State ปัจจุบัน (เรียกทุกครั้งที่เปลี่ยน State เท่านั้น ไม่ใช่ทุก Loop) */
+/* ผูก LED4 (DISPENSING/BUSY STATUS) เข้ากับ State ปัจจุบัน (เรียกทุกครั้งที่เปลี่ยน State เท่านั้น)
+ * หมายเหตุ (ฉบับปรับปรุง): LED1-3 ไม่ใช่หน้าที่ของ FSM อีกต่อไป ถูกควบคุมแยกโดย safety.c
+ * แบบ Background Task ต่อเนื่อง เพื่อไม่ให้การเปลี่ยน State ของ FSM ไปกระทบไฟเตือนสภาวะแวดล้อม
+ */
 static void FSM_UpdateOutputs(void) {
-    LED_Off(LED1_PORT, LED1_PIN);
-    LED_Off(LED2_PORT, LED2_PIN);
-    LED_Off(LED3_PORT, LED3_PIN);
-    LED_Off(LED4_PORT, LED4_PIN);
-
     switch (current_state) {
-    case STATE_IDLE:
-        LED_On(LED1_PORT, LED1_PIN);   /* ระบบพร้อมใช้งาน */
-        break;
-
-    case STATE_SELECT_DRINK:
-    case STATE_CONFIRM:
-        LED_On(LED2_PORT, LED2_PIN);   /* กำลังเลือก/ยืนยันเมนู */
-        break;
-
     case STATE_CHECK_STOCK:
     case STATE_SAFETY_CHECK:
     case STATE_PROCESSING:
     case STATE_COMPLETE:
-        LED_On(LED3_PORT, LED3_PIN);   /* กำลังประมวลผล/เตรียมเครื่องดื่ม */
-        break;
-
-    case STATE_FAULT:
-        LED_On(LED4_PORT, LED4_PIN);   /* สถานะผิดพลาด */
+        LED_On(LED4_PORT, LED4_PIN);   /* กำลังประมวลผล/จ่ายสินค้า (ระหว่าง PROCESSING จะถูก Toggle ให้กระพริบเพิ่มใน FSM_Run) */
         break;
 
     default:
+        LED_Off(LED4_PORT, LED4_PIN);  /* IDLE / SELECT_DRINK / CONFIRM / FAULT: ไม่ได้กำลังจ่ายสินค้า */
         break;
     }
 }

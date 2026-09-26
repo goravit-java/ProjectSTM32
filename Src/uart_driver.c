@@ -80,3 +80,29 @@ void UART2_PrintTemperature(float temp) {
     UART2_SendUint((uint32_t)decimal_part);
     UART2_SendString(" C\r\n");
 }
+
+/* ส่งค่า float แบบทศนิยม 1 ตำแหน่ง โดยไม่มี Label/หน่วยต่อท้าย (เช่น "43.5")
+ * ใช้เป็น Building Block กลางสำหรับประกอบข้อความแจ้งเตือนต่าง ๆ ใน safety.c
+ * ปัดเศษทศนิยมตำแหน่งที่ 1 อย่างถูกต้อง (รวมกรณีทด เช่น 29.96 -> "30.0" ไม่ใช่ "29.10")
+ */
+void UART2_SendFloat1(float value) {
+    int32_t integer_part;
+    int32_t decimal_part;
+
+    if (value < 0.0f) {
+        UART2_SendChar('-');
+        value = -value;
+    }
+
+    integer_part = (int32_t)value;
+    decimal_part = (int32_t)(((value - (float)integer_part) * 10.0f) + 0.5f);
+
+    if (decimal_part >= 10) {
+        decimal_part = 0;
+        integer_part++;
+    }
+
+    UART2_SendUint((uint32_t)integer_part);
+    UART2_SendString(".");
+    UART2_SendUint((uint32_t)decimal_part);
+}

@@ -4,9 +4,9 @@
 #include "stm32f411xx_custom.h"
 
 #define MENU_ITEM_COUNT   4U
-#define MENU_NAME_MAXLEN  16U
+#define MENU_NAME_MAXLEN  24U /* ต้องเผื่อชื่อยาวสุดคือ "Japanese Cucumber" (18 ตัวอักษร + null) */
 
-/* โครงสร้างข้อมูลของเครื่องดื่มแต่ละรายการ (ชื่อ, ราคา, จำนวน Stock) */
+/* โครงสร้างข้อมูลของสินค้าแต่ละรายการ (ชื่อ, ราคา, จำนวน Stock) */
 typedef struct {
     char    name[MENU_NAME_MAXLEN];
     uint16_t price; /* หน่วยเป็นบาท (จำนวนเต็ม) */

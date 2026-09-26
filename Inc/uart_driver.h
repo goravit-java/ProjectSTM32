@@ -8,5 +8,6 @@ void UART2_SendChar(char c);
 void UART2_SendString(char *str);
 void UART2_SendUint(uint32_t value);
 void UART2_PrintTemperature(float temp);
+void UART2_SendFloat1(float value);
 
 #endif /* UART_DRIVER_H_ */

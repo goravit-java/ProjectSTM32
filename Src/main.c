@@ -8,10 +8,11 @@
 #include "fsm.h"
 #include "dht11_driver.h"
 
-/* DHT11 อ่านค่าได้ไม่เร็วกว่า 1 ครั้ง/วินาที จึงอ่านทุก ๆ ~2 วินาทีแทนที่จะอ่านทุกรอบ Loop
+/* DHT11 อ่านค่าได้ไม่เร็วกว่า 1 ครั้ง/วินาที จึงเป็นตัวกำหนดคาบเวลาของ Background Task
+ * ตรวจสอบสภาวะแวดล้อมทั้งหมด (Temp + Humid) ไว้ที่ ~2 วินาทีต่อครั้ง แทนที่จะอ่านทุกรอบ Loop
  * (Loop หลักวิ่งทุก ~20ms ดังนั้น 100 รอบ Loop โดยประมาณ = 2 วินาที)
  */
-#define DHT11_READ_INTERVAL_TICKS   100U
+#define ENV_READ_INTERVAL_TICKS   100U
 
 static void delay_ms(volatile uint32_t ms) {
     for (volatile uint32_t i = 0; i < ms * 3000; i++) {
@@ -30,7 +31,11 @@ static void FPU_Enable(void) {
 }
 
 int main(void) {
-    uint32_t dht11_tick = 0U;
+    uint32_t env_tick = 0U;
+    /* ค่าความชื้นล่าสุดที่อ่านสำเร็จ ใช้ทดแทนชั่วคราวถ้า DHT11 อ่านพลาดบางรอบ
+     * เริ่มต้นที่ 0 (ต่ำกว่าเกณฑ์ 50%) เพื่อไม่ให้ตีความผิดว่าเกินเกณฑ์ก่อนมีข้อมูลจริง
+     */
+    uint8_t last_humidity = 0U;
 
     FPU_Enable();  /* ต้องเป็นบรรทัดแรกสุดของ main() เสมอ ก่อนโค้ดส่วนอื่นที่อาจมี float แฝงอยู่ */
 
@@ -38,13 +43,14 @@ int main(void) {
     UART2_Init();
     ADC1_Init();
     DHT11_Init();
+    Safety_Init();  /* ตั้งค่า LED1-3 เริ่มต้น (ต้องมาหลัง GPIO_Init เสมอ) */
     Menu_Init();
     FSM_Init();
     IWDG_Init();   /* ทำเป็นลำดับสุดท้ายของการ Init เสมอ เผื่อ Init ตัวอื่นค้างจะได้โดน Reset */
 
     UART2_SendString("\r\n========================================\r\n");
-    UART2_SendString("   Smart Vending Machine Controller     \r\n");
-    UART2_SendString("   Day 4: Simulation, Refactor & Test    \r\n");
+    UART2_SendString(" Smart Vegetable & Fruit Vending Machine \r\n");
+    UART2_SendString("  Environment Monitoring & Lockout Mode  \r\n");
     UART2_SendString("========================================\r\n");
 
     Menu_PrintAll();
@@ -54,28 +60,30 @@ int main(void) {
 
         FSM_Run();       /* อ่านปุ่ม + ประมวลผล 1 Tick ของ State ปัจจุบัน (ไม่ Block) */
 
-        dht11_tick++;
-        if (dht11_tick >= DHT11_READ_INTERVAL_TICKS) {
+        env_tick++;
+        if (env_tick >= ENV_READ_INTERVAL_TICKS) {
             DHT11_Data_t dht_data;
+            float mcu_temp;
 
-            dht11_tick = 0U;
+            env_tick = 0U;
 
+            /* อุณหภูมิ: อ่านจาก Internal Temperature Sensor ของ ADC1 เสมอ (ไม่ผูกกับผล DHT11) */
+            mcu_temp = ADC1_ReadTemperature();
+
+            /* ความชื้น: อ่านจาก DHT11 เท่านั้นตามที่โครงงานกำหนด (ไม่ใช้ค่า Temp ที่ DHT11 อ่านได้)
+             * ถ้าอ่านพลาด (Timeout/Checksum) ให้คงค่าความชื้นล่าสุดที่เคยอ่านได้ไว้ก่อน
+             * เพื่อไม่ให้การเชื่อมต่อ DHT11 หลุดชั่วคราวทำให้หยุดตรวจสอบอุณหภูมิไปด้วย
+             */
             if (DHT11_Read(&dht_data) != 0U) {
-                UART2_SendString("[DHT11] Humidity: ");
-                UART2_SendUint(dht_data.humidity);
-                UART2_SendString(" %RH | Temp: ");
-                if (dht_data.temperature < 0) {
-                    UART2_SendString("-");
-                    UART2_SendUint((uint32_t)(-(int32_t)dht_data.temperature));
-                } else {
-                    UART2_SendUint((uint32_t)dht_data.temperature);
-                }
-                UART2_SendString(" C\r\n");
+                last_humidity = dht_data.humidity;
             } else {
                 UART2_SendString("[DHT11] Read failed (timeout/checksum) - check wiring\r\n");
             }
+
+            /* ส่งเข้า safety.c ที่เดียว: พิมพ์สถานะ/WARNING + คุม LED1-3 + ติดตาม Lockout */
+            Safety_Update(mcu_temp, last_humidity);
         }
 
-        delay_ms(20);    /* คาบเวลาสุ่มตรวจปุ่ม ~20ms ช่วย Debounce เบื้องต้น และเป็นฐานเวลาให้ FSM/DHT11 นับ Tick */
+        delay_ms(20);    /* คาบเวลาสุ่มตรวจปุ่ม ~20ms ช่วย Debounce เบื้องต้น และเป็นฐานเวลาให้ FSM/Env Task นับ Tick */
     }
 }

@@ -7,45 +7,45 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         000010ac  08000194  08000194  00001194  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000410  08001240  08001240  00002240  2**2
+  2 .rodata       00000408  08001240  08001240  00002240  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08001650  08001650  00002658  2**0
+  3 .ARM.extab    00000000  08001648  08001648  00002650  2**0
                   CONTENTS, READONLY
-  4 .ARM          00000000  08001650  08001650  00002658  2**0
+  4 .ARM          00000000  08001648  08001648  00002650  2**0
                   CONTENTS, READONLY
-  5 .preinit_array 00000000  08001650  08001658  00002658  2**0
+  5 .preinit_array 00000000  08001648  08001650  00002650  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08001650  08001650  00002650  2**2
+  6 .init_array   00000004  08001648  08001648  00002648  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  08001654  08001654  00002654  2**2
+  7 .fini_array   00000004  0800164c  0800164c  0000264c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         00000000  20000000  20000000  00002658  2**0
+  8 .data         00000000  20000000  20000000  00002650  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          00000078  20000000  08001658  00003000  2**2
+  9 .bss          00000078  20000000  08001650  00003000  2**2
                   ALLOC
- 10 ._user_heap_stack 00000600  20000078  08001658  00003078  2**0
+ 10 ._user_heap_stack 00000600  20000078  08001650  00003078  2**0
                   ALLOC
- 11 .ARM.attributes 00000030  00000000  00000000  00002658  2**0
+ 11 .ARM.attributes 00000030  00000000  00000000  00002650  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00001be7  00000000  00000000  00002688  2**0
+ 12 .debug_info   00001be7  00000000  00000000  00002680  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00000b66  00000000  00000000  0000426f  2**0
+ 13 .debug_abbrev 00000b66  00000000  00000000  00004267  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000248  00000000  00000000  00004dd8  2**3
+ 14 .debug_aranges 00000248  00000000  00000000  00004dd0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00000189  00000000  00000000  00005020  2**0
+ 15 .debug_rnglists 00000189  00000000  00000000  00005018  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00002174  00000000  00000000  000051a9  2**0
+ 16 .debug_macro  00002174  00000000  00000000  000051a1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000035f9  00000000  00000000  0000731d  2**0
+ 17 .debug_line   000035f9  00000000  00000000  00007315  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00007ed4  00000000  00000000  0000a916  2**0
+ 18 .debug_str    00007ed4  00000000  00000000  0000a90e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000127ea  2**0
+ 19 .comment      00000043  00000000  00000000  000127e2  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00000638  00000000  00000000  00012830  2**2
+ 20 .debug_frame  00000638  00000000  00000000  00012828  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000065  00000000  00000000  00012e68  2**0
+ 21 .debug_line_str 00000065  00000000  00000000  00012e60  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1885,7 +1885,7 @@ MenuItem_t menu[MENU_ITEM_COUNT];
 void Menu_Init(void) {
  8000d8c:	b580      	push	{r7, lr}
  8000d8e:	af00      	add	r7, sp, #0
-    (void)strncpy(menu[0].name, "Coffee", MENU_NAME_MAXLEN - 1U);
+    (void)strncpy(menu[0].name, "Salad", MENU_NAME_MAXLEN - 1U);
  8000d90:	220f      	movs	r2, #15
  8000d92:	4918      	ldr	r1, [pc, #96]	@ (8000df4 <Menu_Init+0x68>)
  8000d94:	4818      	ldr	r0, [pc, #96]	@ (8000df8 <Menu_Init+0x6c>)
@@ -1899,7 +1899,7 @@ void Menu_Init(void) {
  8000da2:	2203      	movs	r2, #3
  8000da4:	749a      	strb	r2, [r3, #18]
 
-    (void)strncpy(menu[1].name, "Green Tea", MENU_NAME_MAXLEN - 1U);
+    (void)strncpy(menu[1].name, "Cabbage", MENU_NAME_MAXLEN - 1U);
  8000da6:	220f      	movs	r2, #15
  8000da8:	4914      	ldr	r1, [pc, #80]	@ (8000dfc <Menu_Init+0x70>)
  8000daa:	4815      	ldr	r0, [pc, #84]	@ (8000e00 <Menu_Init+0x74>)
@@ -1913,7 +1913,7 @@ void Menu_Init(void) {
  8000db8:	2202      	movs	r2, #2
  8000dba:	f883 2026 	strb.w	r2, [r3, #38]	@ 0x26
 
-    (void)strncpy(menu[2].name, "Cocoa", MENU_NAME_MAXLEN - 1U);
+    (void)strncpy(menu[2].name, "Melon", MENU_NAME_MAXLEN - 1U);
  8000dbe:	220f      	movs	r2, #15
  8000dc0:	4910      	ldr	r1, [pc, #64]	@ (8000e04 <Menu_Init+0x78>)
  8000dc2:	4811      	ldr	r0, [pc, #68]	@ (8000e08 <Menu_Init+0x7c>)
@@ -1927,7 +1927,7 @@ void Menu_Init(void) {
  8000dd0:	2201      	movs	r2, #1
  8000dd2:	f883 203a 	strb.w	r2, [r3, #58]	@ 0x3a
 
-    (void)strncpy(menu[3].name, "Milk Tea", MENU_NAME_MAXLEN - 1U);
+    (void)strncpy(menu[3].name, "Grape", MENU_NAME_MAXLEN - 1U);
  8000dd6:	220f      	movs	r2, #15
  8000dd8:	490c      	ldr	r1, [pc, #48]	@ (8000e0c <Menu_Init+0x80>)
  8000dda:	480d      	ldr	r0, [pc, #52]	@ (8000e10 <Menu_Init+0x84>)
@@ -1947,9 +1947,9 @@ void Menu_Init(void) {
  8000df8:	20000028 	.word	0x20000028
  8000dfc:	08001558 	.word	0x08001558
  8000e00:	2000003c 	.word	0x2000003c
- 8000e04:	08001564 	.word	0x08001564
+ 8000e04:	08001560 	.word	0x08001560
  8000e08:	20000050 	.word	0x20000050
- 8000e0c:	0800156c 	.word	0x0800156c
+ 8000e0c:	08001568 	.word	0x08001568
  8000e10:	20000064 	.word	0x20000064
 
 08000e14 <Menu_PrintAll>:
@@ -2027,12 +2027,12 @@ void Menu_PrintAll(void) {
  8000e92:	46bd      	mov	sp, r7
  8000e94:	bd80      	pop	{r7, pc}
  8000e96:	bf00      	nop
- 8000e98:	08001578 	.word	0x08001578
+ 8000e98:	08001570 	.word	0x08001570
  8000e9c:	20000028 	.word	0x20000028
- 8000ea0:	0800159c 	.word	0x0800159c
- 8000ea4:	080015a8 	.word	0x080015a8
- 8000ea8:	080015b8 	.word	0x080015b8
- 8000eac:	080015bc 	.word	0x080015bc
+ 8000ea0:	08001594 	.word	0x08001594
+ 8000ea4:	080015a0 	.word	0x080015a0
+ 8000ea8:	080015b0 	.word	0x080015b0
+ 8000eac:	080015b4 	.word	0x080015b4
 
 08000eb0 <Safety_CheckTemperature>:
 #include "safety.h"
@@ -2064,7 +2064,7 @@ uint8_t Safety_CheckTemperature(float current_temp_c) {
  8000eda:	3708      	adds	r7, #8
  8000edc:	46bd      	mov	sp, r7
  8000ede:	bd80      	pop	{r7, pc}
- 8000ee0:	080015dc 	.word	0x080015dc
+ 8000ee0:	080015d4 	.word	0x080015d4
 
 08000ee4 <TIM2_Init>:
 /* ตั้งค่า TIM2 ให้เป็น Free-running Counter ที่นับ 1 Tick = 1 microsecond
@@ -2440,12 +2440,12 @@ void UART2_PrintTemperature(float temp) {
  800114a:	46bd      	mov	sp, r7
  800114c:	bd80      	pop	{r7, pc}
  800114e:	bf00      	nop
- 8001150:	0800161c 	.word	0x0800161c
+ 8001150:	08001614 	.word	0x08001614
  8001154:	42c80000 	.word	0x42c80000
- 8001158:	08001630 	.word	0x08001630
- 800115c:	08001640 	.word	0x08001640
- 8001160:	08001644 	.word	0x08001644
- 8001164:	08001648 	.word	0x08001648
+ 8001158:	08001628 	.word	0x08001628
+ 800115c:	08001638 	.word	0x08001638
+ 8001160:	0800163c 	.word	0x0800163c
+ 8001164:	08001640 	.word	0x08001640
 
 08001168 <Reset_Handler>:
 
@@ -2540,7 +2540,7 @@ LoopForever:
   ldr r1, =_edata
  80011a8:	20000000 	.word	0x20000000
   ldr r2, =_sidata
- 80011ac:	08001658 	.word	0x08001658
+ 80011ac:	08001650 	.word	0x08001650
   ldr r2, =_sbss
  80011b0:	20000000 	.word	0x20000000
   ldr r4, =_ebss
@@ -2599,10 +2599,10 @@ Infinite_Loop:
  8001212:	4798      	blx	r3
  8001214:	3601      	adds	r6, #1
  8001216:	e7f2      	b.n	80011fe <__libc_init_array+0x1e>
- 8001218:	08001650 	.word	0x08001650
- 800121c:	08001650 	.word	0x08001650
- 8001220:	08001650 	.word	0x08001650
- 8001224:	08001654 	.word	0x08001654
+ 8001218:	08001648 	.word	0x08001648
+ 800121c:	08001648 	.word	0x08001648
+ 8001220:	08001648 	.word	0x08001648
+ 8001224:	0800164c 	.word	0x0800164c
 
 08001228 <_init>:
  8001228:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
