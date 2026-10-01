@@ -17,6 +17,9 @@
 #define ADC_COMMON_BASE     (APB2PERIPH_BASE + 0x2300UL)
 #define IWDG_BASE            (0x40003000UL)   /* IWDG อยู่บน APB1 bus เสมอ ไม่ผูกกับ Clock Enable ใด ๆ */
 #define TIM2_BASE            (APB1PERIPH_BASE + 0x0000UL)
+#define SYSCFG_BASE          (APB2PERIPH_BASE + 0x3800UL)  /* เลือกว่า EXTI Line ไหนผูกกับ Port ไหน */
+#define EXTI_BASE            (APB2PERIPH_BASE + 0x3C00UL)
+#define NVIC_ISER_BASE       (0xE000E100UL)                /* Cortex-M4 Core: NVIC Interrupt Set-Enable */
 
 /* RCC Register Structure */
 typedef struct {
@@ -69,6 +72,22 @@ typedef struct {
     volatile uint32_t DCR, DMAR, OR;
 } TIM_TypeDef;
 
+/* System Configuration Controller (ใช้แค่ EXTICR สำหรับเลือก Port ของ EXTI แต่ละ Line) */
+typedef struct {
+    volatile uint32_t MEMRMP, PMC;
+    volatile uint32_t EXTICR[4];
+} SYSCFG_TypeDef;
+
+/* External Interrupt/Event Controller */
+typedef struct {
+    volatile uint32_t IMR, EMR, RTSR, FTSR, SWIER, PR;
+} EXTI_TypeDef;
+
+/* NVIC Interrupt Set-Enable Registers (ISER0-ISER7, เขียน 1 = เปิด IRQ นั้น, เขียน 0 = ไม่มีผล) */
+typedef struct {
+    volatile uint32_t ISER[8];
+} NVIC_ISER_TypeDef;
+
 /* Peripheral Definitions */
 #define RCC                 ((RCC_TypeDef *) RCC_BASE)
 #define GPIOA               ((GPIO_TypeDef *) GPIOA_BASE)
@@ -79,6 +98,17 @@ typedef struct {
 #define ADC123_COMMON       ((ADC_Common_TypeDef *) ADC_COMMON_BASE)
 #define IWDG                ((IWDG_TypeDef *) IWDG_BASE)
 #define TIM2                ((TIM_TypeDef *) TIM2_BASE)
+#define SYSCFG              ((SYSCFG_TypeDef *) SYSCFG_BASE)
+#define EXTI                ((EXTI_TypeDef *) EXTI_BASE)
+#define NVIC_ISER           ((NVIC_ISER_TypeDef *) NVIC_ISER_BASE)
+
+/* IRQ Number ของ STM32F411 (ตำแหน่งใน Vector Table หลัง 16 Exception ของ Core) */
+#define EXTI3_IRQN          9U
+#define EXTI4_IRQN          10U
+#define ADC_IRQN            18U
+#define EXTI9_5_IRQN        23U
+#define USART2_IRQN         38U
+#define EXTI15_10_IRQN      40U
 
 /* Cortex-M4 Core Peripheral: SCB->CPACR (Coprocessor Access Control Register)
  * ต้องเปิดใช้งาน FPU (Coprocessor 10, 11) ก่อนใช้ float/double ใด ๆ ในโปรแกรมเสมอ

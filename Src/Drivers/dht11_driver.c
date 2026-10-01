@@ -1,6 +1,6 @@
-#include "dht11_driver.h"
-#include "gpio_driver.h"
-#include "tim2_driver.h"
+#include "Drivers/dht11_driver.h"
+#include "Drivers/gpio_driver.h"
+#include "Drivers/tim2_driver.h"
 
 /* Timeout ของการรอสัญญาณแต่ละช่วง (หน่วย us) กันค้างถ้า Sensor ไม่ตอบสนอง/ต่อสายผิด
  * สัญญาณจริงของ DHT11 อยู่ราว 50-80us ต่อช่วง ตั้ง Margin ไว้ให้เผื่อความคลาดเคลื่อน
@@ -14,8 +14,8 @@ static uint8_t DHT11_WaitForLevel(uint8_t level, uint32_t timeout_us);
 static uint8_t DHT11_ReadByte(void);
 
 void DHT11_Init(void) {
-    RCC->AHB1ENR |= (1U << 2); /* เปิด Clock ให้ GPIOC (PC3) */
-    TIM2_Init();
+    /* หมายเหตุ: TIM2_Init() ถูกเรียกไว้แล้วใน main() ก่อนหน้า (ใช้ร่วมกันหลายโมดูล) */
+    RCC->AHB1ENR |= (1U << 2U); /* เปิด Clock ให้ GPIOC (PC3) */
 
     /* สถานะปกติเมื่อไม่ได้สื่อสาร: Input + Pull-up (บัสถูกดึงขึ้น HIGH ค้างไว้) */
     GPIO_SetPinMode(DHT11_PORT, DHT11_PIN, GPIO_MODE_INPUT);
@@ -52,7 +52,7 @@ static uint8_t DHT11_ReadByte(void) {
         (void)DHT11_WaitForLevel(0U, DHT11_TIMEOUT_US); /* รอจน HIGH จบ (กลับไป LOW ของบิตถัดไป) */
         high_duration = TIM2_GetMicros() - high_start;
 
-        value = (uint8_t)(value << 1);
+        value = (uint8_t)(value << 1U);
         if (high_duration > DHT11_BIT_THRESHOLD_US) {
             value |= 1U;
         }

@@ -1,7 +1,7 @@
 #ifndef DHT11_DRIVER_H_
 #define DHT11_DRIVER_H_
 
-#include "stm32f411xx_custom.h"
+#include "Drivers/stm32f411xx_custom.h"
 
 /* ขาที่ใช้ต่อสาย DATA ของ DHT11 — แก้ตรงนี้ได้ถ้าเปลี่ยนไปใช้ขาอื่น */
 #define DHT11_PORT   GPIOC

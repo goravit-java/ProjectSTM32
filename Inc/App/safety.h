@@ -1,10 +1,10 @@
 #ifndef SAFETY_H_
 #define SAFETY_H_
 
-#include "stm32f411xx_custom.h"
+#include "Drivers/stm32f411xx_custom.h"
 
 /* เงื่อนไขความปลอดภัย (ฉบับปรับปรุง): ตรวจทั้งอุณหภูมิ MCU (ADC1) และความชื้น (DHT11) */
-#define SAFETY_TEMP_MAX_C      (30.0f)
+#define SAFETY_TEMP_MAX_C      (40.0f)
 #define SAFETY_HUMID_MAX_PCT   (70U)
 
 /* Digital Output แยกต่างหาก (นอกเหนือจาก LED2 บนบอร์ด): HIGH เมื่ออุณหภูมิเกินเกณฑ์เท่านั้น
@@ -27,5 +27,12 @@ void Safety_Update(float temp_c, uint8_t humidity_pct);
 
 /* คืนค่า 1 = ระบบถูกล็อก ห้ามทำรายการซื้อขายใด ๆ, 0 = ปกติ ทำรายการได้ตามปกติ */
 uint8_t Safety_IsLockout(void);
+
+/* Getter ค่า Sensor ล่าสุดที่เคยผ่านเข้ามาทาง Safety_Update() สำหรับโมดูลอื่น (เช่น display.c)
+ * อ่านไปแสดงผลเฉย ๆ ไม่ใช้ตัดสินใจ Logic ซ้ำที่อื่น (safety.c เป็นเจ้าของการตัดสินใจแต่เพียงผู้เดียว)
+ */
+float Safety_GetLastTemp(void);
+uint8_t Safety_HasReading(void);   /* 1 = มีค่า Sensor จริงเข้ามาแล้วอย่างน้อย 1 ครั้ง (ก่อนหน้านั้น Getter คืนค่า 0) */
+uint8_t Safety_GetLastHumidity(void);
 
 #endif /* SAFETY_H_ */

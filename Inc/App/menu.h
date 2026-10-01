@@ -1,7 +1,7 @@
 #ifndef MENU_H_
 #define MENU_H_
 
-#include "stm32f411xx_custom.h"
+#include <stdint.h>
 
 #define MENU_ITEM_COUNT   4U
 #define MENU_NAME_MAXLEN  24U /* ต้องเผื่อชื่อยาวสุดคือ "Japanese Cucumber" (18 ตัวอักษร + null) */

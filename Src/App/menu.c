@@ -1,5 +1,5 @@
-#include "menu.h"
-#include "uart_driver.h"
+#include "App/menu.h"
+#include "Drivers/uart_driver.h"
 #include <string.h>
 
 MenuItem_t menu[MENU_ITEM_COUNT];

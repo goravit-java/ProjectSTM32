@@ -1,11 +1,16 @@
-#include "safety.h"
-#include "uart_driver.h"
-#include "gpio_driver.h"
+#include "App/safety.h"
+#include "Drivers/uart_driver.h"
+#include "Drivers/gpio_driver.h"
 
 /* Lockout ถูกเก็บเป็น Static เพราะ safety.c เป็นเจ้าของ State นี้แต่เพียงผู้เดียว
  * (fsm.c อ่านผ่าน Safety_IsLockout() เท่านั้น ไม่แก้ไขค่าเอง)
  */
 static uint8_t lockout_active = 0U;
+
+/* เก็บค่า Sensor ล่าสุดไว้ให้โมดูลอื่นอ่านผ่าน Getter ด้านล่าง (เช่น display.c เอาไปโชว์หน้าจอ OLED) */
+static float last_temp_c = 0.0f;
+static uint8_t last_humidity_pct = 0U;
+static uint8_t has_reading = 0U;
 
 void Safety_Init(void) {
     lockout_active = 0U;
@@ -27,6 +32,11 @@ void Safety_Update(float temp_c, uint8_t humidity_pct) {
     uint8_t humid_bad = (humidity_pct > SAFETY_HUMID_MAX_PCT) ? 1U : 0U;
     uint8_t abnormal = (uint8_t)(((temp_bad != 0U) || (humid_bad != 0U)) ? 1U : 0U);
 
+    /* เก็บค่าล่าสุดไว้ก่อนเลย ให้ Getter เรียกอ่านได้เสมอไม่ว่าจะเกินเกณฑ์หรือไม่ */
+    last_temp_c = temp_c;
+    last_humidity_pct = humidity_pct;
+    has_reading = 1U;
+
     /* 1. ควบคุม LED1 (Normal) / LED2 (Temp Alarm) / LED3 (Humid Alarm)
      * (ไม่มีการพิมพ์สถานะออก UART ตอนปกติ — เงียบสนิท ต่อเมื่อเกินเกณฑ์เท่านั้นถึงจะเห็นข้อความ ดูข้อ 2)
      */
@@ -41,10 +51,10 @@ void Safety_Update(float temp_c, uint8_t humidity_pct) {
      */
     if (temp_bad != 0U) {
         LED_On(LED2_PORT, LED2_PIN);
-        // GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 1U);
+        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 1U);
     } else {
         LED_Off(LED2_PORT, LED2_PIN);
-        // GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
+        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
     }
 
     if (humid_bad != 0U) {
@@ -92,4 +102,16 @@ void Safety_Update(float temp_c, uint8_t humidity_pct) {
 
 uint8_t Safety_IsLockout(void) {
     return lockout_active;
+}
+
+float Safety_GetLastTemp(void) {
+    return last_temp_c;
+}
+
+uint8_t Safety_GetLastHumidity(void) {
+    return last_humidity_pct;
+}
+
+uint8_t Safety_HasReading(void) {
+    return has_reading;
 }

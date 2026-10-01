@@ -1,1 +1,3 @@
-../Src/safety.c:4:9:Safety_CheckTemperature	2
+../Src/safety.c:10:6:Safety_Init	1
+../Src/safety.c:25:6:Safety_Update	16
+../Src/safety.c:93:9:Safety_IsLockout	1

@@ -3,3 +3,4 @@
 ../Src/uart_driver.c:27:6:UART2_SendString	2
 ../Src/uart_driver.c:37:6:UART2_SendUint	4
 ../Src/uart_driver.c:61:6:UART2_PrintTemperature	3
+../Src/uart_driver.c:88:6:UART2_SendFloat1	3
