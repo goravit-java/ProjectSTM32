@@ -3,9 +3,20 @@
 
 #include "Drivers/stm32f411xx_custom.h"
 
-/* เงื่อนไขความปลอดภัย (ฉบับปรับปรุง): ตรวจทั้งอุณหภูมิ (NTC ที่ PA0 ผ่าน ADC1) และความชื้น (DHT11) */
-#define SAFETY_TEMP_MAX_C      (40.0f)
-#define SAFETY_HUMID_MAX_PCT   (75U)
+/* เงื่อนไขความปลอดภัย (ฉบับปรับปรุง): ตรวจทั้งอุณหภูมิ (NTC ที่ PA0 ผ่าน ADC1) และความชื้น (DHT11)
+ * เกณฑ์ทั้งสองตั้งได้จากหน้า SETTINGS (ดู SAFETY_TEMP_LIMIT_* / SAFETY_HUMID_LIMIT_*) */
+/* เกณฑ์อุณหภูมิและความชื้นตั้งได้จากหน้า SETTINGS (กด BACK ค้างที่หน้าแรก แล้วหมุน Potentiometer PA4)
+ * อุณหภูมิ: 20.0 ถึง 50.0 °C ทีละ 0.5 °C (เก็บเป็น "ขั้น" 0-60 เพื่อไม่ต้องเทียบ float ด้วย ==)
+ * ความชื้น: 40 ถึง 90 % ทีละ 1 %
+ * ค่าเริ่มต้นหลังเปิดเครื่อง 40.0 °C และ 70 % (เก็บใน RAM ปิดเครื่องแล้วกลับเป็นค่าเริ่มต้น)
+ */
+#define SAFETY_TEMP_LIMIT_MIN_C      (20.0f)
+#define SAFETY_TEMP_LIMIT_STEP_C     (0.5f)
+#define SAFETY_TEMP_LIMIT_STEPS      60U    /* (50.0 - 20.0) / 0.5 */
+#define SAFETY_TEMP_LIMIT_DEFAULT    40U    /* ขั้นที่ 40 = 20.0 + (40 x 0.5) = 40.0 °C */
+#define SAFETY_HUMID_LIMIT_MIN_PCT   40U
+#define SAFETY_HUMID_LIMIT_MAX_PCT   90U
+#define SAFETY_HUMID_LIMIT_DEFAULT   70U
 
 /* Digital Output ขับ Relay พัดลมระบายอากาศ: HIGH เมื่ออุณหภูมิหรือความชื้นเกินเกณฑ์ (ระบบ Lockout)
  * LOW เมื่อสภาวะแวดล้อมกลับมาปกติ
@@ -24,6 +35,15 @@ void Safety_Init(void);
  *   3. ติดตามสถานะ Lockout และพิมพ์ข้อความแจ้งเพียงครั้งเดียวตอนเปลี่ยนสถานะ Lock/Unlock (Auto-Recovery)
  */
 void Safety_Update(float temp_c, uint8_t humidity_pct);
+
+/* บันทึกเกณฑ์ใหม่ (เรียกจากหน้า SETTINGS ตอนกด OK) ค่าที่เกินช่วงจะถูกตัดให้อยู่ในช่วง
+ * พิมพ์ "[SET] ..." ทาง UART และตรวจ Lockout ใหม่ทันทีด้วยค่า Sensor ล่าสุด (ไม่ต้องรอรอบ 2 วินาที)
+ */
+void Safety_SetLimits(uint8_t temp_step, uint8_t humid_pct);
+float Safety_GetTempLimit(void);          /* เกณฑ์อุณหภูมิปัจจุบัน (°C) */
+uint8_t Safety_GetTempLimitStep(void);    /* เกณฑ์อุณหภูมิปัจจุบันเป็นขั้น (0-60) */
+uint8_t Safety_GetHumidLimit(void);       /* เกณฑ์ความชื้นปัจจุบัน (%) */
+float Safety_TempStepToC(uint8_t step);   /* แปลงขั้น -> °C (ใช้แสดงค่าที่กำลังตั้งบนจอ) */
 
 /* คืนค่า 1 = ระบบถูกล็อก ห้ามทำรายการซื้อขายใด ๆ, 0 = ปกติ ทำรายการได้ตามปกติ */
 uint8_t Safety_IsLockout(void);

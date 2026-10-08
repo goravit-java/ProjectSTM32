@@ -1,5 +1,11 @@
 #include "Drivers/gpio_driver.h"
 #include "Drivers/exti_driver.h"
+#include "Drivers/tim2_driver.h"
+
+/* สถานะการกดค้างของปุ่ม BACK (อัปเดตจาก Event ที่ EXTI ISR บันทึกไว้) */
+static uint8_t back_held = 0U;        /* 1 = กดอยู่ (รับขอบขาลงแล้ว ยังไม่ได้รับขอบขาขึ้น) */
+static uint8_t back_long_sent = 0U;   /* 1 = ส่ง BTN_EVENT_LONG ของการกดครั้งนี้ไปแล้ว */
+static uint32_t back_press_us = 0U;   /* เวลาที่กด (us จาก TIM2) */
 
 void GPIO_Init(void) {
     /* 1. เปิด Clock จ่ายไฟให้ GPIOA และ GPIOB */
@@ -59,7 +65,7 @@ void BTN_EnableInterrupts(void) {
     EXTI_InitEdge(BTN_UP_PORT, BTN_UP_PIN, EXTI_EDGE_FALLING);
     EXTI_InitEdge(BTN_DOWN_PORT, BTN_DOWN_PIN, EXTI_EDGE_FALLING);
     EXTI_InitEdge(BTN_OK_PORT, BTN_OK_PIN, EXTI_EDGE_FALLING);
-    EXTI_InitEdge(BTN_BACK_PORT, BTN_BACK_PIN, EXTI_EDGE_FALLING);
+    EXTI_InitEdge(BTN_BACK_PORT, BTN_BACK_PIN, EXTI_EDGE_BOTH);   /* กด + ปล่อย สำหรับจับการกดค้าง */
 }
 
 uint8_t BTN_TakePress(const GPIO_TypeDef *GPIOx, uint8_t pin) {
@@ -71,6 +77,34 @@ uint8_t BTN_TakePress(const GPIO_TypeDef *GPIOx, uint8_t pin) {
         /* ไม่มี Event จาก Interrupt ของปุ่มนี้ */
     }
     return pressed;
+}
+
+uint8_t BTN_TakeBackEvent(void) {
+    uint8_t event = BTN_EVENT_NONE;
+
+    if (EXTI_TakeEvent(BTN_BACK_PIN) != 0U) {
+        /* มี Edge ที่นิ่งแล้ว: ดูระดับขาเพื่อแยกว่าเป็นการกด (LOW) หรือการปล่อย (HIGH) */
+        if (BTN_IsPressed(BTN_BACK_PORT, BTN_BACK_PIN) != 0U) {
+            back_held = 1U;
+            back_long_sent = 0U;
+            back_press_us = TIM2_GetMicros();
+            event = BTN_EVENT_SHORT;
+        } else {
+            back_held = 0U;
+        }
+    } else if ((back_held != 0U) && (back_long_sent == 0U)
+               && ((TIM2_GetMicros() - back_press_us) >= BTN_LONG_PRESS_US)) {
+        /* ครบเวลากดค้าง: ยืนยันระดับขาอีกครั้ง (กรณีปล่อยเร็วจนขอบขาขึ้นถูกกรองทิ้งโดยช่วง Guard 100 ms) */
+        if (BTN_IsPressed(BTN_BACK_PORT, BTN_BACK_PIN) != 0U) {
+            back_long_sent = 1U;
+            event = BTN_EVENT_LONG;
+        } else {
+            back_held = 0U;
+        }
+    } else {
+        /* ไม่มีอะไรใหม่ */
+    }
+    return event;
 }
 
 /* ตั้งค่า Mode ของขา (Input/Output/AF/Analog) ทีละขา ใช้เวลาต้องสลับ Direction แบบ Dynamic

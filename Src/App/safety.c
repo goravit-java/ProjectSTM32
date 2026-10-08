@@ -15,6 +15,10 @@ static float last_temp_c = 0.0f;
 static uint8_t last_humidity_pct = 0U;
 static uint8_t has_reading = 0U;
 
+/* เกณฑ์ปัจจุบัน: อุณหภูมิเก็บเป็น "ขั้น" (0-60) แทน float เพื่อเทียบค่าได้ตรง ๆ ไม่ต้องเทียบ float ด้วย == */
+static uint8_t temp_limit_step = SAFETY_TEMP_LIMIT_DEFAULT;
+static uint8_t humid_limit_pct = SAFETY_HUMID_LIMIT_DEFAULT;
+
 void Safety_Init(void) {
     lockout_active = 0U;
 
@@ -35,13 +39,13 @@ void Safety_Update(float temp_c, uint8_t humidity_pct) {
     uint8_t humid_bad;
     uint8_t abnormal;
 
-    if (temp_c > SAFETY_TEMP_MAX_C) {
+    if (temp_c > Safety_GetTempLimit()) {
         temp_bad = 1U;
     } else {
         temp_bad = 0U;
     }
 
-    if (humidity_pct > SAFETY_HUMID_MAX_PCT) {
+    if (humidity_pct > humid_limit_pct) {
         humid_bad = 1U;
     } else {
         humid_bad = 0U;
@@ -96,13 +100,13 @@ void Safety_Update(float temp_c, uint8_t humidity_pct) {
         UART2_SendString("[WARNING] Temp Exceeded! (Current Temp: ");
         UART2_SendFloat1(temp_c);
         UART2_SendString(" C | Limit: ");
-        UART2_SendFloat1(SAFETY_TEMP_MAX_C);   /* ดึงจากค่าเกณฑ์จริง ถ้าแก้เกณฑ์ ข้อความก็เปลี่ยนตาม */
+        UART2_SendFloat1(Safety_GetTempLimit());   /* เกณฑ์ปัจจุบันจากปุ่มหมุน */
         UART2_SendString(" C)\r\n");
     } else if (humid_bad != 0U) {
         UART2_SendString("[WARNING] Humidity Exceeded! (Current Humid: ");
         UART2_SendUint(humidity_pct);
         UART2_SendString(" % | Limit: ");
-        UART2_SendUint(SAFETY_HUMID_MAX_PCT);
+        UART2_SendUint((uint32_t)humid_limit_pct);
         UART2_SendString(" %)\r\n");
     } else {
         /* ปกติ ไม่ต้องพิมพ์ข้อความเตือนซ้ำ */
@@ -122,6 +126,53 @@ void Safety_Update(float temp_c, uint8_t humidity_pct) {
     }
 }
 
+void Safety_SetLimits(uint8_t temp_step, uint8_t humid_pct) {
+    if (temp_step > SAFETY_TEMP_LIMIT_STEPS) {
+        temp_limit_step = SAFETY_TEMP_LIMIT_STEPS;
+    } else {
+        temp_limit_step = temp_step;
+    }
+
+    if (humid_pct < SAFETY_HUMID_LIMIT_MIN_PCT) {
+        humid_limit_pct = SAFETY_HUMID_LIMIT_MIN_PCT;
+    } else if (humid_pct > SAFETY_HUMID_LIMIT_MAX_PCT) {
+        humid_limit_pct = SAFETY_HUMID_LIMIT_MAX_PCT;
+    } else {
+        humid_limit_pct = humid_pct;
+    }
+
+    UART2_SendString("[SET] Limits saved: Temp ");
+    UART2_SendFloat1(Safety_GetTempLimit());
+    UART2_SendString(" C, Humid ");
+    UART2_SendUint((uint32_t)humid_limit_pct);
+    UART2_SendString(" %\r\n");
+
+    /* ตรวจ Lockout ใหม่ทันทีด้วยค่า Sensor ล่าสุด เพื่อให้เห็นผลของเกณฑ์ใหม่เลย */
+    if (has_reading != 0U) {
+        Safety_Update(last_temp_c, last_humidity_pct);
+    } else {
+        /* ยังไม่เคยอ่าน Sensor: รอรอบอ่านปกติ */
+    }
+}
+
+float Safety_GetTempLimit(void) {
+    float limit_c = Safety_TempStepToC(temp_limit_step);
+
+    return limit_c;
+}
+
+uint8_t Safety_GetTempLimitStep(void) {
+    return temp_limit_step;
+}
+
+uint8_t Safety_GetHumidLimit(void) {
+    return humid_limit_pct;
+}
+
+float Safety_TempStepToC(uint8_t step) {
+    return SAFETY_TEMP_LIMIT_MIN_C + ((float)step * SAFETY_TEMP_LIMIT_STEP_C);
+}
+
 uint8_t Safety_IsLockout(void) {
     return lockout_active;
 }
@@ -136,5 +187,4 @@ uint8_t Safety_GetLastHumidity(void) {
 
 uint8_t Safety_HasReading(void) {
     return has_reading;
-}\
-
+}

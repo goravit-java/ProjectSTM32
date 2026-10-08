@@ -3,6 +3,7 @@
 #include "App/fsm.h"
 #include "App/safety.h"
 #include "App/menu.h"
+#include "App/settings.h"
 
 /* หน่วงความถี่การ Refresh จอ OLED ไว้ที่ ~ทุก 8 รอบ Main Loop (Loop หลักวิ่งทุก ~20ms ดังนั้นประมาณ 160ms/ครั้ง)
  * เพราะการส่งข้อมูลเต็มจอ (1024 Byte) ผ่าน I2C ใช้เวลาระดับหลัก ms ต่อครั้ง ถ้าทำทุก Loop จะหน่วงปุ่มกด/FSM
@@ -26,6 +27,8 @@
 #define IDLE_HINT_X             19U   /* "To Select Drink"     15 ตัวอักษร = 90 px */
 #define IDLE_HINT_Y             32U
 #define IDLE_HUMID_X            68U   /* ครึ่งขวาของ Footer */
+#define IDLE_LIMIT_X            13U   /* "Limit:40.0C / 70%"   17 ตัวอักษร = 102 px */
+#define IDLE_LIMIT_Y            41U   /* ระหว่างข้อความ Hint (y=32) กับเส้น Footer (y=50) */
 
 /* หน้าเลือกสินค้า */
 #define MENU_COUNTER_X          96U   /* "[1/4]" ชิดขวาบน */
@@ -80,6 +83,13 @@
 #define LOCK_ROW2_Y             28U
 #define LOCK_ROW3_Y             38U
 
+/* หน้า SETTINGS */
+#define SET_TITLE_X             22U   /* "== SETTINGS ==" 14 ตัวอักษร = 84 px */
+#define SET_TITLE_LOCK_X        10U   /* "SETTINGS  !LOCKED!" 18 ตัวอักษร = 108 px */
+#define SET_TEMP_Y              16U
+#define SET_HUMID_Y             28U
+#define SET_HINT_Y              40U
+
 static uint32_t disp_tick = 0U;
 
 static void Display_DrawIdleScreen(void);
@@ -92,6 +102,7 @@ static uint16_t Display_UintWidth(uint32_t value);
 static uint16_t Display_TextWidth(const char *str);
 static void Display_DrawLockoutFooter(const char *status_text);
 static void Display_DrawLockoutScreen(void);
+static void Display_DrawSettingsScreen(void);
 
 void Display_Init(void) {
     SSD1306_Init();
@@ -105,8 +116,12 @@ void Display_Update(void) {
         disp_tick = 0U;
         SSD1306_Clear();
 
-        /* Safety Lockout มีสิทธิ์สูงสุด: บังคับตัดมาหน้า Lockout ทันทีไม่ว่า FSM จะอยู่ State ไหนอยู่ก็ตาม */
-        if (Safety_IsLockout() != 0U) {
+        /* หน้า SETTINGS แสดงก่อนหน้า Lockout (ผู้ดูแลต้องเห็นค่าที่กำลังตั้ง หัวจอมีป้าย !LOCKED! บอกแทน)
+         * นอกนั้น Safety Lockout มีสิทธิ์สูงสุด: บังคับตัดมาหน้า Lockout ทันทีไม่ว่า FSM จะอยู่ State ไหน
+         */
+        if (FSM_GetState() == STATE_SETTINGS) {
+            Display_DrawSettingsScreen();
+        } else if (Safety_IsLockout() != 0U) {
             Display_DrawLockoutScreen();
         } else {
             SystemState_t state = FSM_GetState();
@@ -141,7 +156,14 @@ static void Display_DrawIdleScreen(void) {
     SSD1306_DrawHLine(X_LEFT, Y_HEADER_LINE, (uint16_t)SSD1306_WIDTH);
 
     (void)SSD1306_DrawString(IDLE_PROMPT_X, IDLE_PROMPT_Y, "[ PRESS OK / UP ]");
-    (void)SSD1306_DrawString(IDLE_HINT_X, IDLE_HINT_Y, "To Select Item");
+    (void)SSD1306_DrawString(IDLE_HINT_X, IDLE_HINT_Y, "To Select Drink");
+
+    /* เกณฑ์ปัจจุบัน (ตั้งได้ที่หน้า SETTINGS: กด BACK ค้าง) */
+    x = SSD1306_DrawString(IDLE_LIMIT_X, IDLE_LIMIT_Y, "Limit:");
+    x = SSD1306_DrawFloat1(x, IDLE_LIMIT_Y, Safety_GetTempLimit());
+    x = SSD1306_DrawString(x, IDLE_LIMIT_Y, "C / ");
+    x = SSD1306_DrawUint(x, IDLE_LIMIT_Y, (uint32_t)Safety_GetHumidLimit());
+    (void)SSD1306_DrawString(x, IDLE_LIMIT_Y, "%");
 
     SSD1306_DrawHLine(X_LEFT, Y_FOOTER_LINE, (uint16_t)SSD1306_WIDTH);
 
@@ -356,13 +378,13 @@ static void Display_DrawLockoutScreen(void) {
     uint8_t humid_bad;
     uint16_t x;
 
-    if (temp > SAFETY_TEMP_MAX_C) {
+    if (temp > Safety_GetTempLimit()) {
         temp_bad = 1U;
     } else {
         temp_bad = 0U;
     }
 
-    if (humid > SAFETY_HUMID_MAX_PCT) {
+    if (humid > Safety_GetHumidLimit()) {
         humid_bad = 1U;
     } else {
         humid_bad = 0U;
@@ -389,7 +411,7 @@ static void Display_DrawLockoutScreen(void) {
         (void)SSD1306_DrawString(x, LOCK_ROW2_Y, "C");
 
         x = SSD1306_DrawString(X_LEFT, LOCK_ROW3_Y, "Limit: ");
-        x = SSD1306_DrawFloat1(x, LOCK_ROW3_Y, SAFETY_TEMP_MAX_C);
+        x = SSD1306_DrawFloat1(x, LOCK_ROW3_Y, Safety_GetTempLimit());
         (void)SSD1306_DrawString(x, LOCK_ROW3_Y, "C");
 
         SSD1306_DrawHLine(X_LEFT, Y_FOOTER_LINE, (uint16_t)SSD1306_WIDTH);
@@ -402,7 +424,7 @@ static void Display_DrawLockoutScreen(void) {
         (void)SSD1306_DrawString(x, LOCK_ROW2_Y, "%");
 
         x = SSD1306_DrawString(X_LEFT, LOCK_ROW3_Y, "Limit: ");
-        x = SSD1306_DrawUint(x, LOCK_ROW3_Y, (uint32_t)SAFETY_HUMID_MAX_PCT);
+        x = SSD1306_DrawUint(x, LOCK_ROW3_Y, (uint32_t)Safety_GetHumidLimit());
         (void)SSD1306_DrawString(x, LOCK_ROW3_Y, "%");
 
         SSD1306_DrawHLine(X_LEFT, Y_FOOTER_LINE, (uint16_t)SSD1306_WIDTH);
@@ -420,4 +442,43 @@ static void Display_DrawLockoutFooter(const char *status_text) {
     } else {
         (void)SSD1306_DrawString(X_LEFT, Y_BOTTOM_TEXT, status_text);
     }
+}
+
+/* Screen: SETTINGS (ตั้งเกณฑ์ด้วยปุ่มหมุน)
+ * แถวละหัวข้อ: "> Temp : 35.5C (40.0)" = ค่าที่กำลังตั้ง และ (ค่าเดิมที่ใช้อยู่) ลูกศรชี้หัวข้อที่เลือก
+ */
+static void Display_DrawSettingsScreen(void) {
+    uint16_t x;
+
+    if (Safety_IsLockout() != 0U) {
+        (void)SSD1306_DrawString(SET_TITLE_LOCK_X, Y_HEADER, "SETTINGS  !LOCKED!");
+    } else {
+        (void)SSD1306_DrawString(SET_TITLE_X, Y_HEADER, "== SETTINGS ==");
+    }
+    SSD1306_DrawHLine(X_LEFT, Y_HEADER_LINE, (uint16_t)SSD1306_WIDTH);
+
+    if (Settings_GetField() == SETTINGS_FIELD_TEMP) {
+        x = SSD1306_DrawString(X_LEFT, SET_TEMP_Y, "> Temp : ");
+    } else {
+        x = SSD1306_DrawString(X_LEFT, SET_TEMP_Y, "  Temp : ");
+    }
+    x = SSD1306_DrawFloat1(x, SET_TEMP_Y, Safety_TempStepToC(Settings_GetPendingTempStep()));
+    x = SSD1306_DrawString(x, SET_TEMP_Y, "C (");
+    x = SSD1306_DrawFloat1(x, SET_TEMP_Y, Safety_GetTempLimit());
+    (void)SSD1306_DrawString(x, SET_TEMP_Y, ")");
+
+    if (Settings_GetField() == SETTINGS_FIELD_HUMID) {
+        x = SSD1306_DrawString(X_LEFT, SET_HUMID_Y, "> Humid: ");
+    } else {
+        x = SSD1306_DrawString(X_LEFT, SET_HUMID_Y, "  Humid: ");
+    }
+    x = SSD1306_DrawUint(x, SET_HUMID_Y, (uint32_t)Settings_GetPendingHumid());
+    x = SSD1306_DrawString(x, SET_HUMID_Y, "%  (");
+    x = SSD1306_DrawUint(x, SET_HUMID_Y, (uint32_t)Safety_GetHumidLimit());
+    (void)SSD1306_DrawString(x, SET_HUMID_Y, ")");
+
+    (void)SSD1306_DrawString(X_LEFT, SET_HINT_Y, "Turn knob, UP/DN sel");
+
+    SSD1306_DrawHLine(X_LEFT, Y_FOOTER_LINE, (uint16_t)SSD1306_WIDTH);
+    (void)SSD1306_DrawString(X_LEFT, Y_FOOTER_TEXT, "[OK]Save [BACK]Cancel");
 }

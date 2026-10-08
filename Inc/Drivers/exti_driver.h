@@ -17,6 +17,7 @@
 /* ขอบสัญญาณที่ต้องการให้เกิด Interrupt */
 #define EXTI_EDGE_FALLING   0U   /* HIGH -> LOW (เช่น กดปุ่ม Active-Low) */
 #define EXTI_EDGE_RISING    1U   /* LOW -> HIGH (เช่น เซ็นเซอร์แสงถูกบัง) */
+#define EXTI_EDGE_BOTH      2U   /* ทั้งสองขอบ (เช่น ปุ่มที่ต้องรู้ทั้งตอนกดและตอนปล่อย เพื่อจับการกดค้าง) */
 
 /* ผูกขา pin ของ port (GPIOA/GPIOB/GPIOC) เข้ากับ EXTI Line เดียวกับเลขขา แล้วเปิด Interrupt ที่ขอบ edge
  * ขาต้องถูกตั้งเป็น Input ไว้ก่อนแล้ว

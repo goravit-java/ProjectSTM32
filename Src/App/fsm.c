@@ -4,6 +4,7 @@
 #include "App/safety.h"
 #include "App/menu.h"
 #include "Drivers/light_sensor_driver.h"
+#include "App/settings.h"
 
 /* Main loop เรียก FSM_Run() ทุก ๆ 20ms (คุมจังหวะด้วย TIM2 ใน main.c ดู MAIN_LOOP_PERIOD_US)
  * ค่า TICKS ด้านล่างจึงอิงจากรอบเวลานั้น ใช้แทนการ Block ด้วย Delay ตรง ๆ ใน State
@@ -22,6 +23,9 @@
 #define PAYMENT_TIMEOUT_TICKS   (PAYMENT_TIMEOUT_SECONDS * TICKS_PER_SECOND)
 #define PAYMENT_FAILED_TICKS    (3U * TICKS_PER_SECOND)   /* แสดงหน้า "ชำระเงินไม่สำเร็จ" 3 วินาที */
 
+/* หน้า SETTINGS: ไม่มีการกดปุ่มหรือหมุนปุ่มนาน 20 วินาที -> ออกเองโดยไม่บันทึก */
+#define SETTINGS_TIMEOUT_TICKS  (20U * TICKS_PER_SECOND)
+
 static SystemState_t current_state = STATE_INIT;
 static uint8_t selected_index = 0U;
 static uint32_t state_tick = 0U;
@@ -38,6 +42,7 @@ static void FSM_UpdateOutputs(void);
 static void FSM_EnterState(SystemState_t new_state);
 static void FSM_CancelForLockout(const char *stage_text);
 static void FSM_PrintRefund(void);
+static void FSM_OpenSettings(void);
 
 void FSM_Init(void) {
     current_state = STATE_INIT;
@@ -113,7 +118,10 @@ void FSM_Run(void) {
     uint8_t up_edge   = BTN_TakePress(BTN_UP_PORT,   BTN_UP_PIN);
     uint8_t down_edge = BTN_TakePress(BTN_DOWN_PORT, BTN_DOWN_PIN);
     uint8_t ok_edge   = BTN_TakePress(BTN_OK_PORT,   BTN_OK_PIN);
-    uint8_t back_edge = BTN_TakePress(BTN_BACK_PORT, BTN_BACK_PIN);
+    /* ปุ่ม BACK แยก 2 แบบ: กดสั้น (ยกเลิก/ย้อนกลับ เหมือนเดิม) และกดค้าง 1.5 วินาที (เปิดหน้า SETTINGS) */
+    uint8_t back_event = BTN_TakeBackEvent();
+    uint8_t back_edge = 0U;
+    uint8_t back_long = 0U;
 
     /* Event การบังแสง (หยอดเหรียญ) จาก EXTI ดึงออกทุก Tick เหมือนปุ่ม แต่นับเงินเฉพาะตอนอยู่ใน PAYMENT
      * เพื่อไม่ให้การบังแสงก่อนถึงหน้าชำระเงินถูกเก็บค้างไว้แล้วนับเป็นเงินทีหลัง
@@ -125,6 +133,14 @@ void FSM_Run(void) {
      */
     uint8_t locked = Safety_IsLockout();
 
+    if (back_event == BTN_EVENT_SHORT) {
+        back_edge = 1U;
+    } else if (back_event == BTN_EVENT_LONG) {
+        back_long = 1U;
+    } else {
+        /* ไม่มี Event จากปุ่ม BACK */
+    }
+
     state_tick++;
 
     switch (current_state) {
@@ -135,7 +151,11 @@ void FSM_Run(void) {
         break;
 
     case STATE_IDLE:
-        if (locked != 0U) {
+        if (back_long != 0U) {
+            /* หน้าตั้งค่าเปิดได้แม้ระบบล็อกอยู่ เพื่อให้ผู้ดูแลแก้เกณฑ์ที่ตั้งผิดได้ทันที */
+            FSM_OpenSettings();
+        }
+        else if (locked != 0U) {
             /* ระบบถูกล็อกจากสภาวะแวดล้อมผิดปกติ -> ไม่ตอบสนองปุ่มใด ๆ (ดู LED1-3 และ UART WARNING) */
         }
         else if ((ok_edge != 0U) || (up_edge != 0U)) {
@@ -344,11 +364,46 @@ void FSM_Run(void) {
         }
         break;
 
+    case STATE_SETTINGS:
+        /* หน้าตั้งค่ายังทำงานต่อแม้ระบบล็อก (ผู้ดูแลต้องแก้เกณฑ์ได้) การตรวจ Safety ยังทำงานเบื้องหลังตามปกติ */
+        if (Settings_TakeActivity() != 0U) {
+            state_tick = 0U;   /* หมุนปุ่ม = มีการใช้งาน: เริ่มนับ Timeout ใหม่ */
+        } else {
+            /* ไม่ได้หมุนปุ่ม */
+        }
+
+        if (ok_edge != 0U) {
+            Settings_Save();
+            UART2_SendString("[FSM] Settings saved -> IDLE\r\n");
+            FSM_EnterState(STATE_IDLE);
+        }
+        else if (back_edge != 0U) {
+            Settings_Exit();
+            UART2_SendString("[FSM] Settings cancelled (not saved) -> IDLE\r\n");
+            FSM_EnterState(STATE_IDLE);
+        }
+        else if ((up_edge != 0U) || (down_edge != 0U)) {
+            Settings_NextField();
+            state_tick = 0U;
+        }
+        else if (state_tick >= SETTINGS_TIMEOUT_TICKS) {
+            Settings_Exit();
+            UART2_SendString("[FSM] Settings timeout (not saved) -> IDLE\r\n");
+            FSM_EnterState(STATE_IDLE);
+        }
+        else {
+            /* รอผู้ใช้ */
+        }
+        break;
+
     case STATE_FAULT:
         /* Auto-Recovery: ไม่ต้องกด BACK เอง -> กลับ IDLE ทันทีที่สภาวะแวดล้อมกลับมาปกติ
          * (ข้อความ "[SYSTEM] Environment Restored - System Ready" พิมพ์แล้วโดย safety.c)
+         * กด BACK ค้างระหว่างล็อกเพื่อเปิดหน้าตั้งค่าได้ (เผื่อเกณฑ์ตั้งไว้ต่ำเกินไป)
          */
-        if (locked == 0U) {
+        if (back_long != 0U) {
+            FSM_OpenSettings();
+        } else if (locked == 0U) {
             UART2_SendString("[FSM] Resuming normal operation -> IDLE\r\n");
             FSM_EnterState(STATE_IDLE);
         } else {
@@ -393,6 +448,13 @@ static void FSM_EnterState(SystemState_t new_state) {
     }
     state_tick = 0U;
     FSM_UpdateOutputs();
+}
+
+/* เปิดหน้า SETTINGS (จาก IDLE หรือ FAULT ด้วยการกด BACK ค้าง) */
+static void FSM_OpenSettings(void) {
+    Settings_Enter();
+    UART2_SendString("[FSM] Settings mode (UP/DOWN = select, knob = adjust, OK = save, BACK = cancel)\r\n");
+    FSM_EnterState(STATE_SETTINGS);
 }
 
 /* ยกเลิกรายการเพราะสภาพแวดล้อมผิดปกติ (Safety First): ไม่หัก Stock และคืนเงินที่ลูกค้าจ่ายมาแล้ว

@@ -12,6 +12,7 @@
 #include "App/fsm.h"
 #include "App/display.h"
 #include "App/telemetry.h"
+#include "App/settings.h"
 
 /* คาบเวลาของ Main Loop 1 รอบ (1 Tick) = 20 ms คุมด้วย TIM2 ให้แม่นยำ
  * FSM และ Display นับเวลาเป็นจำนวน Tick จากค่านี้
@@ -23,8 +24,14 @@
  */
 #define ENV_READ_INTERVAL_TICKS   100U
 
+/* ADC (NTC + ปุ่มหมุน) แปลงทุก 5 Tick = 100 ms ให้ปุ่มหมุนในหน้า SETTINGS ตอบสนองไว
+ * ส่วนการตัดสินใจ Safety ยังใช้รอบ 2 วินาทีตาม ENV_READ_INTERVAL_TICKS เหมือนเดิม
+ */
+#define ADC_READ_INTERVAL_TICKS   5U
+
 int main(void) {
     uint32_t env_tick = 0U;
+    uint32_t adc_tick = 0U;
     uint32_t loop_start;
     /* อุณหภูมิล่าสุดที่อ่านจาก NTC (PA0) ได้ถูกต้อง และธงบอกว่าเคยอ่านได้แล้วอย่างน้อย 1 ครั้ง
      * ถ้า NTC หลุดชั่วคราว ให้คงค่าล่าสุดไว้เหมือนการจัดการ DHT11
@@ -70,12 +77,21 @@ int main(void) {
         Telemetry_Update(); /* ส่งบรรทัดสถานะ "#S ..." ให้ Serial Monitor (TUI) เมื่อค่าเปลี่ยน + Heartbeat ทุก 5 วินาที */
 
         env_tick++;
+        adc_tick++;
 
-        /* สั่ง ADC เริ่มแปลงล่วงหน้า 1 Tick (20 ms) ผลจะถูกเก็บโดย ADC_IRQHandler ทันทีที่แปลงเสร็จ
+        /* สั่ง ADC เริ่มแปลง (NTC แล้วต่อด้วย Pot) ล่วงหน้า 1 Tick (20 ms) ผลจะถูกเก็บโดย ADC_IRQHandler
          * พอถึง Tick ถัดไปค่าก็พร้อมใช้ โดยไม่ต้องวนรอ (ไม่มี Polling)
          */
-        if (env_tick == (ENV_READ_INTERVAL_TICKS - 1U)) {
+        if (adc_tick == (ADC_READ_INTERVAL_TICKS - 1U)) {
             ADC1_StartConversion();
+        } else if (adc_tick >= ADC_READ_INTERVAL_TICKS) {
+            adc_tick = 0U;
+            /* ปุ่มหมุน PA4 -> หน้า SETTINGS (มีผลเฉพาะตอนอยู่หน้าตั้งค่า settings.c จัดการเอง) */
+            if (ADC1_HasData() != 0U) {
+                Settings_OnKnob(ADC1_GetPotRaw());
+            } else {
+                /* ยังไม่มีผลการแปลงรอบแรก */
+            }
         } else {
             /* No action */
         }

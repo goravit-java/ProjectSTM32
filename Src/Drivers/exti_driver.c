@@ -59,8 +59,11 @@ void EXTI_InitEdge(GPIO_TypeDef *port, uint8_t pin, uint8_t edge) {
         SYSCFG->EXTICR[cr_index] &= ~(EXTI_CR_FIELD_MASK << cr_shift);
         SYSCFG->EXTICR[cr_index] |= ((uint32_t)EXTI_PortCode(port) << cr_shift);
 
-        /* 2. เลือกขอบสัญญาณที่จะเกิด Interrupt (ขอบเดียว ไม่สนขอบอีกด้าน) */
-        if (edge == EXTI_EDGE_RISING) {
+        /* 2. เลือกขอบสัญญาณที่จะเกิด Interrupt (ขอบเดียว หรือทั้งสองขอบ) */
+        if (edge == EXTI_EDGE_BOTH) {
+            EXTI->RTSR |= line_bit;
+            EXTI->FTSR |= line_bit;
+        } else if (edge == EXTI_EDGE_RISING) {
             EXTI->RTSR |= line_bit;
             EXTI->FTSR &= ~line_bit;
         } else {

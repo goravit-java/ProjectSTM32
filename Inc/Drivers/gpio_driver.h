@@ -49,6 +49,18 @@ void BTN_EnableInterrupts(void);
  */
 uint8_t BTN_TakePress(const GPIO_TypeDef *GPIOx, uint8_t pin);
 
+/* ปุ่ม BACK (PB4) ใช้ EXTI ทั้งขอบขาลง (กด) และขาขึ้น (ปล่อย) เพื่อแยกการกดสั้นกับการกดค้าง
+ *   BTN_EVENT_SHORT : ส่งทันทีตอนกดลง (ตอบสนองไวเหมือนปุ่มอื่น)
+ *   BTN_EVENT_LONG  : ส่งครั้งเดียวเมื่อกดค้างครบ BTN_LONG_PRESS_US ขณะที่ยังกดอยู่ (ไม่ต้องรอปล่อยมือ)
+ * การจับเวลาใช้ TIM2 เทียบกับเวลาที่ Interrupt รับการกด ไม่มีการวนอ่านขาปุ่ม
+ */
+#define BTN_EVENT_NONE      0U
+#define BTN_EVENT_SHORT     1U
+#define BTN_EVENT_LONG      2U
+#define BTN_LONG_PRESS_US   1500000U   /* 1.5 วินาที */
+
+uint8_t BTN_TakeBackEvent(void);   /* เรียกทุก Tick แทน BTN_TakePress() สำหรับปุ่ม BACK */
+
 /* ฟังก์ชันทั่วไปสำหรับควบคุมขา GPIO แบบ Dynamic (ใช้กับ Sensor ที่ต้องสลับ Input/Output เช่น DHT11) */
 #define GPIO_MODE_INPUT     0U
 #define GPIO_MODE_OUTPUT    1U

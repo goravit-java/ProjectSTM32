@@ -2,6 +2,7 @@
 #include "App/fsm.h"
 #include "App/safety.h"
 #include "App/menu.h"
+#include "App/settings.h"
 #include "Drivers/uart_driver.h"
 
 #define TELEMETRY_MIN_GAP_TICKS     10U    /* ส่งถี่สุด 1 ครั้งต่อ 10 Tick = 200 ms (ไม่ให้ท่วม UART) */
@@ -12,6 +13,11 @@
 typedef struct {
     SystemState_t state;
     int32_t temp_x10;
+    int32_t limit_x10;
+    uint8_t humid_limit;
+    uint8_t set_field;
+    uint8_t set_temp_step;
+    uint8_t set_humid;
     uint8_t humidity;
     uint8_t has_reading;
     uint8_t lock;
@@ -69,6 +75,11 @@ static void Telemetry_Capture(TelemetrySnapshot_t *snap) {
 
     snap->state = FSM_GetState();
     snap->temp_x10 = (int32_t)(Safety_GetLastTemp() * TEMP_SCALE_X10);
+    snap->limit_x10 = (int32_t)(Safety_GetTempLimit() * TEMP_SCALE_X10);
+    snap->humid_limit = Safety_GetHumidLimit();
+    snap->set_field = Settings_GetField();
+    snap->set_temp_step = Settings_GetPendingTempStep();
+    snap->set_humid = Settings_GetPendingHumid();
     snap->humidity = Safety_GetLastHumidity();
     snap->has_reading = Safety_HasReading();
     snap->lock = Safety_IsLockout();
@@ -87,6 +98,10 @@ static uint8_t Telemetry_IsSame(const TelemetrySnapshot_t *a, const TelemetrySna
     uint8_t i;
 
     if ((a->state != b->state) || (a->temp_x10 != b->temp_x10) || (a->humidity != b->humidity)) {
+        same = 0U;
+    } else if ((a->limit_x10 != b->limit_x10) || (a->humid_limit != b->humid_limit)) {
+        same = 0U;
+    } else if ((a->set_field != b->set_field) || (a->set_temp_step != b->set_temp_step) || (a->set_humid != b->set_humid)) {
         same = 0U;
     } else if ((a->has_reading != b->has_reading) || (a->lock != b->lock) || (a->item != b->item)) {
         same = 0U;
@@ -113,6 +128,10 @@ static void Telemetry_Send(const TelemetrySnapshot_t *snap) {
     UART2_SendString(Telemetry_StateName(snap->state));
     UART2_SendString(" temp=");
     UART2_SendFloat1(Safety_GetLastTemp());
+    UART2_SendString(" tlim=");
+    UART2_SendFloat1(Safety_GetTempLimit());
+    UART2_SendString(" hlim=");
+    UART2_SendUint((uint32_t)snap->humid_limit);
     UART2_SendString(" hum=");
     UART2_SendUint((uint32_t)snap->humidity);
     UART2_SendString(" sens=");
@@ -131,6 +150,12 @@ static void Telemetry_Send(const TelemetrySnapshot_t *snap) {
     UART2_SendUint(snap->progress);
     UART2_SendString(" cancel=");
     UART2_SendUint((uint32_t)snap->cancelled);
+    UART2_SendString(" sf=");
+    UART2_SendUint((uint32_t)snap->set_field);
+    UART2_SendString(" spt=");
+    UART2_SendFloat1(Safety_TempStepToC(snap->set_temp_step));
+    UART2_SendString(" sph=");
+    UART2_SendUint((uint32_t)snap->set_humid);
     UART2_SendString(" stock=");
     for (i = 0U; i < MENU_ITEM_COUNT; i++) {
         if (i > 0U) {
@@ -176,6 +201,9 @@ static const char *Telemetry_StateName(SystemState_t state) {
         break;
     case STATE_COMPLETE:
         name = "COMPLETE";
+        break;
+    case STATE_SETTINGS:
+        name = "SETTINGS";
         break;
     case STATE_FAULT:
         name = "FAULT";

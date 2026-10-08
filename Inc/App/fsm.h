@@ -15,6 +15,7 @@ typedef enum {
     STATE_SAFETY_CHECK,
     STATE_PROCESSING,
     STATE_COMPLETE,
+    STATE_SETTINGS,         /* ตั้งเกณฑ์อุณหภูมิ/ความชื้นด้วยปุ่มหมุน (เข้าจากหน้าแรกด้วยการกด BACK ค้าง) */
     STATE_FAULT             /* LOCKOUT_ALARM: ล็อกระบบเมื่อ Temp/Humid เกินเกณฑ์ */
 } SystemState_t;
 
