@@ -15,7 +15,4 @@ void UART2_SendString(const char *str);
 void UART2_SendUint(uint32_t value);
 void UART2_SendFloat1(float value);
 
-/* จำนวนตัวอักษรที่ถูกทิ้งเพราะ Buffer เต็ม (ไว้ตรวจสอบตอน Debug ว่า Buffer เล็กเกินไปหรือไม่) */
-uint32_t UART2_GetDroppedCount(void);
-
 #endif /* UART_DRIVER_H_ */

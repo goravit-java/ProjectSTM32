@@ -3,6 +3,7 @@
 #include "Drivers/uart_driver.h"
 #include "App/safety.h"
 #include "App/menu.h"
+#include "Drivers/light_sensor_driver.h"
 
 /* Main loop เรียก FSM_Run() ทุก ๆ 20ms (คุมจังหวะด้วย TIM2 ใน main.c ดู MAIN_LOOP_PERIOD_US)
  * ค่า TICKS ด้านล่างจึงอิงจากรอบเวลานั้น ใช้แทนการ Block ด้วย Delay ตรง ๆ ใน State
@@ -12,13 +13,31 @@
 #define PROCESSING_SECONDS    4U /* Dispense Simulation: นับถอยหลัง 4 วินาที (อยู่ในช่วง 3-5 วิ ตามสเปก) */
 #define PROCESSING_TICKS     (PROCESSING_SECONDS * TICKS_PER_SECOND)
 #define COMPLETE_TICKS        (1U * TICKS_PER_SECOND) /* ~1 วินาที : เวลาแสดงผล "เสร็จสิ้น" ก่อนกลับ IDLE */
+#define LED4_BLINK_TICKS      25U /* Toggle LED4 ทุก 25 Tick = 0.5 วินาที ระหว่างจ่ายสินค้า */
+#define PERCENT_FULL          100U
+
+/* ระบบชำระเงินด้วยเซ็นเซอร์แสง */
+#define COIN_VALUE_THB          10U   /* บังแสง 1 ครั้ง = 10 บาท */
+#define PAYMENT_TIMEOUT_SECONDS 30U
+#define PAYMENT_TIMEOUT_TICKS   (PAYMENT_TIMEOUT_SECONDS * TICKS_PER_SECOND)
+#define PAYMENT_FAILED_TICKS    (3U * TICKS_PER_SECOND)   /* แสดงหน้า "ชำระเงินไม่สำเร็จ" 3 วินาที */
 
 static SystemState_t current_state = STATE_INIT;
 static uint8_t selected_index = 0U;
 static uint32_t state_tick = 0U;
 
+/* 1 = รายการซื้อล่าสุดถูกยกเลิกเพราะระบบล็อกกลางคัน (ให้ display.c แจ้งลูกค้าบนหน้า Lockout)
+ * เคลียร์เป็น 0 อัตโนมัติเมื่อกลับเข้า IDLE (ดู FSM_EnterState)
+ */
+static uint8_t order_cancelled = 0U;
+
+/* ยอดเงินสะสมของรายการปัจจุบัน (บาท) รีเซ็ตเป็น 0 ทุกครั้งที่เข้า PAYMENT และเมื่อกลับ IDLE */
+static uint32_t paid_amount = 0U;
+
 static void FSM_UpdateOutputs(void);
 static void FSM_EnterState(SystemState_t new_state);
+static void FSM_CancelForLockout(const char *stage_text);
+static void FSM_PrintRefund(void);
 
 void FSM_Init(void) {
     current_state = STATE_INIT;
@@ -28,6 +47,14 @@ void FSM_Init(void) {
 
 SystemState_t FSM_GetState(void) {
     return current_state;
+}
+
+uint8_t FSM_IsOrderCancelled(void) {
+    return order_cancelled;
+}
+
+uint32_t FSM_GetPaidAmount(void) {
+    return paid_amount;
 }
 
 uint8_t FSM_GetSelectedIndex(void) {
@@ -41,31 +68,42 @@ uint32_t FSM_GetProgressPercent(void) {
     uint32_t percent;
 
     if (current_state == STATE_COMPLETE) {
-        return 100U;
-    }
-    if (current_state != STATE_PROCESSING) {
-        return 0U;
-    }
-
-    percent = (state_tick * 100U) / PROCESSING_TICKS;
-    if (percent > 100U) {
-        percent = 100U; /* กันไว้เผื่อรอบ Tick สุดท้ายก่อนเปลี่ยน State (Defensive) */
+        percent = PERCENT_FULL;
+    } else if (current_state == STATE_PROCESSING) {
+        percent = (state_tick * PERCENT_FULL) / PROCESSING_TICKS;
+        if (percent > PERCENT_FULL) {
+            percent = PERCENT_FULL; /* กันไว้เผื่อรอบ Tick สุดท้ายก่อนเปลี่ยน State (Defensive) */
+        } else {
+            /* อยู่ในช่วง 0-100 อยู่แล้ว */
+        }
+    } else {
+        percent = 0U;
     }
     return percent;
 }
 
 uint32_t FSM_GetSecondsLeft(void) {
     uint32_t seconds_elapsed;
+    uint32_t seconds_left = 0U;
 
-    if (current_state != STATE_PROCESSING) {
-        return 0U;
+    if (current_state == STATE_PROCESSING) {
+        seconds_elapsed = state_tick / TICKS_PER_SECOND;
+        if (seconds_elapsed < (uint32_t)PROCESSING_SECONDS) {
+            seconds_left = (uint32_t)PROCESSING_SECONDS - seconds_elapsed;
+        } else {
+            /* ครบเวลาแล้ว: เหลือ 0 วินาที */
+        }
+    } else if (current_state == STATE_PAYMENT) {
+        if (state_tick < PAYMENT_TIMEOUT_TICKS) {
+            /* ปัดขึ้น: จอแสดง 30, 29, ... 1 วินาที (ไม่โชว์ 0 ทั้งที่ยังเหลือเวลาไม่ถึง 1 วินาที) */
+            seconds_left = ((PAYMENT_TIMEOUT_TICKS - state_tick) + (TICKS_PER_SECOND - 1U)) / TICKS_PER_SECOND;
+        } else {
+            /* หมดเวลาแล้ว: เหลือ 0 วินาที */
+        }
+    } else {
+        /* ไม่ได้อยู่ในช่วงนับถอยหลัง: เหลือ 0 วินาที */
     }
-
-    seconds_elapsed = state_tick / TICKS_PER_SECOND;
-    if (seconds_elapsed >= (uint32_t)PROCESSING_SECONDS) {
-        return 0U;
-    }
-    return (uint32_t)PROCESSING_SECONDS - seconds_elapsed;
+    return seconds_left;
 }
 
 void FSM_Run(void) {
@@ -76,6 +114,11 @@ void FSM_Run(void) {
     uint8_t down_edge = BTN_TakePress(BTN_DOWN_PORT, BTN_DOWN_PIN);
     uint8_t ok_edge   = BTN_TakePress(BTN_OK_PORT,   BTN_OK_PIN);
     uint8_t back_edge = BTN_TakePress(BTN_BACK_PORT, BTN_BACK_PIN);
+
+    /* Event การบังแสง (หยอดเหรียญ) จาก EXTI ดึงออกทุก Tick เหมือนปุ่ม แต่นับเงินเฉพาะตอนอยู่ใน PAYMENT
+     * เพื่อไม่ให้การบังแสงก่อนถึงหน้าชำระเงินถูกเก็บค้างไว้แล้วนับเป็นเงินทีหลัง
+     */
+    uint8_t coin_edge = LightSensor_TakeBlockEvent();
 
     /* Flag สภาวะแวดล้อมจาก safety.c (Background Task ที่อัปเดตทุก ๆ รอบอ่าน Sensor)
      * อ่านครั้งเดียวต่อ Tick เพื่อให้ทุก case ในรอบนี้เห็นค่าเดียวกัน ไม่มีโอกาส Race ระหว่าง case
@@ -114,7 +157,12 @@ void FSM_Run(void) {
             /* ระงับการทำงานขณะสภาวะแวดล้อมผิดปกติ (ไม่ตอบสนอง UP/DOWN/OK/BACK) */
         }
         else if (up_edge != 0U) {
-            selected_index = (selected_index == 0U) ? (uint8_t)(MENU_ITEM_COUNT - 1U) : (uint8_t)(selected_index - 1U);
+            /* เลื่อนขึ้น: ถ้าอยู่รายการแรกให้วนไปรายการสุดท้าย */
+            if (selected_index == 0U) {
+                selected_index = (uint8_t)(MENU_ITEM_COUNT - 1U);
+            } else {
+                selected_index = (uint8_t)(selected_index - 1U);
+            }
             UART2_SendString("> ");
             UART2_SendString(menu[selected_index].name);
             UART2_SendString("\r\n");
@@ -159,12 +207,15 @@ void FSM_Run(void) {
     case STATE_CHECK_STOCK:
         if (locked != 0U) {
             /* เผื่อกรณีสภาวะแวดล้อมเพิ่งเปลี่ยนเป็นผิดปกติระหว่างขั้นตอนนี้พอดี (Race เล็กน้อย) */
-            UART2_SendString("[FSM] Environment alert triggered mid-order -> aborting\r\n");
-            FSM_EnterState(STATE_FAULT);
+            FSM_CancelForLockout("");
         }
         else if (menu[selected_index].stock > 0U) {
-            UART2_SendString("[FSM] Stock OK -> checking safety...\r\n");
-            FSM_EnterState(STATE_SAFETY_CHECK);
+            UART2_SendString("[FSM] Stock OK -> PAYMENT: please pay ");
+            UART2_SendUint((uint32_t)menu[selected_index].price);
+            UART2_SendString(" THB (cover light sensor = 10 THB, BACK = cancel, timeout ");
+            UART2_SendUint(PAYMENT_TIMEOUT_SECONDS);
+            UART2_SendString(" s)\r\n");
+            FSM_EnterState(STATE_PAYMENT);
         }
         else {
             UART2_SendString("[FSM] OUT OF STOCK! Please choose another item.\r\n");
@@ -172,10 +223,62 @@ void FSM_Run(void) {
         }
         break;
 
+    case STATE_PAYMENT:
+        if (locked != 0U) {
+            FSM_CancelForLockout(" during payment");
+        }
+        else if (back_edge != 0U) {
+            UART2_SendString("[PAY] Cancelled by customer,");
+            FSM_PrintRefund();
+            UART2_SendString(" -> back to selection\r\n");
+            FSM_EnterState(STATE_SELECT_DRINK);
+        }
+        else if (coin_edge != 0U) {
+            paid_amount += COIN_VALUE_THB;
+            UART2_SendString("[PAY] +");
+            UART2_SendUint(COIN_VALUE_THB);
+            UART2_SendString(" THB -> Paid: ");
+            UART2_SendUint(paid_amount);
+            UART2_SendString(" / ");
+            UART2_SendUint((uint32_t)menu[selected_index].price);
+            UART2_SendString(" THB\r\n");
+
+            if (paid_amount >= (uint32_t)menu[selected_index].price) {
+                UART2_SendString("[PAY] Payment complete! Change: ");
+                UART2_SendUint(paid_amount - (uint32_t)menu[selected_index].price);
+                UART2_SendString(" THB\r\n");
+                FSM_EnterState(STATE_SAFETY_CHECK);
+            } else {
+                /* ยอดยังไม่ครบ: รอรับเงินต่อ */
+            }
+        }
+        else if (state_tick >= PAYMENT_TIMEOUT_TICKS) {
+            UART2_SendString("[PAY] TIMEOUT! Paid ");
+            UART2_SendUint(paid_amount);
+            UART2_SendString(" of ");
+            UART2_SendUint((uint32_t)menu[selected_index].price);
+            UART2_SendString(" THB -> PAYMENT FAILED, money returned\r\n");
+            FSM_EnterState(STATE_PAYMENT_FAILED);
+        }
+        else {
+            /* รอลูกค้าชำระเงิน */
+        }
+        break;
+
+    case STATE_PAYMENT_FAILED:
+        /* แสดงหน้าแจ้งเตือนค้างไว้ 3 วินาที แล้วกลับหน้าแรกเอง (ไม่ต้องกดปุ่ม) */
+        if (state_tick >= PAYMENT_FAILED_TICKS) {
+            UART2_SendString("[FSM] Returning to main menu -> IDLE\r\n");
+            FSM_EnterState(STATE_IDLE);
+        } else {
+            /* ยังแสดงข้อความแจ้งเตือนอยู่ */
+        }
+        break;
+
     case STATE_SAFETY_CHECK:
         /* ไม่ต้องอ่าน ADC ซ้ำที่นี่ -> ใช้ผลของ Background Task (safety.c) ที่อัปเดตต่อเนื่องอยู่แล้ว */
         if (locked != 0U) {
-            FSM_EnterState(STATE_FAULT);
+            FSM_CancelForLockout("");
         } else {
             UART2_SendString("[FSM] Environment OK -> Preparing your item... ");
             UART2_SendUint(PROCESSING_SECONDS);
@@ -185,32 +288,50 @@ void FSM_Run(void) {
         break;
 
     case STATE_PROCESSING:
-        /* LED4 กระพริบระหว่างกำลังจ่ายสินค้า (Toggle ทุก ๆ ~0.5 วินาที) */
-        if ((state_tick % 25U) == 0U) {
-            LED_Toggle(LED4_PORT, LED4_PIN);
-        }
-
-        /* Dispense Simulation: พิมพ์เลขนับถอยหลังทุก ๆ 1 วินาทีโดยประมาณ */
-        if ((state_tick % TICKS_PER_SECOND) == 0U) {
-            uint32_t seconds_elapsed = state_tick / TICKS_PER_SECOND;
-            if (seconds_elapsed < (uint32_t)PROCESSING_SECONDS) {
-                uint32_t seconds_left = (uint32_t)PROCESSING_SECONDS - seconds_elapsed;
-                UART2_SendString("   ... ");
-                UART2_SendUint(seconds_left);
-                UART2_SendString(" sec\r\n");
-            }
-        }
-
-        if (state_tick >= PROCESSING_TICKS) {
-            /* Stock Update: ตัด Stock ลง 1 หน่วยเมื่อจ่ายสินค้าสำเร็จ (กันค่าติดลบด้วยเงื่อนไข > 0) */
-            if (menu[selected_index].stock > 0U) {
-                menu[selected_index].stock--;
+        if (locked != 0U) {
+            /* Safety First: สภาพแวดล้อมผิดปกติระหว่างจ่ายสินค้า -> หยุดจ่ายทันทีและยกเลิกรายการ
+             * Stock จะถูกหักเฉพาะตอนจ่ายครบเวลาเท่านั้น (ด้านล่าง) การออกจาก State ตรงนี้จึงไม่หัก Stock
+             * FSM_EnterState(STATE_FAULT) จะดับ LED4 ให้เอง
+             */
+            FSM_CancelForLockout(" during dispensing");
+        } else {
+            /* LED4 กระพริบระหว่างกำลังจ่ายสินค้า (Toggle ทุก ๆ ~0.5 วินาที) */
+            if ((state_tick % LED4_BLINK_TICKS) == 0U) {
+                LED_Toggle(LED4_PORT, LED4_PIN);
+            } else {
+                /* No action */
             }
 
-            UART2_SendString("[FSM] Item prepared! Stock updated:\r\n");
-            Menu_PrintAll();
+            /* Dispense Simulation: พิมพ์เลขนับถอยหลังทุก ๆ 1 วินาทีโดยประมาณ */
+            if ((state_tick % TICKS_PER_SECOND) == 0U) {
+                uint32_t seconds_elapsed = state_tick / TICKS_PER_SECOND;
+                if (seconds_elapsed < (uint32_t)PROCESSING_SECONDS) {
+                    uint32_t seconds_left = (uint32_t)PROCESSING_SECONDS - seconds_elapsed;
+                    UART2_SendString("   ... ");
+                    UART2_SendUint(seconds_left);
+                    UART2_SendString(" sec\r\n");
+                } else {
+                    /* No action */
+                }
+            } else {
+                /* No action */
+            }
 
-            FSM_EnterState(STATE_COMPLETE);
+            if (state_tick >= PROCESSING_TICKS) {
+                /* Stock Update: ตัด Stock ลง 1 หน่วยเมื่อจ่ายสินค้าสำเร็จ (กันค่าติดลบด้วยเงื่อนไข > 0) */
+                if (menu[selected_index].stock > 0U) {
+                    menu[selected_index].stock--;
+                } else {
+                    /* No action */
+                }
+
+                UART2_SendString("[FSM] Item prepared! Stock updated:\r\n");
+                Menu_PrintAll();
+
+                FSM_EnterState(STATE_COMPLETE);
+            } else {
+                /* No action */
+            }
         }
         break;
 
@@ -218,6 +339,8 @@ void FSM_Run(void) {
         if (state_tick >= COMPLETE_TICKS) {
             UART2_SendString("[FSM] Enjoy your fresh pick! -> back to IDLE\r\n");
             FSM_EnterState(STATE_IDLE);
+        } else {
+            /* No action */
         }
         break;
 
@@ -228,6 +351,8 @@ void FSM_Run(void) {
         if (locked == 0U) {
             UART2_SendString("[FSM] Resuming normal operation -> IDLE\r\n");
             FSM_EnterState(STATE_IDLE);
+        } else {
+            /* No action */
         }
         break;
 
@@ -258,6 +383,39 @@ static void FSM_UpdateOutputs(void) {
 
 static void FSM_EnterState(SystemState_t new_state) {
     current_state = new_state;
+    if (new_state == STATE_IDLE) {
+        order_cancelled = 0U; /* เริ่มรายการใหม่ ล้างสถานะการยกเลิกของรายการก่อนหน้า */
+        paid_amount = 0U;
+    } else if (new_state == STATE_PAYMENT) {
+        paid_amount = 0U;     /* เริ่มรับเงินรายการใหม่จาก 0 บาท */
+    } else {
+        /* No action */
+    }
     state_tick = 0U;
     FSM_UpdateOutputs();
+}
+
+/* ยกเลิกรายการเพราะสภาพแวดล้อมผิดปกติ (Safety First): ไม่หัก Stock และคืนเงินที่ลูกค้าจ่ายมาแล้ว
+ * stage_text ใช้บอกว่าเกิดขึ้นช่วงไหน เช่น " during payment", " during dispensing" ("" = ไม่ระบุ)
+ */
+static void FSM_CancelForLockout(const char *stage_text) {
+    UART2_SendString("[FSM] Environment alert");
+    UART2_SendString(stage_text);
+    UART2_SendString(" -> ORDER CANCELLED (stock not deducted");
+    if (paid_amount > 0U) {
+        UART2_SendString(",");
+        FSM_PrintRefund();
+    } else {
+        /* ยังไม่ได้รับเงิน: ไม่มีเงินต้องคืน */
+    }
+    UART2_SendString(")\r\n");
+    order_cancelled = 1U;
+    FSM_EnterState(STATE_FAULT);
+}
+
+/* พิมพ์ยอดคืนเงิน " refund X THB" (ระบบจำลอง: ไม่มีกลไกคืนเหรียญจริง แจ้งยอดผ่าน UART/จอแทน) */
+static void FSM_PrintRefund(void) {
+    UART2_SendString(" refund ");
+    UART2_SendUint(paid_amount);
+    UART2_SendString(" THB");
 }

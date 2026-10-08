@@ -3,7 +3,7 @@
 
 void GPIO_Init(void) {
     /* 1. เปิด Clock จ่ายไฟให้ GPIOA และ GPIOB */
-    RCC->AHB1ENR |= (1U << 0U) | (1U << 1U);
+    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN);
 
     /* 2. ตั้งค่า LED เป็น Output (PA5, PA6, PA7, PB6) */
     GPIO_SetPinMode(LED1_PORT, LED1_PIN, GPIO_MODE_OUTPUT);
@@ -36,22 +36,30 @@ void LED_On(GPIO_TypeDef *GPIOx, uint8_t pin) {
 }
 
 void LED_Off(GPIO_TypeDef *GPIOx, uint8_t pin) {
-    GPIOx->BSRR = (1U << ((uint32_t)pin + 16U));
+    GPIOx->BSRR = (1U << ((uint32_t)pin + GPIO_BSRR_RESET_OFFSET));
 }
 
 void LED_Toggle(GPIO_TypeDef *GPIOx, uint8_t pin) {
     GPIOx->ODR ^= (1U << (uint32_t)pin);
 }
 
+/* ปุ่มเป็น Active-Low: ขาเป็น LOW = กำลังกดอยู่ */
 uint8_t BTN_IsPressed(const GPIO_TypeDef *GPIOx, uint8_t pin) {
-    return ((GPIOx->IDR & (1U << (uint32_t)pin)) == 0U) ? 1U : 0U;
+    uint8_t pressed;
+
+    if (GPIO_ReadPin(GPIOx, pin) == 0U) {
+        pressed = 1U;
+    } else {
+        pressed = 0U;
+    }
+    return pressed;
 }
 
 void BTN_EnableInterrupts(void) {
-    EXTI_InitFallingEdge(BTN_UP_PORT, BTN_UP_PIN);
-    EXTI_InitFallingEdge(BTN_DOWN_PORT, BTN_DOWN_PIN);
-    EXTI_InitFallingEdge(BTN_OK_PORT, BTN_OK_PIN);
-    EXTI_InitFallingEdge(BTN_BACK_PORT, BTN_BACK_PIN);
+    EXTI_InitEdge(BTN_UP_PORT, BTN_UP_PIN, EXTI_EDGE_FALLING);
+    EXTI_InitEdge(BTN_DOWN_PORT, BTN_DOWN_PIN, EXTI_EDGE_FALLING);
+    EXTI_InitEdge(BTN_OK_PORT, BTN_OK_PIN, EXTI_EDGE_FALLING);
+    EXTI_InitEdge(BTN_BACK_PORT, BTN_BACK_PIN, EXTI_EDGE_FALLING);
 }
 
 uint8_t BTN_TakePress(const GPIO_TypeDef *GPIOx, uint8_t pin) {
@@ -59,6 +67,8 @@ uint8_t BTN_TakePress(const GPIO_TypeDef *GPIOx, uint8_t pin) {
 
     if (EXTI_TakeEvent(pin) != 0U) {
         pressed = BTN_IsPressed(GPIOx, pin);
+    } else {
+        /* ไม่มี Event จาก Interrupt ของปุ่มนี้ */
     }
     return pressed;
 }
@@ -67,14 +77,18 @@ uint8_t BTN_TakePress(const GPIO_TypeDef *GPIOx, uint8_t pin) {
  * เช่น DHT11 ที่ต้องเป็น Output ตอนส่ง Start Signal แล้วสลับเป็น Input ตอนอ่านข้อมูลกลับ
  */
 void GPIO_SetPinMode(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t mode) {
-    GPIOx->MODER &= ~(3U << ((uint32_t)pin * 2U));
-    GPIOx->MODER |= ((uint32_t)mode << ((uint32_t)pin * 2U));
+    uint32_t shift = (uint32_t)pin * GPIO_MODER_BITS_PER_PIN;
+
+    GPIOx->MODER &= ~(GPIO_MODER_FIELD_MASK << shift);
+    GPIOx->MODER |= ((uint32_t)mode << shift);
 }
 
 /* ตั้งค่า Pull-up/Pull-down ของขา (0=ไม่ต่อ, 1=Pull-up, 2=Pull-down) */
 void GPIO_SetPinPull(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t pull) {
-    GPIOx->PUPDR &= ~(3U << ((uint32_t)pin * 2U));
-    GPIOx->PUPDR |= ((uint32_t)pull << ((uint32_t)pin * 2U));
+    uint32_t shift = (uint32_t)pin * GPIO_MODER_BITS_PER_PIN;
+
+    GPIOx->PUPDR &= ~(GPIO_MODER_FIELD_MASK << shift);
+    GPIOx->PUPDR |= ((uint32_t)pull << shift);
 }
 
 /* เขียนค่า Digital Output ของขา (state: 0=Low, 1=High) ผ่าน BSRR (Atomic, ปลอดภัยกว่าการแก้ ODR ตรง ๆ) */
@@ -82,11 +96,18 @@ void GPIO_WritePin(GPIO_TypeDef *GPIOx, uint8_t pin, uint8_t state) {
     if (state != 0U) {
         GPIOx->BSRR = (1U << (uint32_t)pin);
     } else {
-        GPIOx->BSRR = (1U << ((uint32_t)pin + 16U));
+        GPIOx->BSRR = (1U << ((uint32_t)pin + GPIO_BSRR_RESET_OFFSET));
     }
 }
 
 /* อ่านค่า Digital Input ของขา คืนค่า 0 หรือ 1 */
 uint8_t GPIO_ReadPin(const GPIO_TypeDef *GPIOx, uint8_t pin) {
-    return ((GPIOx->IDR & (1U << (uint32_t)pin)) != 0U) ? 1U : 0U;
+    uint8_t level;
+
+    if ((GPIOx->IDR & (1U << (uint32_t)pin)) != 0U) {
+        level = 1U;
+    } else {
+        level = 0U;
+    }
+    return level;
 }

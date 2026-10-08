@@ -7,6 +7,7 @@
 #define SSD1306_WIDTH        128U
 #define SSD1306_HEIGHT       64U
 #define SSD1306_PAGE_COUNT   8U      /* 64 / 8 */
+#define SSD1306_CHAR_ADVANCE 6U      /* ความกว้างต่อตัวอักษร: ฟอนต์ 5 px + เว้นช่อง 1 px */
 
 /* เรียกครั้งเดียวตอนเริ่มระบบ: เปิด Software I2C (PC8/PC6) + ส่งลำดับคำสั่งเริ่มต้นจอ + เคลียร์จอให้ว่างสนิท */
 void SSD1306_Init(void);

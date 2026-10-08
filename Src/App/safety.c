@@ -5,6 +5,9 @@
 /* Lockout ถูกเก็บเป็น Static เพราะ safety.c เป็นเจ้าของ State นี้แต่เพียงผู้เดียว
  * (fsm.c อ่านผ่าน Safety_IsLockout() เท่านั้น ไม่แก้ไขค่าเอง)
  */
+#define PIN_LOW     0U
+#define PIN_HIGH    1U
+
 static uint8_t lockout_active = 0U;
 
 /* เก็บค่า Sensor ล่าสุดไว้ให้โมดูลอื่นอ่านผ่าน Getter ด้านล่าง (เช่น display.c เอาไปโชว์หน้าจอ OLED) */
@@ -15,11 +18,11 @@ static uint8_t has_reading = 0U;
 void Safety_Init(void) {
     lockout_active = 0U;
 
-    /* ตั้งค่าขา PC2 เป็น Digital Output สำหรับ Temperature Alarm (แยกจาก LED2 บนบอร์ด)
-     * เริ่มต้นที่ LOW ไปก่อน จนกว่าจะเกินเกณฑ์อุณหภูมิจริงผ่าน Safety_Update()
+    /* ตั้งค่าขา PC2 เป็น Digital Output สำหรับ Relay พัดลมระบายอากาศ
+     * เริ่มต้นที่ LOW (พัดลมหยุด) จนกว่าอุณหภูมิหรือความชื้นจะเกินเกณฑ์จริงผ่าน Safety_Update()
      */
     GPIO_SetPinMode(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, GPIO_MODE_OUTPUT);
-    GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
+    GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, PIN_LOW);
 
     /* ตั้งต้นเป็นสถานะปกติไปก่อน จนกว่าจะมีค่า Sensor จริงเข้ามาผ่าน Safety_Update() ครั้งแรก */
     LED_On(LED1_PORT, LED1_PIN);
@@ -28,41 +31,56 @@ void Safety_Init(void) {
 }
 
 void Safety_Update(float temp_c, uint8_t humidity_pct) {
-    uint8_t temp_bad = (temp_c > SAFETY_TEMP_MAX_C) ? 1U : 0U;
-    uint8_t humid_bad = (humidity_pct > SAFETY_HUMID_MAX_PCT) ? 1U : 0U;
-    uint8_t abnormal = (uint8_t)(((temp_bad != 0U) || (humid_bad != 0U)) ? 1U : 0U);
+    uint8_t temp_bad;
+    uint8_t humid_bad;
+    uint8_t abnormal;
+
+    if (temp_c > SAFETY_TEMP_MAX_C) {
+        temp_bad = 1U;
+    } else {
+        temp_bad = 0U;
+    }
+
+    if (humidity_pct > SAFETY_HUMID_MAX_PCT) {
+        humid_bad = 1U;
+    } else {
+        humid_bad = 0U;
+    }
+
+    if ((temp_bad != 0U) || (humid_bad != 0U)) {
+        abnormal = 1U;
+    } else {
+        abnormal = 0U;
+    }
 
     /* เก็บค่าล่าสุดไว้ก่อนเลย ให้ Getter เรียกอ่านได้เสมอไม่ว่าจะเกินเกณฑ์หรือไม่ */
     last_temp_c = temp_c;
     last_humidity_pct = humidity_pct;
     has_reading = 1U;
 
-    /* 1. ควบคุม LED1 (Normal) / LED2 (Temp Alarm) / LED3 (Humid Alarm)
+    /* 1. ควบคุม LED1 (Normal) / LED2 (Temp Alarm) / LED3 (Humid Alarm) และขา PC2 (Relay พัดลม)
      * (ไม่มีการพิมพ์สถานะออก UART ตอนปกติ — เงียบสนิท ต่อเมื่อเกินเกณฑ์เท่านั้นถึงจะเห็นข้อความ ดูข้อ 2)
+     * PC2 ผูกกับ abnormal (Temp หรือ Humid เกิน) ที่จุดเดียว เพื่อไม่ให้บล็อกหนึ่งสั่งทับอีกบล็อก
      */
     if (abnormal != 0U) {
         LED_Off(LED1_PORT, LED1_PIN);
+        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, PIN_HIGH);
     } else {
         LED_On(LED1_PORT, LED1_PIN);
+        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, PIN_LOW);
     }
 
-    /* LED2 (บนบอร์ด) และขา PC2 (Output ภายนอก) ทั้งคู่ผูกกับ temp_bad เท่านั้น ไม่ผูกกับความชื้น
-     * ตามที่ต้องการ: "เวลาอุณหภูมิเกินค่าที่ตั้งไว้ให้ปล่อย output ออก pin PC2"
-     */
+    /* LED2 = อุณหภูมิเกิน, LED3 = ความชื้นเกิน (บอกสาเหตุของการ Lockout) */
     if (temp_bad != 0U) {
         LED_On(LED2_PORT, LED2_PIN);
-        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 1U);
     } else {
         LED_Off(LED2_PORT, LED2_PIN);
-        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
     }
 
     if (humid_bad != 0U) {
         LED_On(LED3_PORT, LED3_PIN);
-        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 1U);
     } else {
         LED_Off(LED3_PORT, LED3_PIN);
-        GPIO_WritePin(TEMP_ALARM_OUT_PORT, TEMP_ALARM_OUT_PIN, 0U);
     }
 
     /* 2. ข้อความแจ้งเตือนวนซ้ำทุกครั้งที่ Update (~ทุก 2 วินาที) ตราบใดที่ยังเกินเกณฑ์อยู่
@@ -77,11 +95,15 @@ void Safety_Update(float temp_c, uint8_t humidity_pct) {
     } else if (temp_bad != 0U) {
         UART2_SendString("[WARNING] Temp Exceeded! (Current Temp: ");
         UART2_SendFloat1(temp_c);
-        UART2_SendString(" C | Limit: 40 C)\r\n");
+        UART2_SendString(" C | Limit: ");
+        UART2_SendFloat1(SAFETY_TEMP_MAX_C);   /* ดึงจากค่าเกณฑ์จริง ถ้าแก้เกณฑ์ ข้อความก็เปลี่ยนตาม */
+        UART2_SendString(" C)\r\n");
     } else if (humid_bad != 0U) {
         UART2_SendString("[WARNING] Humidity Exceeded! (Current Humid: ");
         UART2_SendUint(humidity_pct);
-        UART2_SendString(" % | Limit: 50 %)\r\n");
+        UART2_SendString(" % | Limit: ");
+        UART2_SendUint(SAFETY_HUMID_MAX_PCT);
+        UART2_SendString(" %)\r\n");
     } else {
         /* ปกติ ไม่ต้องพิมพ์ข้อความเตือนซ้ำ */
     }
@@ -114,4 +136,5 @@ uint8_t Safety_GetLastHumidity(void) {
 
 uint8_t Safety_HasReading(void) {
     return has_reading;
-}
+}\
+

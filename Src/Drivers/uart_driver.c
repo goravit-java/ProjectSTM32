@@ -1,13 +1,24 @@
 #include "Drivers/uart_driver.h"
 #include "Drivers/cortex_driver.h"
 
-#define USART_SR_TXE      (1U << 7U)
-#define USART_CR1_RE      (1U << 2U)
-#define USART_CR1_TE      (1U << 3U)
-#define USART_CR1_TXEIE   (1U << 7U)
-#define USART_CR1_UE      (1U << 13U)
+#define USART_SR_TXE        (1U << 7U)
+#define USART_CR1_RE        (1U << 2U)
+#define USART_CR1_TE        (1U << 3U)
+#define USART_CR1_TXEIE     (1U << 7U)
+#define USART_CR1_UE        (1U << 13U)
+
+#define UART_TX_PIN         2U        /* PA2 = USART2_TX */
+#define UART_RX_PIN         3U        /* PA3 = USART2_RX */
+#define GPIO_MODE_ALTERNATE 0x2U
+#define GPIO_AF7_USART2     0x7U
+#define USART2_BRR_115200   0x008AU   /* 16 MHz / 115200 = 8.68 -> Mantissa 8, Fraction 10 */
 
 #define UART_TX_INDEX_MASK  (UART_TX_BUFFER_SIZE - 1U)
+#define UART_UINT_MAX_DIGITS 10U      /* uint32_t มีได้สูงสุด 10 หลัก (4294967295) */
+#define DECIMAL_BASE        10U
+#define DECIMAL_BASE_S      10        /* ฐาน 10 แบบ Signed สำหรับคำนวณทศนิยม (int32_t) */
+#define ROUND_HALF          0.5f
+#define FLOAT_DECIMAL_SCALE 10.0f     /* ทศนิยม 1 ตำแหน่ง */
 
 /* Ring Buffer สำหรับการส่ง
  * - tx_head: เขียนโดยโปรแกรมหลักเท่านั้น (ตำแหน่งที่จะใส่ข้อมูลถัดไป)
@@ -18,28 +29,31 @@
 static volatile uint8_t tx_buffer[UART_TX_BUFFER_SIZE];
 static volatile uint16_t tx_head = 0U;
 static volatile uint16_t tx_tail = 0U;
-static volatile uint32_t tx_dropped = 0U;
 
 void USART2_IRQHandler(void);
 
 void UART2_Init(void) {
+    uint32_t tx_shift_mode = UART_TX_PIN * GPIO_MODER_BITS_PER_PIN;
+    uint32_t rx_shift_mode = UART_RX_PIN * GPIO_MODER_BITS_PER_PIN;
+    uint32_t tx_shift_af = UART_TX_PIN * GPIO_AFR_BITS_PER_PIN;
+    uint32_t rx_shift_af = UART_RX_PIN * GPIO_AFR_BITS_PER_PIN;
+
     /* 1. เปิด Clock ให้ GPIOA และ USART2 */
-    RCC->AHB1ENR |= (1U << 0U);          /* GPIOA Clock Enable */
-    RCC->APB1ENR |= (1U << 17U);         /* USART2 Clock Enable */
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
 
     /* 2. ตั้งค่า PA2 (TX) และ PA3 (RX) เป็น Alternate Function 7 (AF07) */
-    GPIOA->MODER &= ~((3U << (2U * 2U)) | (3U << (3U * 2U)));
-    GPIOA->MODER |=  ((2U << (2U * 2U)) | (2U << (3U * 2U)));     /* Alternate Function mode */
+    GPIOA->MODER &= ~((GPIO_MODER_FIELD_MASK << tx_shift_mode) | (GPIO_MODER_FIELD_MASK << rx_shift_mode));
+    GPIOA->MODER |= ((GPIO_MODE_ALTERNATE << tx_shift_mode) | (GPIO_MODE_ALTERNATE << rx_shift_mode));
 
-    GPIOA->AFR[0] &= ~((0xFU << (2U * 4U)) | (0xFU << (3U * 4U)));
-    GPIOA->AFR[0] |=  ((0x7U << (2U * 4U)) | (0x7U << (3U * 4U))); /* AF07 (USART2) */
+    GPIOA->AFR[0U] &= ~((GPIO_AFR_FIELD_MASK << tx_shift_af) | (GPIO_AFR_FIELD_MASK << rx_shift_af));
+    GPIOA->AFR[0U] |= ((GPIO_AF7_USART2 << tx_shift_af) | (GPIO_AF7_USART2 << rx_shift_af));
 
     /* 3. ตั้งค่า Baud Rate = 115200 (คำนวณจาก Clock HSI 16 MHz) */
-    USART2->BRR = 0x008AU;
+    USART2->BRR = USART2_BRR_115200;
 
     tx_head = 0U;
     tx_tail = 0U;
-    tx_dropped = 0U;
 
     /* 4. เปิดใช้งาน Transmitter, Receiver และ USART2 (TXEIE ยังปิดไว้ จนกว่าจะมีข้อมูลรอส่ง) */
     USART2->CR1 |= (USART_CR1_TE | USART_CR1_RE | USART_CR1_UE);
@@ -48,7 +62,7 @@ void UART2_Init(void) {
     Cortex_NvicEnableIrq((uint8_t)USART2_IRQN);
 }
 
-/* ใส่ 1 ตัวอักษรลง Buffer แล้วคืนค่าทันที (ไม่รอ Hardware) ถ้า Buffer เต็มจะทิ้งตัวอักษรนั้นและนับไว้ */
+/* ใส่ 1 ตัวอักษรลง Buffer แล้วคืนค่าทันที (ไม่รอ Hardware) ถ้า Buffer เต็มจะทิ้งตัวอักษรนั้น */
 void UART2_SendChar(char c) {
     uint16_t next = (uint16_t)(((uint32_t)tx_head + 1U) & UART_TX_INDEX_MASK);
 
@@ -57,7 +71,7 @@ void UART2_SendChar(char c) {
         tx_head = next;
         USART2->CR1 |= USART_CR1_TXEIE; /* ปลุก ISR ให้เริ่ม/ส่งต่อ */
     } else {
-        tx_dropped++;
+        /* Buffer เต็ม: ทิ้งตัวอักษรนี้ (ข้อความชุดยาวสุดของระบบใช้ไม่ถึงครึ่ง Buffer) */
     }
 }
 
@@ -72,11 +86,9 @@ void USART2_IRQHandler(void) {
         } else {
             USART2->CR1 &= ~USART_CR1_TXEIE;
         }
+    } else {
+        /* Interrupt จากสาเหตุอื่นที่ไม่ได้เปิดใช้งาน: ไม่ทำอะไร */
     }
-}
-
-uint32_t UART2_GetDroppedCount(void) {
-    return tx_dropped;
 }
 
 void UART2_SendString(const char *str) {
@@ -92,7 +104,7 @@ void UART2_SendString(const char *str) {
  * (หลีกเลี่ยงการพึ่งพา Standard I/O Library ซึ่งกินพื้นที่ Flash มากบนระบบ Bare-metal)
  */
 void UART2_SendUint(uint32_t value) {
-    char buf[10];
+    char buf[UART_UINT_MAX_DIGITS];
     uint8_t i = 0U;
     uint32_t v = value;
 
@@ -100,9 +112,9 @@ void UART2_SendUint(uint32_t value) {
         UART2_SendChar('0');
     } else {
         while (v > 0U) {
-            buf[i] = (char)((v % 10U) + (uint32_t)'0');
+            buf[i] = (char)((v % DECIMAL_BASE) + (uint32_t)'0');
             i++;
-            v /= 10U;
+            v /= DECIMAL_BASE;
         }
 
         while (i > 0U) {
@@ -123,14 +135,18 @@ void UART2_SendFloat1(float value) {
     if (v < 0.0f) {
         UART2_SendChar('-');
         v = -v;
+    } else {
+        /* ค่าบวก: ไม่ต้องใส่เครื่องหมาย */
     }
 
     integer_part = (int32_t)v;
-    decimal_part = (int32_t)(((v - (float)integer_part) * 10.0f) + 0.5f);
+    decimal_part = (int32_t)(((v - (float)integer_part) * FLOAT_DECIMAL_SCALE) + ROUND_HALF);
 
-    if (decimal_part >= 10) {
+    if (decimal_part >= DECIMAL_BASE_S) {
         decimal_part = 0;
         integer_part++;
+    } else {
+        /* ไม่มีการทดหลัก */
     }
 
     UART2_SendUint((uint32_t)integer_part);

@@ -7,9 +7,11 @@
 #define IWDG_SR_PVU       (1U << 0U)
 #define IWDG_SR_RVU       (1U << 1U)
 
+#define IWDG_PRESCALER_DIV32   0x03U  /* PR = 3 -> หาร 32 */
+#define IWDG_RELOAD_1S         999U   /* (32 x (999 + 1)) / 32 kHz = 1.0 วินาที */
+
 /* IWDG ทำงานด้วย LSI Clock ภายใน (~32 kHz) และแยกอิสระจาก Clock หลักของระบบ
- * Timeout = (Prescaler * (RLR + 1)) / LSI_Freq
- * เลือก Prescaler = /32, RLR = 999 -> Timeout ~= (32 * 1000) / 32000 = 1.0 วินาที
+ * Timeout = (Prescaler * (RLR + 1)) / LSI_Freq ~= 1.0 วินาที
  * ดังนั้นในโปรแกรมหลักต้องเรียก IWDG_Refresh() อย่างน้อยทุก 1 วินาที ไม่เช่นนั้น MCU จะ Reset ตัวเอง
  */
 void IWDG_Init(void) {
@@ -18,12 +20,12 @@ void IWDG_Init(void) {
     while ((IWDG->SR & IWDG_SR_PVU) != 0U) {
         /* รอจน Prescaler Value Update ว่าง (ใช้เวลาไม่กี่รอบ LSI ทำครั้งเดียวตอนเริ่มระบบ) */
     }
-    IWDG->PR = 0x03U;                   /* Prescaler = /32 */
+    IWDG->PR = IWDG_PRESCALER_DIV32;
 
     while ((IWDG->SR & IWDG_SR_RVU) != 0U) {
         /* รอจน Reload Value Update ว่าง */
     }
-    IWDG->RLR = 999U;                   /* Reload value -> Timeout ~ 1 วินาที */
+    IWDG->RLR = IWDG_RELOAD_1S;
 
     IWDG->KR = IWDG_KEY_RELOAD;
     IWDG->KR = IWDG_KEY_START;
