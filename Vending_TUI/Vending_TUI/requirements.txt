@@ -1,0 +1,2 @@
+textual>=0.86
+pyserial>=3.5

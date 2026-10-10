@@ -1,3 +1,0 @@
-../Src/main.c:17:13:delay_ms	24	static,ignoring_inline_asm
-../Src/main.c:27:13:FPU_Enable	4	static,ignoring_inline_asm
-../Src/main.c:33:5:main	24	static

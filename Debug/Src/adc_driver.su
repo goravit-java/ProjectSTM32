@@ -1,3 +1,0 @@
-../Src/adc_driver.c:13:6:ADC1_Init	16	static,ignoring_inline_asm
-../Src/adc_driver.c:44:10:ADC1_ReadRaw	4	static
-../Src/adc_driver.c:50:7:ADC1_ReadTemperature	16	static

@@ -1,0 +1,294 @@
+0	
+0	========================================
+0	 Smart Vegetable & Fruit Vending Machine 
+0	  Environment Monitoring & Lockout Mode  
+0	========================================
+0	
+0	----------- MENU -----------
+0	Fresh Salad | Price: 25 Baht | Stock: 3
+0	Japanese Cucumber | Price: 15 Baht | Stock: 2
+0	Red Apple | Price: 20 Baht | Stock: 1
+0	Organic Grape | Price: 30 Baht | Stock: 0
+0	-----------------------------
+0	[FSM] INIT -> IDLE
+0	#S state=IDLE temp=0.0 tlim=40.0 hlim=70 hum=0 sens=0 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+2000	#S state=IDLE temp=27.1 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+3000	[FSM] Welcome! Select an item (UP/DOWN = scroll, OK = confirm)
+3000	> Fresh Salad
+3000	#S state=SELECT temp=27.1 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+4000	#S state=SELECT temp=27.3 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+4200	> Japanese Cucumber
+4200	#S state=SELECT temp=27.3 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+5200	> Red Apple
+5200	#S state=SELECT temp=27.3 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+6000	#S state=SELECT temp=27.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+6200	> Organic Grape
+6200	#S state=SELECT temp=27.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=3 price=30 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+7500	[FSM] Confirm order: Organic Grape ? (OK = Yes, BACK = Cancel)
+7500	#S state=CONFIRM temp=27.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=3 price=30 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+8000	#S state=CONFIRM temp=27.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=3 price=30 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+8800	#S state=CHECK_STOCK temp=27.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=3 price=30 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+8820	[FSM] OUT OF STOCK! Please choose another item.
+9000	#S state=SELECT temp=27.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=3 price=30 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+10000	#S state=SELECT temp=27.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=3 price=30 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+10500	> Red Apple
+10500	#S state=SELECT temp=27.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+11300	> Japanese Cucumber
+11300	#S state=SELECT temp=27.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+12100	> Fresh Salad
+12100	#S state=SELECT temp=27.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+13500	[FSM] Confirm order: Fresh Salad ? (OK = Yes, BACK = Cancel)
+13500	#S state=CONFIRM temp=27.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+15000	#S state=CHECK_STOCK temp=27.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+15020	[FSM] Stock OK -> PAYMENT: please pay 25 THB (cover light sensor = 10 THB, BACK = cancel, timeout 30 s)
+15200	#S state=PAYMENT temp=27.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=0 price=25 paid=0 left=30 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+16020	#S state=PAYMENT temp=27.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=0 price=25 paid=0 left=29 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+17000	[PAY] +10 THB -> Paid: 10 / 25 THB
+17000	#S state=PAYMENT temp=27.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=0 price=25 paid=10 left=29 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+17200	#S state=PAYMENT temp=27.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=0 price=25 paid=10 left=28 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+18000	#S state=PAYMENT temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=10 left=28 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+18200	#S state=PAYMENT temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=10 left=27 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+19000	[PAY] +10 THB -> Paid: 20 / 25 THB
+19000	#S state=PAYMENT temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=20 left=27 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+19200	#S state=PAYMENT temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=20 left=26 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+20000	#S state=PAYMENT temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=20 left=26 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+20200	#S state=PAYMENT temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=20 left=25 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+21000	[PAY] +10 THB -> Paid: 30 / 25 THB
+21000	[PAY] Payment complete! Change: 5 THB
+21000	#S state=SAFETY_CHECK temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=30 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+21020	[FSM] Environment OK -> Preparing your item... 4 sec
+21200	#S state=PROCESSING temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=30 left=4 prog=4 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+21400	#S state=PROCESSING temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=30 left=4 prog=9 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+21600	#S state=PROCESSING temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=30 left=4 prog=14 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+21800	#S state=PROCESSING temp=27.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=30 left=4 prog=19 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+22000	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=4 prog=24 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+22020	   ... 3 sec
+22200	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=3 prog=29 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+22400	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=3 prog=34 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+22600	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=3 prog=39 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+22800	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=3 prog=44 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+23000	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=3 prog=49 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+23020	   ... 2 sec
+23200	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=2 prog=54 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+23400	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=2 prog=59 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+23600	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=2 prog=64 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+23800	#S state=PROCESSING temp=27.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=0 price=25 paid=30 left=2 prog=69 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+24000	#S state=PROCESSING temp=27.3 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=2 prog=74 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+24020	   ... 1 sec
+24200	#S state=PROCESSING temp=27.3 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=1 prog=79 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+24400	#S state=PROCESSING temp=27.3 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=1 prog=84 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+24600	#S state=PROCESSING temp=27.3 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=1 prog=89 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+24800	#S state=PROCESSING temp=27.3 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=1 prog=94 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+25000	#S state=PROCESSING temp=27.3 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=1 prog=99 cancel=0 sf=0 spt=40.0 sph=70 stock=3,2,1,0
+25020	[FSM] Item prepared! Stock updated:
+25020	
+25020	----------- MENU -----------
+25020	Fresh Salad | Price: 25 Baht | Stock: 2
+25020	Japanese Cucumber | Price: 15 Baht | Stock: 2
+25020	Red Apple | Price: 20 Baht | Stock: 1
+25020	Organic Grape | Price: 30 Baht | Stock: 0
+25020	-----------------------------
+25200	#S state=COMPLETE temp=27.3 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=0 prog=100 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+26000	#S state=COMPLETE temp=27.2 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=30 left=0 prog=100 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+26020	[FSM] Enjoy your fresh pick! -> back to IDLE
+26200	#S state=IDLE temp=27.2 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+28000	#S state=IDLE temp=27.0 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+30000	[FSM] Welcome! Select an item (UP/DOWN = scroll, OK = confirm)
+30000	> Fresh Salad
+30000	#S state=SELECT temp=26.9 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+31000	> Japanese Cucumber
+31000	#S state=SELECT temp=26.9 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+32000	#S state=SELECT temp=26.8 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+32200	[FSM] Confirm order: Japanese Cucumber ? (OK = Yes, BACK = Cancel)
+32200	#S state=CONFIRM temp=26.8 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+33500	#S state=CHECK_STOCK temp=26.8 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+33520	[FSM] Stock OK -> PAYMENT: please pay 15 THB (cover light sensor = 10 THB, BACK = cancel, timeout 30 s)
+33700	#S state=PAYMENT temp=26.8 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=30 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+34000	#S state=PAYMENT temp=26.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=30 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+34520	#S state=PAYMENT temp=26.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=29 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+35520	#S state=PAYMENT temp=26.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=0 left=28 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+36000	[PAY] +10 THB -> Paid: 10 / 15 THB
+36000	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=10 left=28 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+36520	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=10 left=27 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+37520	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=10 left=26 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+38000	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=10 left=26 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+38520	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=10 left=25 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+39520	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=1 price=15 paid=10 left=24 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+40000	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=1 price=15 paid=10 left=24 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+40520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=1 price=15 paid=10 left=23 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+41520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=1 price=15 paid=10 left=22 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+42520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=1 price=15 paid=10 left=21 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+43520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=1 price=15 paid=10 left=20 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+44000	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=1 price=15 paid=10 left=20 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+44520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=1 price=15 paid=10 left=19 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+45520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=1 price=15 paid=10 left=18 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+46000	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=18 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+46520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=17 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+47520	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=16 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+48000	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=16 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+48520	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=15 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+49520	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=14 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+50000	#S state=PAYMENT temp=26.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=14 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+50520	#S state=PAYMENT temp=26.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=13 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+51520	#S state=PAYMENT temp=26.6 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=12 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+52000	#S state=PAYMENT temp=26.7 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=12 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+52520	#S state=PAYMENT temp=26.7 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=11 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+53520	#S state=PAYMENT temp=26.7 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=10 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+54000	#S state=PAYMENT temp=26.8 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=10 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+54520	#S state=PAYMENT temp=26.8 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=9 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+55520	#S state=PAYMENT temp=26.8 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=8 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+56000	#S state=PAYMENT temp=27.0 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=8 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+56520	#S state=PAYMENT temp=27.0 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=7 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+57520	#S state=PAYMENT temp=27.0 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=6 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+58000	#S state=PAYMENT temp=27.1 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=6 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+58520	#S state=PAYMENT temp=27.1 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=5 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+59520	#S state=PAYMENT temp=27.1 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=4 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+60000	#S state=PAYMENT temp=27.2 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=4 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+60520	#S state=PAYMENT temp=27.2 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=3 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+61520	#S state=PAYMENT temp=27.2 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=1 price=15 paid=10 left=2 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+62000	#S state=PAYMENT temp=27.3 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=2 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+62520	#S state=PAYMENT temp=27.3 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=1 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+63520	[PAY] TIMEOUT! Paid 10 of 15 THB -> PAYMENT FAILED, money returned
+63520	#S state=PAYMENT_FAILED temp=27.3 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+64000	#S state=PAYMENT_FAILED temp=27.4 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=10 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+66000	#S state=PAYMENT_FAILED temp=27.5 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=1 price=15 paid=10 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+66520	[FSM] Returning to main menu -> IDLE
+66520	#S state=IDLE temp=27.5 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+68000	#S state=IDLE temp=27.6 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+70000	[FSM] Welcome! Select an item (UP/DOWN = scroll, OK = confirm)
+70000	> Fresh Salad
+70000	#S state=SELECT temp=27.6 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+70800	> Japanese Cucumber
+70800	#S state=SELECT temp=27.6 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+71400	> Red Apple
+71400	#S state=SELECT temp=27.6 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+72000	[FSM] Confirm order: Red Apple ? (OK = Yes, BACK = Cancel)
+72000	#S state=CONFIRM temp=27.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+72600	#S state=CHECK_STOCK temp=27.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+72620	[FSM] Stock OK -> PAYMENT: please pay 20 THB (cover light sensor = 10 THB, BACK = cancel, timeout 30 s)
+72800	#S state=PAYMENT temp=27.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=30 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+73600	[PAY] +10 THB -> Paid: 10 / 20 THB
+73600	#S state=PAYMENT temp=27.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=10 left=30 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+73800	#S state=PAYMENT temp=27.6 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=10 left=29 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+73980	[WARNING] Humidity Exceeded! (Current Humid: 73 % | Limit: 70 %)
+73980	[SYSTEM] Environment Abnormal - System Locked
+74000	[FSM] Environment alert during payment -> ORDER CANCELLED (stock not deducted, refund 10 THB)
+74000	#S state=FAULT temp=27.6 tlim=40.0 hlim=70 hum=73 sens=1 lock=1 item=2 price=20 paid=10 left=0 prog=0 cancel=1 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+75980	[WARNING] Humidity Exceeded! (Current Humid: 80 % | Limit: 70 %)
+76000	#S state=FAULT temp=27.5 tlim=40.0 hlim=70 hum=80 sens=1 lock=1 item=2 price=20 paid=10 left=0 prog=0 cancel=1 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+77980	[WARNING] Humidity Exceeded! (Current Humid: 75 % | Limit: 70 %)
+78000	#S state=FAULT temp=27.4 tlim=40.0 hlim=70 hum=75 sens=1 lock=1 item=2 price=20 paid=10 left=0 prog=0 cancel=1 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+79980	[SYSTEM] Environment Restored - System Ready
+80000	[FSM] Resuming normal operation -> IDLE
+80000	#S state=IDLE temp=27.3 tlim=40.0 hlim=70 hum=70 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+82000	#S state=IDLE temp=27.2 tlim=40.0 hlim=70 hum=65 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+84000	#S state=IDLE temp=27.1 tlim=40.0 hlim=70 hum=61 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+86000	#S state=IDLE temp=26.9 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+88000	#S state=IDLE temp=26.8 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+90000	#S state=IDLE temp=26.7 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+92000	[FSM] Welcome! Select an item (UP/DOWN = scroll, OK = confirm)
+92000	> Fresh Salad
+92000	#S state=SELECT temp=26.6 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=0 price=25 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+92800	> Japanese Cucumber
+92800	#S state=SELECT temp=26.6 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=1 price=15 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+93600	> Red Apple
+93600	#S state=SELECT temp=26.6 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+94000	#S state=SELECT temp=26.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+94600	[FSM] Confirm order: Red Apple ? (OK = Yes, BACK = Cancel)
+94600	#S state=CONFIRM temp=26.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+95400	#S state=CHECK_STOCK temp=26.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+95420	[FSM] Stock OK -> PAYMENT: please pay 20 THB (cover light sensor = 10 THB, BACK = cancel, timeout 30 s)
+95600	#S state=PAYMENT temp=26.5 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=30 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+96420	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=29 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+96600	[PAY] +10 THB -> Paid: 10 / 20 THB
+96620	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=10 left=29 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+97420	#S state=PAYMENT temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=10 left=28 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+98000	[PAY] +10 THB -> Paid: 20 / 20 THB
+98000	[PAY] Payment complete! Change: 0 THB
+98000	#S state=SAFETY_CHECK temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+98020	[FSM] Environment OK -> Preparing your item... 4 sec
+98200	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=4 prog=4 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+98400	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=4 prog=9 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+98600	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=4 prog=14 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+98800	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=4 prog=19 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+99000	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=4 prog=24 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+99020	   ... 3 sec
+99200	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=3 prog=29 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+99400	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=3 prog=34 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+99600	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=3 prog=39 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+99800	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=3 prog=44 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+100000	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=3 prog=49 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+100020	   ... 2 sec
+100200	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=2 prog=54 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+100400	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=2 prog=59 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+100600	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=2 prog=64 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+100800	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=2 prog=69 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+101000	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=2 prog=74 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+101020	   ... 1 sec
+101200	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=1 prog=79 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+101400	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=1 prog=84 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+101600	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=1 prog=89 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+101800	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=1 prog=94 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+102000	#S state=PROCESSING temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=1 prog=99 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,1,0
+102020	[FSM] Item prepared! Stock updated:
+102020	
+102020	----------- MENU -----------
+102020	Fresh Salad | Price: 25 Baht | Stock: 2
+102020	Japanese Cucumber | Price: 15 Baht | Stock: 2
+102020	Red Apple | Price: 20 Baht | Stock: 0
+102020	Organic Grape | Price: 30 Baht | Stock: 0
+102020	-----------------------------
+102200	#S state=COMPLETE temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=20 left=0 prog=100 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,0,0
+103020	[FSM] Enjoy your fresh pick! -> back to IDLE
+103020	#S state=IDLE temp=26.4 tlim=40.0 hlim=70 hum=57 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,0,0
+106000	#S state=IDLE temp=26.6 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,0,0
+108000	#S state=IDLE temp=26.7 tlim=40.0 hlim=70 hum=56 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,0,0
+110000	[FSM] Settings mode (UP/DOWN = select, knob = adjust, OK = save, BACK = cancel)
+110000	#S state=SETTINGS temp=26.8 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=70 stock=2,2,0,0
+111200	#S state=SETTINGS temp=26.8 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=38.5 sph=70 stock=2,2,0,0
+111400	#S state=SETTINGS temp=26.8 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=37.0 sph=70 stock=2,2,0,0
+111600	#S state=SETTINGS temp=26.8 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=35.5 sph=70 stock=2,2,0,0
+111800	#S state=SETTINGS temp=26.8 tlim=40.0 hlim=70 hum=55 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=34.0 sph=70 stock=2,2,0,0
+112000	#S state=SETTINGS temp=26.9 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=32.5 sph=70 stock=2,2,0,0
+112200	#S state=SETTINGS temp=26.9 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=31.0 sph=70 stock=2,2,0,0
+112400	#S state=SETTINGS temp=26.9 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=29.5 sph=70 stock=2,2,0,0
+112600	#S state=SETTINGS temp=26.9 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=28.0 sph=70 stock=2,2,0,0
+112800	#S state=SETTINGS temp=26.9 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=26.5 sph=70 stock=2,2,0,0
+113000	#S state=SETTINGS temp=26.9 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=25.0 sph=70 stock=2,2,0,0
+114000	#S state=SETTINGS temp=27.1 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=70 stock=2,2,0,0
+115200	#S state=SETTINGS temp=27.1 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=50 stock=2,2,0,0
+115400	#S state=SETTINGS temp=27.1 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=53 stock=2,2,0,0
+115600	#S state=SETTINGS temp=27.1 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=55 stock=2,2,0,0
+115800	#S state=SETTINGS temp=27.1 tlim=40.0 hlim=70 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=57 stock=2,2,0,0
+116000	#S state=SETTINGS temp=27.2 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=59 stock=2,2,0,0
+116200	#S state=SETTINGS temp=27.2 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=61 stock=2,2,0,0
+116400	#S state=SETTINGS temp=27.2 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=63 stock=2,2,0,0
+116600	#S state=SETTINGS temp=27.2 tlim=40.0 hlim=70 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=65 stock=2,2,0,0
+118000	[SET] Limits saved: Temp 25.0 C, Humid 65 %
+118000	[WARNING] Temp Exceeded! (Current Temp: 27.3 C | Limit: 25.0 C)
+118000	[SYSTEM] Environment Abnormal - System Locked
+118000	[FSM] Settings saved -> IDLE
+118000	#S state=IDLE temp=27.3 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=65 stock=2,2,0,0
+119980	[WARNING] Temp Exceeded! (Current Temp: 27.4 C | Limit: 25.0 C)
+120000	#S state=IDLE temp=27.4 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=1 spt=25.0 sph=65 stock=2,2,0,0
+121980	[WARNING] Temp Exceeded! (Current Temp: 27.5 C | Limit: 25.0 C)
+122000	[FSM] Settings mode (UP/DOWN = select, knob = adjust, OK = save, BACK = cancel)
+122000	#S state=SETTINGS temp=27.5 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=25.0 sph=65 stock=2,2,0,0
+123300	#S state=SETTINGS temp=27.5 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=36.0 sph=65 stock=2,2,0,0
+123500	#S state=SETTINGS temp=27.5 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=36.5 sph=65 stock=2,2,0,0
+123700	#S state=SETTINGS temp=27.5 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=37.0 sph=65 stock=2,2,0,0
+123900	#S state=SETTINGS temp=27.5 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=38.0 sph=65 stock=2,2,0,0
+123980	[WARNING] Temp Exceeded! (Current Temp: 27.6 C | Limit: 25.0 C)
+124100	#S state=SETTINGS temp=27.6 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=38.5 sph=65 stock=2,2,0,0
+124300	#S state=SETTINGS temp=27.6 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=39.0 sph=65 stock=2,2,0,0
+124500	#S state=SETTINGS temp=27.6 tlim=25.0 hlim=65 hum=53 sens=1 lock=1 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=65 stock=2,2,0,0
+125500	[SET] Limits saved: Temp 40.0 C, Humid 65 %
+125500	[SYSTEM] Environment Restored - System Ready
+125500	[FSM] Settings saved -> IDLE
+125500	#S state=IDLE temp=27.6 tlim=40.0 hlim=65 hum=53 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=65 stock=2,2,0,0
+128000	#S state=IDLE temp=27.6 tlim=40.0 hlim=65 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=65 stock=2,2,0,0
+129000	[FSM] Settings mode (UP/DOWN = select, knob = adjust, OK = save, BACK = cancel)
+129000	#S state=SETTINGS temp=27.6 tlim=40.0 hlim=65 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=65 stock=2,2,0,0
+131000	[FSM] Settings cancelled (not saved) -> IDLE
+131000	#S state=IDLE temp=27.6 tlim=40.0 hlim=65 hum=54 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=65 stock=2,2,0,0
+132000	#S state=IDLE temp=27.5 tlim=40.0 hlim=65 hum=55 sens=1 lock=0 item=2 price=20 paid=0 left=0 prog=0 cancel=0 sf=0 spt=40.0 sph=65 stock=2,2,0,0

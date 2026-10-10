@@ -1,3 +1,0 @@
-../Src/safety.c:10:6:Safety_Init	8	static
-../Src/safety.c:25:6:Safety_Update	24	static
-../Src/safety.c:93:9:Safety_IsLockout	4	static

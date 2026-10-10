@@ -1,6 +1,0 @@
-../Src/fsm.c:30:6:FSM_Init	1
-../Src/fsm.c:40:15:FSM_GetState	1
-../Src/fsm.c:44:6:FSM_Run	31
-../Src/fsm.c:210:16:EdgePressed	3
-../Src/fsm.c:221:13:FSM_UpdateOutputs	2
-../Src/fsm.c:236:13:FSM_EnterState	1

@@ -1,3 +1,0 @@
-../Src/adc_driver.c:13:6:ADC1_Init	2
-../Src/adc_driver.c:44:10:ADC1_ReadRaw	2
-../Src/adc_driver.c:50:7:ADC1_ReadTemperature	1

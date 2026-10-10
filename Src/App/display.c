@@ -156,7 +156,7 @@ static void Display_DrawIdleScreen(void) {
     SSD1306_DrawHLine(X_LEFT, Y_HEADER_LINE, (uint16_t)SSD1306_WIDTH);
 
     (void)SSD1306_DrawString(IDLE_PROMPT_X, IDLE_PROMPT_Y, "[ PRESS OK / UP ]");
-    (void)SSD1306_DrawString(IDLE_HINT_X, IDLE_HINT_Y, "To Select Drink");
+    (void)SSD1306_DrawString(IDLE_HINT_X, IDLE_HINT_Y, "To Select Items");
 
     /* เกณฑ์ปัจจุบัน (ตั้งได้ที่หน้า SETTINGS: กด BACK ค้าง) */
     x = SSD1306_DrawString(IDLE_LIMIT_X, IDLE_LIMIT_Y, "Limit:");
