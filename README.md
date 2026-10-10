@@ -1,63 +1,38 @@
-# 🥦 Vegetable Vending Machine with Preservation System
+# 🥦 Smart Vegetable Vending Machine (STM32F411)
 
-An automated vegetable vending machine and environmental monitoring system built on the **STM32F401RE** microcontroller. This project combines state-machine architecture, multi-sensor feedback, motor actuators, and real-time OLED monitoring to deliver a reliable automated vending process alongside active freshness preservation.
-
----
-
-## 📌 Project Overview
-Vending fresh produce requires precise operational control and continuous environmental management. This system handles user selection, verifies payment input via optical sensors, dispenses items using motor actuation, and continuously monitors ambient conditions to trigger temperature-controlled cooling.
-
-### Key Highlights
-- **Finite State Machine (FSM) Control:** Ensures predictable state transitions across selection, payment, dispensing, and idle modes.
-- **LDR-Based Payment Verification:** Optical sensing mechanism to detect coin/payment insertion.
-- **Active Freshness Preservation:** Closed-loop monitoring that drives a 12V cooling fan via PWM to regulate internal temperature.
-- **OLED User Interface:** Real-time feedback displaying item availability, prices, operating states, and sensor telemetry.
+A modular, production-grade embedded control system for an automated vegetable vending machine featuring integrated freshness preservation and remote telemetry monitoring. Developed for the **STM32F411** microcontroller using custom bare-metal register-level drivers.
 
 ---
 
-## 🛠️ Hardware Architecture & Peripherals
-
-### Hardware Components
-* **Microcontroller:** STM32F401RE (ARM Cortex-M4 @ 84 MHz)
-* **Actuators:** Servo Motor (dispensing mechanism), DC Motor, 12V Cooling Fan, Relay Modules
-* **Sensors:** LDR (Light Dependent Resistor), Analog Temperature Sensor
-* **Display:** 0.96" OLED Display (I2C)
-* **Input/Control:** Push Buttons for product selection and manual resets
-
-### STM32 Peripherals Utilized
-| Peripheral | Function / Usage |
-| :--- | :--- |
-| **GPIO** | Button inputs, status LEDs, and relay switching |
-| **ADC** | Sampling analog inputs from temperature and light sensors |
-| **TIM (PWM)** | Precise pulse-width modulation for servo positioning and fan speed control |
-| **I2C** | Driving the OLED display interface |
-| **UART / SPI** | Serial communication and peripheral expansion |
-| **EXTI (Interrupts)** | Low-latency response for push-button inputs and coin detection events |
+## 📌 Key System Features
+- **Bare-Metal Drivers:** Custom register-level drivers for GPIO, I2C, UART, ADC, EXTI, TIM2, and IWDG without reliance on heavy HAL boilerplate.
+- **Layered Architecture:** Clear decoupling between hardware abstraction layers (`Drivers/`) and high-level application logic (`App/`).
+- **Finite State Machine Control (`fsm.c`):** Deterministic FSM handling system initialization, user interaction, payment verification, dispensing, and fault recovery.
+- **Closed-Loop Climate Control:** Automated environmental monitoring using DHT11 (Temperature & Humidity) and Light Sensors to maintain optimal vegetable storage conditions.
+- **Graphical OLED Display:** SSD1306 OLED screen (I2C) driven with custom 5x7 bitmap fonts and interactive menu systems.
+- **Safety & Fault Tolerance (`safety.c`, `iwdg_driver.c`):** Integrated Independent Watchdog Timer (IWDG) and continuous safety parameter validation to prevent system freezes.
+- **Remote Telemetry & TUI Dashboard (`Vending_TUI`):** Python-based Terminal User Interface (`vending_tui.py`) running over UART for real-time telemetry stream, system configuration, and remote diagnosis.
 
 ---
 
-## 📐 System Logic & Architecture
+## 🛠️ Software Architecture
 
 ```text
-                       ┌─────────────────────────┐
-                       │   Push Buttons (GPIO)   │
-                       └────────────┬────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│                   Application Layer (Inc/App, Src/App)                 │
+│   fsm.c  │  menu.c  │  display.c  │  telemetry.c  │  safety.c  │ settings.c│
+└───────────────────────────────────┬────────────────────────────────────┘
                                     │
-┌────────────────────────┐          ▼          ┌────────────────────────┐
-│ LDR Sensor (ADC/EXTI)  ├────► [ STM32 ] ────►│ OLED Display (I2C)     │
-├────────────────────────┤      │ F401RE │     ├────────────────────────┤
-│ Temp Sensor (ADC)      ├────► [ Core  ] ────►│ Servo / Motors (PWM)   │
-└────────────────────────┘          │          ├────────────────────────┤
-                                    │          │ 12V Fan & Relays (GPIO)│
-                                    └──────────┴────────────────────────┘
+┌───────────────────────────────────┴────────────────────────────────────┐
+│                    Driver Layer (Inc/Drivers, Src/Drivers)             │
+│   gpio   │   i2c   │   uart   │   adc   │   exti   │   tim2   │   iwdg  │
+│  ssd1306 │  dht11  │ light_sensor │ font5x7 │ stm32f411xx_custom.h    │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────┴────────────────────────────────────┐
+│                       Hardware (STM32F411 MCU & Peripherals)           │
+└────────────────────────────────────────────────────────────────────────┘
 ```
-
-### Operational States (FSM)
-1. **IDLE / MONITORING:** Displays menu options on OLED while running background temperature checks.
-2. **SELECTION:** Captures button input to select the desired vegetable item and display the required price.
-3. **PAYMENT_VERIFICATION:** Waits for payment insertion detected via the LDR sensor threshold.
-4. **DISPENSING:** Drives the servo/motor to release the selected product.
-5. **PRESERVATION_ACTIVE:** Automatically engages the 12V fan via PWM when the internal temperature exceeds set limits.
 
 ---
 
@@ -65,48 +40,53 @@ Vending fresh produce requires precise operational control and continuous enviro
 
 ```text
 ProjectSTM32-VegetableMachine/
-├── Core/
-│   ├── Inc/                  # C/C++ Header files (.h)
-│   └── Src/                  # Core application source code (.c)
-├── Drivers/                  # STM32F4xx HAL and CMSIS hardware drivers
-├── docs/                     # Circuit schematics, FSM diagrams, and documentation
-│   └── system_architecture.png
-├── .gitignore                # Git ignore configuration for STM32CubeIDE build artifacts
-└── README.md                 # Project documentation
+├── Inc/
+│   ├── App/                   # Application layer header files (FSM, Menu, Safety, etc.)
+│   └── Drivers/               # Custom peripheral & device driver headers
+├── Src/
+│   ├── App/                   # Application logic source files
+│   ├── Drivers/               # Hardware abstraction driver source files
+│   └── main.c                 # Main system entry point
+├── Vending_TUI/               # Python-based Terminal Dashboard over UART
+│   └── Vending_TUI/
+│       ├── vending_tui.py     # Interactive TUI dashboard application
+│       ├── screenshot_dashboard.png
+│       └── screenshot_settings.png
+└── README.md                  # Project documentation
 ```
+
+---
+
+## 🖥️ Remote Management Dashboard (TUI)
+
+The project includes a Python TUI application (`vending_tui.py`) that communicates with the STM32F411 board over serial UART to stream live sensor telemetry and adjust operational parameters.
+
+| Real-Time Dashboard | Settings & Configuration |
+| :---: | :---: |
+| ![Dashboard](Vending_TUI/Vending_TUI/screenshot_dashboard.png) | ![Settings](Vending_TUI/Vending_TUI/screenshot_settings.png) |
 
 ---
 
 ## 💻 Building & Flashing
 
-### Prerequisites
-* **IDE:** [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) (v1.10.0 or higher)
-* **Hardware:** STM32F401RE Nucleo-64 Board + ST-Link Programmer
+### Development Tools
+* **IDE / Toolchain:** [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) / Keil MDK / GNU Arm Embedded Toolchain
+* **Hardware:** STM32F411 Nucleo Board + ST-Link Debugger
+* **Python Environment (for TUI):** Python 3.x (`pip install -r Vending_TUI/Vending_TUI/requirements.txt`)
 
-### Steps
-1. **Clone the Repository:**
+### How to Run
+1. Clone the repository:
    ```bash
    git clone [https://github.com/goravit-p/ProjectSTM32-VegetableMachine.git](https://github.com/goravit-p/ProjectSTM32-VegetableMachine.git)
    ```
-2. **Import Project:**
-   * Open STM32CubeIDE.
-   * Go to `File` ➔ `Import...` ➔ `General` ➔ `Existing Projects into Workspace`.
-   * Browse to the cloned `ProjectSTM32-VegetableMachine` folder and click **Finish**.
-3. **Build Firmware:**
-   * Press `Ctrl + B` (or click `Project` ➔ `Build Project`) to compile the source files.
-4. **Flash Hardware:**
-   * Connect the STM32 Nucleo board via USB.
-   * Click **Run** (`Ctrl + F11`) to flash the `.elf` binary to the MCU.
-
----
-
-## 📸 Hardware Demo
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/ae316877-3f91-46e4-a799-58ab84d4ba27" alt="Vegetable Vending Machine Prototype" width="600"/>
-  <br/>
-  <i>Figure 1: Hardware setup and system prototype powered by STM32F401RE.</i>
-</p>
+2. Open the project folder in **STM32CubeIDE**.
+3. Build the project firmware (`Ctrl + B`).
+4. Flash the binary file onto the STM32F411 target microcontroller.
+5. To launch the remote monitoring interface, connect the UART-to-USB converter to your PC and run:
+   ```bash
+   cd Vending_TUI/Vending_TUI
+   python vending_tui.py
+   ```
 
 ---
 
