@@ -54,16 +54,44 @@ ProjectSTM32-VegetableMachine/
 │       └── screenshot_settings.png
 └── README.md                  # Project documentation
 ```
+---
+
+## 📂 Repository Structure
+
+```text
+ProjectSTM32-VegetableMachine/
+├── Inc/
+│   ├── App/                   # Application layer header files (FSM, Menu, Safety, etc.)
+│   └── Drivers/               # Custom peripheral & device driver headers
+├── Src/
+│   ├── App/                   # Application logic source files
+│   ├── Drivers/               # Hardware abstraction driver source files
+│   └── main.c                 # Main system entry point
+├── Vending_TUI/               # Python-based Terminal Dashboard over UART
+│   └── Vending_TUI/
+│       ├── vending_tui.py     # Interactive TUI dashboard application
+│       ├── screenshot_dashboard.png
+│       └── screenshot_settings.png
+└── README.md                  # Project documentation
+```
 
 ---
 
-## 🖥️ Remote Management Dashboard (TUI)
+## 📸 Demo & Hardware Gallery
 
-The project includes a Python TUI application (`vending_tui.py`) that communicates with the STM32F411 board over serial UART to stream live sensor telemetry and adjust operational parameters.
+### 1. Remote Management Dashboard (TUI)
+The Python TUI application (`vending_tui.py`) connects via UART to stream real-time telemetry and control machine settings.
 
 | Real-Time Dashboard | Settings & Configuration |
 | :---: | :---: |
 | ![Dashboard](Vending_TUI/Vending_TUI/screenshot_dashboard.png) | ![Settings](Vending_TUI/Vending_TUI/screenshot_settings.png) |
+
+### 2. Physical Hardware Prototype
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9abae029-336b-4e77-8560-979c4284376b" alt="Hardware Prototype Setup" width="650"/>
+  <br/>
+  <i>Figure 1: Hardware prototype setup powered by STM32F411 MCU and custom sensor array.</i>
+</p>
 
 ---
 
