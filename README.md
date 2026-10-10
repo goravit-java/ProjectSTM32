@@ -54,26 +54,6 @@ ProjectSTM32-VegetableMachine/
 │       └── screenshot_settings.png
 └── README.md                  # Project documentation
 ```
----
-
-## 📂 Repository Structure
-
-```text
-ProjectSTM32-VegetableMachine/
-├── Inc/
-│   ├── App/                   # Application layer header files (FSM, Menu, Safety, etc.)
-│   └── Drivers/               # Custom peripheral & device driver headers
-├── Src/
-│   ├── App/                   # Application logic source files
-│   ├── Drivers/               # Hardware abstraction driver source files
-│   └── main.c                 # Main system entry point
-├── Vending_TUI/               # Python-based Terminal Dashboard over UART
-│   └── Vending_TUI/
-│       ├── vending_tui.py     # Interactive TUI dashboard application
-│       ├── screenshot_dashboard.png
-│       └── screenshot_settings.png
-└── README.md                  # Project documentation
-```
 
 ---
 
