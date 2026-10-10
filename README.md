@@ -100,11 +100,13 @@ ProjectSTM32-VegetableMachine/
 
 ---
 
-## 📸 Demo & Hardware Gallery
+## 📸 Hardware Demo
 
-| Circuit Setup | OLED Interface | Hardware Assembly |
-| :---: | :---: | :---: |
-| *(Add Photo)* | *(Add Photo)* | *(Add Photo)* |
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ae316877-3f91-46e4-a799-58ab84d4ba27" alt="Vegetable Vending Machine Prototype" width="600"/>
+  <br/>
+  <i>Figure 1: Hardware setup and system prototype powered by STM32F401RE.</i>
+</p>
 
 ---
 
